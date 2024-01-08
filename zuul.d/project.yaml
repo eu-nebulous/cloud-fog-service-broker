@@ -1,0 +1,20 @@
+- project:
+    check:
+      jobs:
+        - opendev-buildset-registry
+        - nebulous-cloud-fog-service-broker-helm-lint
+        - nebulous-cloud-fog-service-broker-build-container-images
+        - nebulous-cloud-fog-service-broker-hadolint
+        - nebulous-platform-apply-helm-charts
+        - nox-linters
+    gate:
+      jobs:
+        - opendev-buildset-registry
+        - nebulous-cloud-fog-service-broker-helm-lint
+        - nebulous-cloud-fog-service-broker-upload-container-images
+        - nebulous-cloud-fog-service-broker-hadolint
+        - nebulous-platform-apply-helm-charts
+        - nox-linters
+    promote:
+      jobs:
+        - nebulous-cloud-fog-service-broker-promote-container-images
