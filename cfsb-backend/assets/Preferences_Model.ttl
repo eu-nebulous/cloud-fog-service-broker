@@ -1,0 +1,1302 @@
+@prefix smi:   <https://www.nebulouscloud.eu/smi#> .
+@prefix attr:  <https://www.nebulouscloud.eu/smi/SMI-OBJECT#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+
+attr:attr-root  a                      smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-root" ;
+        dcterms:created                "1900-01-01T00:07:48Z"^^xsd:dateTime ;
+        dcterms:description            "This model encapsulates all the necessary user preference indicators that will allow for comparisons between cloud continuum resources, in the NebulOuS Cloud/Fog Service Broker. It involves the reuse, extension and proper adjustment of mainly the Service Measurement Index (SMI) (CSMIC, 2013) and the Broker@Cloud preferences model (Patiniotakis et al., 2015) that have been introduced for capturing preferences over cloud services." ;
+        dcterms:identifier             "attr-root" ;
+        dcterms:modified               "2023-11-23T14:40:11.988Z"^^xsd:dateTime ;
+        dcterms:title                  "Cloud Continuum Preferences Model" .
+
+attr:attr-reputation-brand-name
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-reputation-brand-name" ;
+        dcterms:created                "2014-05-23T18:34:52Z"^^xsd:dateTime ;
+        dcterms:description            "It is the linguistic expression of the reputation of the provider as perceived by its users" ;
+        dcterms:identifier             "attr-reputation-brand-name" ;
+        dcterms:modified               "2023-11-23T14:33:41.804Z"^^xsd:dateTime ;
+        dcterms:title                  "Brand Name" ;
+        skos:broader                   attr:attr-reputation .
+
+attr:attr-reputation  a                smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-reputation" ;
+        dcterms:created                "2014-05-23T18:21:41Z"^^xsd:dateTime ;
+        dcterms:description            "It is related to the reputation of the provider and of the cloud continuum resource offerings that are provided or that have been provided in the past." ;
+        dcterms:identifier             "attr-reputation" ;
+        dcterms:modified               "2023-11-23T11:39:30.397Z"^^xsd:dateTime ;
+        dcterms:title                  "Reputation" ;
+        skos:broader                   attr:attr-root .
+
+attr:attr-performance-suitability
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-performance-suitability" ;
+        dcterms:created                "2014-07-18T12:02:58Z"^^xsd:dateTime ;
+        dcterms:description            "How closely do the capabilities of the resource match the needs of the user." ;
+        dcterms:identifier             "attr-performance-suitability" ;
+        dcterms:modified               "2023-11-23T14:14:08.532Z"^^xsd:dateTime ;
+        dcterms:title                  "Suitability" ;
+        skos:broader                   attr:attr-performance .
+
+attr:attr-performance
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-performance" ;
+        dcterms:created                "2014-05-23T18:20:08Z"^^xsd:dateTime ;
+        dcterms:description            "It covers the features and functions of the provided resources" ;
+        dcterms:identifier             "attr-performance" ;
+        dcterms:modified               "2023-11-23T11:38:45.121Z"^^xsd:dateTime ;
+        dcterms:title                  "Performance" ;
+        skos:broader                   attr:attr-root .
+
+attr:attr-assurance-serviceability
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-assurance-serviceability" ;
+        dcterms:created                "2014-05-23T18:28:31Z"^^xsd:dateTime ;
+        dcterms:description            "The ease and efficiency of performing maintenance and correcting problems with the resource." ;
+        dcterms:identifier             "attr-assurance-serviceability" ;
+        dcterms:modified               "2023-11-23T13:58:32.12Z"^^xsd:dateTime ;
+        dcterms:title                  "Serviceability" ;
+        skos:broader                   attr:attr-assurance .
+
+attr:attr-reputation-sustainability
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-reputation-sustainability" ;
+        dcterms:created                "2014-07-18T13:34:01Z"^^xsd:dateTime ;
+        dcterms:description            "The impact on the economy, society and the environment of a certain provider." ;
+        dcterms:identifier             "attr-reputation-sustainability" ;
+        dcterms:modified               "2023-11-23T14:36:32.058Z"^^xsd:dateTime ;
+        dcterms:title                  "Sustainability" ;
+        skos:broader                   attr:attr-reputation .
+
+attr:attr-security-data-geographic-political
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-security-data-geographic-political" ;
+        dcterms:created                "2014-07-18T12:52:25Z"^^xsd:dateTime ;
+        dcterms:description            "The user's constraints on resource location based on geography or politics." ;
+        dcterms:identifier             "attr-security-data-geographic-political" ;
+        dcterms:modified               "2023-11-23T14:23:06.007Z"^^xsd:dateTime ;
+        dcterms:title                  "Data Geographic/Political" ;
+        skos:broader                   attr:attr-security .
+
+attr:attr-security  a                  smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-security" ;
+        dcterms:created                "2014-05-23T18:21:05Z"^^xsd:dateTime ;
+        dcterms:description            "It indicates the effectiveness of a provider's controls on access to resources, data, and the physical facilities from which resources are provided." ;
+        dcterms:identifier             "attr-security" ;
+        dcterms:modified               "2023-11-23T14:21:43.655Z"^^xsd:dateTime ;
+        dcterms:title                  "Security and Privacy" ;
+        skos:broader                   attr:attr-root .
+
+attr:attr-accountability-personnel-requirements
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-accountability-personnel-requirements" ;
+        dcterms:created                "2014-07-18T07:36:10Z"^^xsd:dateTime ;
+        dcterms:description            "The extent to which provider personnel have the skills, experience, education, and certifications required to effectively offer and maintain a cloud continuum resource." ;
+        dcterms:identifier             "attr-accountability-personnel-requirements" ;
+        dcterms:modified               "2023-11-23T14:20:59.228Z"^^xsd:dateTime ;
+        dcterms:title                  "Provider Personnel Requirements" ;
+        skos:broader                   attr:attr-accountability .
+
+attr:attr-accountability
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-accountability" ;
+        dcterms:created                "1970-01-01T00:00:00Z"^^xsd:dateTime ;
+        dcterms:description            "Measures the properties related to the cloud continuum resource provider " ;
+        dcterms:identifier             "attr-accountability" ;
+        dcterms:modified               "2023-11-23T11:37:45.402Z"^^xsd:dateTime ;
+        dcterms:title                  "Accountability" ;
+        skos:broader                   attr:attr-root .
+
+attr:attr-accountability-compliance
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-accountability-compliance" ;
+        dcterms:created                "2014-07-18T07:30:22Z"^^xsd:dateTime ;
+        dcterms:description            "It examines whether or not, standards, processes, and policies committed to by the provider, are followed." ;
+        dcterms:identifier             "attr-accountability-compliance" ;
+        dcterms:modified               "2023-11-23T11:49:44.192Z"^^xsd:dateTime ;
+        dcterms:title                  "Compliance" ;
+        skos:broader                   attr:attr-accountability .
+
+attr:attr-accountability-personnel-requirements-technical-competency-of-support
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-accountability-personnel-requirements-technical-competency-of-support" ;
+        dcterms:created                "2014-07-18T07:36:47Z"^^xsd:dateTime ;
+        dcterms:identifier             "attr-accountability-personnel-requirements-technical-competency-of-support" ;
+        dcterms:modified               "2023-11-23T11:53:16.264Z"^^xsd:dateTime ;
+        dcterms:title                  "Technical competency w.r.t resources hardware" ;
+        skos:broader                   attr:attr-accountability-personnel-requirements .
+
+attr:attr-assurance-availability
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-assurance-availability" ;
+        dcterms:created                "2014-05-23T18:27:57Z"^^xsd:dateTime ;
+        dcterms:description            "The amount of time that a user can make use of a service." ;
+        dcterms:identifier             "attr-assurance-availability" ;
+        dcterms:modified               "2023-11-23T13:55:45.154Z"^^xsd:dateTime ;
+        dcterms:title                  "Availability" ;
+        skos:broader                   attr:attr-assurance .
+
+attr:attr-assurance  a                 smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-assurance" ;
+        dcterms:created                "2014-05-23T18:16:36Z"^^xsd:dateTime ;
+        dcterms:description            "Indicates how likely it is that the service will be available as specified" ;
+        dcterms:identifier             "attr-assurance" ;
+        dcterms:modified               "2023-11-23T11:38:19.703Z"^^xsd:dateTime ;
+        dcterms:title                  "Assurance" ;
+        skos:broader                   attr:attr-root .
+
+attr:attr-reputation-sustainability-societal-impact
+        a                    smi:SMI-OBJECT ;
+        dc:type              "CONCEPT" ;
+        dcterms:URI          "attr:attr-reputation-sustainability-societal-impact" ;
+        dcterms:created      "2014-07-18T13:35:01Z"^^xsd:dateTime ;
+        dcterms:creator      "" ;
+        dcterms:description  "" ;
+        dcterms:identifier   "attr-reputation-sustainability-societal-impact" ;
+        dcterms:modified     "2014-07-18T13:35:01Z"^^xsd:dateTime ;
+        dcterms:title        "Societal impact" ;
+        skos:broader         attr:attr-reputation-sustainability .
+
+attr:attr-performance-capacity-memory-speed
+        a                    smi:SMI-OBJECT ;
+        dc:type              "CONCEPT" ;
+        dcterms:URI          "attr:attr-performance-capacity-memory-speed" ;
+        dcterms:created      "2014-07-18T11:57:47Z"^^xsd:dateTime ;
+        dcterms:creator      "" ;
+        dcterms:description  "" ;
+        dcterms:identifier   "attr-performance-capacity-memory-speed" ;
+        dcterms:modified     "2014-07-18T11:57:47Z"^^xsd:dateTime ;
+        dcterms:title        "Memory Speed" ;
+        skos:broader         attr:attr-performance-capacity .
+
+attr:attr-performance-capacity
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-performance-capacity" ;
+        dcterms:created                "2014-07-18T11:42:01Z"^^xsd:dateTime ;
+        dcterms:description            "The maximum number of resources that a provider can deliver while meeting agreed SLAs." ;
+        dcterms:identifier             "attr-performance-capacity" ;
+        dcterms:modified               "2023-11-23T14:05:35.838Z"^^xsd:dateTime ;
+        dcterms:title                  "Capacity" ;
+        skos:broader                   attr:attr-performance .
+
+attr:attr-security-proactive-threat-vulnerability-management
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-security-proactive-threat-vulnerability-management" ;
+        dcterms:created                "2014-07-18T12:55:12Z"^^xsd:dateTime ;
+        dcterms:description            "Mechanisms in place to ensure that the resource is protected against known recurring threats as well as new evolving vulnerabilities." ;
+        dcterms:identifier             "attr-security-proactive-threat-vulnerability-management" ;
+        dcterms:modified               "2023-11-23T14:24:22.839Z"^^xsd:dateTime ;
+        dcterms:title                  "Proactive Threat & Vulnerability Management" ;
+        skos:broader                   attr:attr-security .
+
+attr:attr-assurance-serviceability-type-of-support
+        a                    smi:SMI-OBJECT ;
+        dc:type              "CONCEPT" ;
+        dcterms:URI          "attr:attr-assurance-serviceability-type-of-support" ;
+        dcterms:created      "2014-05-23T21:30:19+03:00"^^xsd:dateTime ;
+        dcterms:description  "" ;
+        dcterms:identifier   "attr-assurance-serviceability-type-of-support" ;
+        dcterms:modified     "2014-05-23T21:30:19+03:00"^^xsd:dateTime ;
+        dcterms:title        "Type of Support" ;
+        skos:broader         attr:attr-assurance-serviceability .
+
+attr:attr-assurance-reliability
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-assurance-reliability" ;
+        dcterms:created                "2014-07-18T08:53:48Z"^^xsd:dateTime ;
+        dcterms:description            "It reflects measures of how a resource operates without failure under given conditions during a given time period." ;
+        dcterms:identifier             "attr-assurance-reliability" ;
+        dcterms:modified               "2023-11-23T13:56:52.072Z"^^xsd:dateTime ;
+        dcterms:title                  "Reliability" ;
+        skos:broader                   attr:attr-assurance .
+
+attr:attr-performance-capacity-clock-speed
+        a                    smi:SMI-OBJECT ;
+        dc:type              "CONCEPT" ;
+        dcterms:URI          "attr:attr-performance-capacity-clock-speed" ;
+        dcterms:created      "2014-07-18T11:56:52Z"^^xsd:dateTime ;
+        dcterms:creator      "" ;
+        dcterms:description  "" ;
+        dcterms:identifier   "attr-performance-capacity-clock-speed" ;
+        dcterms:modified     "2014-07-18T11:56:52Z"^^xsd:dateTime ;
+        dcterms:title        "Clock Speed" ;
+        skos:broader         attr:attr-performance-capacity .
+
+attr:attr-usability-client-personnel-requirements
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-usability-client-personnel-requirements" ;
+        dcterms:created                "2014-07-18T13:00:27Z"^^xsd:dateTime ;
+        dcterms:description            "The minimum number of personnel satisfying roles, skills, experience, education, and certification required of the user to effectively access and utilize a resource." ;
+        dcterms:identifier             "attr-usability-client-personnel-requirements" ;
+        dcterms:modified               "2023-11-23T14:29:32.154Z"^^xsd:dateTime ;
+        dcterms:title                  "Client Personnel Requirements" ;
+        skos:broader                   attr:attr-usability .
+
+attr:attr-usability  a                 smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-usability" ;
+        dcterms:created                "2014-07-18T12:58:49Z"^^xsd:dateTime ;
+        dcterms:description            "It is related to the ease with which a resource can be used" ;
+        dcterms:identifier             "attr-usability" ;
+        dcterms:modified               "2023-11-23T11:39:18.385Z"^^xsd:dateTime ;
+        dcterms:title                  "Usability" ;
+        skos:broader                   attr:attr-root .
+
+attr:attr-security-management
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-security-management" ;
+        dcterms:created                "2014-07-18T12:56:50Z"^^xsd:dateTime ;
+        dcterms:description            "The capabilities of providers to ensure network, data and infrastructure security based on the security requirements of the user." ;
+        dcterms:identifier             "attr-security-management" ;
+        dcterms:modified               "2023-11-23T14:25:15.572Z"^^xsd:dateTime ;
+        dcterms:title                  "Security Management" ;
+        skos:broader                   attr:attr-security .
+
+attr:attr-performance-capacity-memory
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-performance-capacity-memory" ;
+        dcterms:created                "2014-07-18T11:57:29Z"^^xsd:dateTime ;
+        dcterms:identifier             "attr-performance-capacity-memory" ;
+        dcterms:modified               "2023-11-23T14:06:48.606Z"^^xsd:dateTime ;
+        dcterms:title                  "Memory Size" ;
+        skos:broader                   attr:attr-performance-capacity .
+
+attr:attr-security-physical-environmental-security
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-security-physical-environmental-security" ;
+        dcterms:created                "2014-07-18T12:54:37Z"^^xsd:dateTime ;
+        dcterms:description            "Policies and processes in use by the provider to protect the provider facilities and physical resources from unauthorized access, damage or interference." ;
+        dcterms:identifier             "attr-security-physical-environmental-security" ;
+        dcterms:modified               "2023-11-23T14:24:06.408Z"^^xsd:dateTime ;
+        dcterms:title                  "Physical & Environmental Security" ;
+        skos:broader                   attr:attr-security .
+
+attr:attr-security-proactive-threat-vulnerability-management-firewall-utm
+        a                    smi:SMI-OBJECT ;
+        dc:type              "CONCEPT" ;
+        dcterms:URI          "attr:attr-security-proactive-threat-vulnerability-management-firewall-utm" ;
+        dcterms:created      "2014-07-18T12:55:50Z"^^xsd:dateTime ;
+        dcterms:creator      "" ;
+        dcterms:description  "" ;
+        dcterms:identifier   "attr-security-proactive-threat-vulnerability-management-firewall-utm" ;
+        dcterms:modified     "2014-07-18T12:55:50Z"^^xsd:dateTime ;
+        dcterms:title        "Firewall (UTM-unified threat management)" ;
+        skos:broader         attr:attr-security-proactive-threat-vulnerability-management .
+
+attr:attr-assurance-service-stability
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-assurance-service-stability" ;
+        dcterms:created                "2014-05-23T18:28:13Z"^^xsd:dateTime ;
+        dcterms:description            "The degree to which the resource is resistant to (network) change, deterioration, or displacement." ;
+        dcterms:identifier             "attr-assurance-service-stability" ;
+        dcterms:modified               "2023-11-23T13:58:15.633Z"^^xsd:dateTime ;
+        dcterms:title                  "Service Stability" ;
+        skos:broader                   attr:attr-assurance .
+
+attr:attr-security-data-privacy-loss
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-security-data-privacy-loss" ;
+        dcterms:created                "2014-07-18T12:53:42Z"^^xsd:dateTime ;
+        dcterms:description            "User restrictions on access and use of data are enforced by the provider. Any failures of these protection measures are promptly detected and reported to the user." ;
+        dcterms:identifier             "attr-security-data-privacy-loss" ;
+        dcterms:modified               "2023-11-23T14:23:38.32Z"^^xsd:dateTime ;
+        dcterms:title                  "Data Privacy & Data Loss" ;
+        skos:broader                   attr:attr-security .
+
+attr:attr-financial-cost-operation-cost
+        a                    smi:SMI-OBJECT ;
+        dc:type              "CONCEPT" ;
+        dcterms:URI          "attr:attr-financial-cost-operation-cost" ;
+        dcterms:created      "2014-05-23T18:32:03Z"^^xsd:dateTime ;
+        dcterms:creator      "" ;
+        dcterms:description  "" ;
+        dcterms:identifier   "attr-financial-cost-operation-cost" ;
+        dcterms:modified     "2014-07-18T09:25:18Z"^^xsd:dateTime ;
+        dcterms:title        "Operating cost" ;
+        skos:broader         attr:attr-financial-cost .
+
+attr:attr-financial-cost
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-financial-cost" ;
+        dcterms:created                "2014-05-23T18:19:47Z"^^xsd:dateTime ;
+        dcterms:description            "The user’s cost to exploit a cloud continuum resource over time. This includes the cost of data migration, along with recurring costs (e.g., monthly access fees) and usage based costs." ;
+        dcterms:identifier             "attr-financial-cost" ;
+        dcterms:modified               "2023-11-23T14:03:11.63Z"^^xsd:dateTime ;
+        dcterms:title                  "Cost" ;
+        skos:broader                   attr:attr-financial .
+
+attr:attr-security-management-encrypted-storage
+        a                    smi:SMI-OBJECT ;
+        dc:type              "CONCEPT" ;
+        dcterms:URI          "attr:attr-security-management-encrypted-storage" ;
+        dcterms:created      "2014-07-18T15:57:10+03:00"^^xsd:dateTime ;
+        dcterms:creator      "" ;
+        dcterms:description  "" ;
+        dcterms:identifier   "attr-security-management-encrypted-storage" ;
+        dcterms:modified     "2014-07-18T15:57:10+03:00"^^xsd:dateTime ;
+        dcterms:title        "Encrypted Storage" ;
+        skos:broader         attr:attr-security-management .
+
+attr:attr-reputation-ease-of-doing-business
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-reputation-ease-of-doing-business" ;
+        dcterms:created                "2014-07-18T13:32:31Z"^^xsd:dateTime ;
+        dcterms:description            "Users’ satisfaction with the ability to do business with a certain provider." ;
+        dcterms:identifier             "attr-reputation-ease-of-doing-business" ;
+        dcterms:modified               "2023-11-23T14:35:17.092Z"^^xsd:dateTime ;
+        dcterms:title                  "Ease of doing business" ;
+        skos:broader                   attr:attr-reputation .
+
+attr:attr-agility-adaptability
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-agility-adaptability" ;
+        dcterms:created                "2014-07-18T08:13:04Z"^^xsd:dateTime ;
+        dcterms:description            "The ability of the provider to adjust to changes in user requirements." ;
+        dcterms:identifier             "attr-agility-adaptability" ;
+        dcterms:modified               "2023-11-23T13:46:15.718Z"^^xsd:dateTime ;
+        dcterms:title                  "Adaptability" ;
+        skos:broader                   attr:attr-agility .
+
+attr:attr-agility  a                   smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-agility" ;
+        dcterms:created                "2014-05-23T18:20:44Z"^^xsd:dateTime ;
+        dcterms:description            "Indicates the impact of a resource use upon a user's ability to change direction, strategy, or tactics quickly and with minimal disruption." ;
+        dcterms:identifier             "attr-agility" ;
+        dcterms:modified               "2023-11-23T11:38:04.567Z"^^xsd:dateTime ;
+        dcterms:title                  "Agility" ;
+        skos:broader                   attr:attr-root .
+
+attr:attr-security-access-control-privilege-management
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-security-access-control-privilege-management" ;
+        dcterms:created                "2014-07-18T12:50:58Z"^^xsd:dateTime ;
+        dcterms:description            "Policies and processes in use by the provider to ensure that only the provider and user personnel with appropriate role/reasons to access a resource may do so." ;
+        dcterms:identifier             "attr-security-access-control-privilege-management" ;
+        dcterms:modified               "2023-11-23T14:22:09.413Z"^^xsd:dateTime ;
+        dcterms:title                  "Access Control & Privilege Management" ;
+        skos:broader                   attr:attr-security .
+
+attr:attr-usability-installability
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-usability-installability" ;
+        dcterms:created                "2014-07-18T13:23:17Z"^^xsd:dateTime ;
+        dcterms:description            "Installability characterizes the time and effort required to get a resource ready for use." ;
+        dcterms:identifier             "attr-usability-installability" ;
+        dcterms:modified               "2023-11-23T14:29:49.794Z"^^xsd:dateTime ;
+        dcterms:title                  "Installability" ;
+        skos:broader                   attr:attr-usability .
+
+attr:attr-security-retention-disposition
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-security-retention-disposition" ;
+        dcterms:created                "2014-07-18T12:56:25Z"^^xsd:dateTime ;
+        dcterms:description            "The provider’s data retention and disposition processes meet the users' requirements." ;
+        dcterms:identifier             "attr-security-retention-disposition" ;
+        dcterms:modified               "2023-11-23T14:24:56.997Z"^^xsd:dateTime ;
+        dcterms:title                  "Retention/Disposition" ;
+        skos:broader                   attr:attr-security .
+
+attr:attr-accountability-governance
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-accountability-governance" ;
+        dcterms:created                "2014-07-18T07:31:58Z"^^xsd:dateTime ;
+        dcterms:description            "The processes used by the provider to manage user expectations, issues and perceived performance." ;
+        dcterms:identifier             "attr-accountability-governance" ;
+        dcterms:modified               "2023-11-23T11:50:02.21Z"^^xsd:dateTime ;
+        dcterms:title                  "Governance" ;
+        skos:broader                   attr:attr-accountability .
+
+attr:attr-reputation-provider-ethicality
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-reputation-provider-ethicality" ;
+        dcterms:created                "2014-07-18T13:33:42Z"^^xsd:dateTime ;
+        dcterms:description            "Ethicality refers to the manner in which the provider conducts business; it includes business practices and ethics outside the scope of regulatory compliance. It also includes fair practices with suppliers, customers, and employees" ;
+        dcterms:identifier             "attr-reputation-provider-ethicality" ;
+        dcterms:modified               "2023-11-23T14:36:18.404Z"^^xsd:dateTime ;
+        dcterms:title                  "Provider Ethicality" ;
+        skos:broader                   attr:attr-reputation .
+
+attr:attr-financial-agility
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-financial-agility" ;
+        dcterms:created                "2014-07-18T09:41:28Z"^^xsd:dateTime ;
+        dcterms:description            "The flexibility and elasticity of the financial aspects of the provider’s resources" ;
+        dcterms:identifier             "attr-financial-agility" ;
+        dcterms:modified               "2023-11-23T14:04:08.73Z"^^xsd:dateTime ;
+        dcterms:title                  "Financial Agility" ;
+        skos:broader                   attr:attr-financial .
+
+attr:attr-financial  a                 smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-financial" ;
+        dcterms:created                "2014-07-18T09:22:34Z"^^xsd:dateTime ;
+        dcterms:description            "It is related to all the economic aspects related to using a cloud continuum resource" ;
+        dcterms:identifier             "attr-financial" ;
+        dcterms:modified               "2023-11-23T14:02:42.329Z"^^xsd:dateTime ;
+        dcterms:title                  "Financial" ;
+        skos:broader                   attr:attr-root .
+
+attr:attr-usability-understandability
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-usability-understandability" ;
+        dcterms:created                "2014-07-18T13:25:06Z"^^xsd:dateTime ;
+        dcterms:description            "The ease with which users can understand the capabilities and operation of the resource." ;
+        dcterms:identifier             "attr-usability-understandability" ;
+        dcterms:modified               "2023-11-23T14:31:03.143Z"^^xsd:dateTime ;
+        dcterms:title                  "Understandability" ;
+        skos:broader                   attr:attr-usability .
+
+attr:attr-performance-capacity-storage-capacity
+        a                    smi:SMI-OBJECT ;
+        dc:type              "CONCEPT" ;
+        dcterms:URI          "attr:attr-performance-capacity-storage-capacity" ;
+        dcterms:created      "2014-07-18T11:58:03Z"^^xsd:dateTime ;
+        dcterms:creator      "" ;
+        dcterms:description  "" ;
+        dcterms:identifier   "attr-performance-capacity-storage-capacity" ;
+        dcterms:modified     "2014-07-18T11:58:03Z"^^xsd:dateTime ;
+        dcterms:title        "Storage Capacity" ;
+        skos:broader         attr:attr-performance-capacity .
+
+attr:attr-reputation-sustainability-economical-impact
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-reputation-sustainability-economical-impact" ;
+        dcterms:created                "2014-07-18T13:34:41Z"^^xsd:dateTime ;
+        dcterms:identifier             "attr-reputation-sustainability-economical-impact" ;
+        dcterms:modified               "2023-11-23T14:36:42.81Z"^^xsd:dateTime ;
+        dcterms:title                  "Economic impact" ;
+        skos:broader                   attr:attr-reputation-sustainability .
+
+attr:attr-financial-structure
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-financial-structure" ;
+        dcterms:created                "2014-07-18T09:41:49Z"^^xsd:dateTime ;
+        dcterms:description            "How responsive to the user's needs are the provider's pricing and billing components" ;
+        dcterms:identifier             "attr-financial-structure" ;
+        dcterms:modified               "2023-11-23T14:04:26.835Z"^^xsd:dateTime ;
+        dcterms:title                  "Financial Structure" ;
+        skos:broader                   attr:attr-financial .
+
+attr:attr-agility-elasticity
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-agility-elasticity" ;
+        dcterms:created                "2014-05-23T18:24:03Z"^^xsd:dateTime ;
+        dcterms:description            "The ability of adjusting the offered  resource capacity to meet demand (e.g., in cases that a fog resource had been partially made available to NebulOuS)." ;
+        dcterms:identifier             "attr-agility-elasticity" ;
+        dcterms:modified               "2023-11-23T13:46:34.109Z"^^xsd:dateTime ;
+        dcterms:title                  "Elasticity" ;
+        skos:broader                   attr:attr-agility .
+
+attr:attr-reputation-contracting-experience
+        a                    smi:SMI-OBJECT ;
+        dc:type              "CONCEPT" ;
+        dcterms:URI          "attr:attr-reputation-contracting-experience" ;
+        dcterms:created      "2014-07-18T13:31:30Z"^^xsd:dateTime ;
+        dcterms:creator      "" ;
+        dcterms:description  "Indicators of client effort and satisfaction with the process of entering into the agreements required to use a service" ;
+        dcterms:identifier   "attr-reputation-contracting-experience" ;
+        dcterms:modified     "2014-07-18T13:31:30Z"^^xsd:dateTime ;
+        dcterms:title        "Contracting Experience" ;
+        skos:broader         attr:attr-reputation .
+
+attr:attr-assurance-serviceability-support-satisfaction
+        a                    smi:SMI-OBJECT ;
+        dc:type              "CONCEPT" ;
+        dcterms:URI          "attr:attr-assurance-serviceability-support-satisfaction" ;
+        dcterms:created      "2014-05-23T18:30:36Z"^^xsd:dateTime ;
+        dcterms:description  "" ;
+        dcterms:identifier   "attr-assurance-serviceability-support-satisfaction" ;
+        dcterms:modified     "2014-05-23T18:30:36Z"^^xsd:dateTime ;
+        dcterms:title        "Support satisfaction" ;
+        skos:broader         attr:attr-assurance-serviceability .
+
+attr:attr-security-management-encryption-type
+        a                    smi:SMI-OBJECT ;
+        dc:type              "CONCEPT" ;
+        dcterms:URI          "attr:attr-security-management-encryption-type" ;
+        dcterms:created      "2014-07-18T15:57:28+03:00"^^xsd:dateTime ;
+        dcterms:description  "" ;
+        dcterms:identifier   "attr-security-management-encryption-type" ;
+        dcterms:modified     "2014-07-18T15:57:28+03:00"^^xsd:dateTime ;
+        dcterms:title        "Encryption Type" ;
+        skos:broader         attr:attr-security-management .
+
+attr:attr-security-access-control-privilege-management-authentication-schemes
+        a                    smi:SMI-OBJECT ;
+        dc:type              "CONCEPT" ;
+        dcterms:URI          "attr:attr-security-access-control-privilege-management-authentication-schemes" ;
+        dcterms:created      "2014-07-18T12:51:22Z"^^xsd:dateTime ;
+        dcterms:creator      "" ;
+        dcterms:description  "" ;
+        dcterms:identifier   "attr-security-access-control-privilege-management-authentication-schemes" ;
+        dcterms:modified     "2014-07-18T12:51:22Z"^^xsd:dateTime ;
+        dcterms:title        "Supported authentication schemes" ;
+        skos:broader         attr:attr-security-access-control-privilege-management .
+
+attr:attr-reputation-service-reputation
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-reputation-service-reputation" ;
+        dcterms:created                "2014-05-23T18:35:14Z"^^xsd:dateTime ;
+        dcterms:description            "It is the linguistic expression of the reputation of the cloud continuum resource  as perceived by its users." ;
+        dcterms:identifier             "attr-reputation-service-reputation" ;
+        dcterms:modified               "2023-11-23T14:34:03.793Z"^^xsd:dateTime ;
+        dcterms:title                  "Resource Reputation" ;
+        skos:broader                   attr:attr-reputation .
+
+attr:attr-usability-operability
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-usability-operability" ;
+        dcterms:created                "2014-07-18T13:24:11Z"^^xsd:dateTime ;
+        dcterms:description            "The ability of a resource to be easily operated by users." ;
+        dcterms:identifier             "attr-usability-operability" ;
+        dcterms:modified               "2023-11-23T14:30:27.039Z"^^xsd:dateTime ;
+        dcterms:title                  "Operability" ;
+        skos:broader                   attr:attr-usability .
+
+attr:attr-assurance-serviceability-os-support
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-assurance-serviceability-os-support" ;
+        dcterms:created                "2014-07-18T09:14:14Z"^^xsd:dateTime ;
+        dcterms:identifier             "attr-assurance-serviceability-os-support" ;
+        dcterms:modified               "2023-11-23T14:00:32.187Z"^^xsd:dateTime ;
+        dcterms:title                  "Network Support" ;
+        skos:broader                   attr:attr-assurance-serviceability .
+
+attr:attr-assurance-resiliency-fault-tolerance
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-assurance-resiliency-fault-tolerance" ;
+        dcterms:created                "2014-07-18T08:54:24Z"^^xsd:dateTime ;
+        dcterms:description            "The ability of a resource to continue to operate properly in the event of a failure." ;
+        dcterms:identifier             "attr-assurance-resiliency-fault-tolerance" ;
+        dcterms:modified               "2023-11-23T13:57:54.303Z"^^xsd:dateTime ;
+        dcterms:title                  "Resiliency/Fault Tolerance" ;
+        skos:broader                   attr:attr-assurance .
+
+attr:attr-agility-flexibility
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-agility-flexibility" ;
+        dcterms:created                "2014-07-18T08:16:15Z"^^xsd:dateTime ;
+        dcterms:description            "The ability to add or remove predefined features from a resource." ;
+        dcterms:identifier             "attr-agility-flexibility" ;
+        dcterms:modified               "2023-11-23T13:50:22.434Z"^^xsd:dateTime ;
+        dcterms:title                  "Flexibility" ;
+        skos:broader                   attr:attr-agility .
+
+attr:attr-agility-portability
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-agility-portability" ;
+        dcterms:created                "2014-07-18T08:16:33Z"^^xsd:dateTime ;
+        dcterms:description            "The ability of a user to easily move a service from one provider to another with minimal disruption." ;
+        dcterms:identifier             "attr-agility-portability" ;
+        dcterms:modified               "2023-11-23T13:50:48.632Z"^^xsd:dateTime ;
+        dcterms:title                  "Portability" ;
+        skos:broader                   attr:attr-agility .
+
+attr:attr-security-management-transport-security-guarantees
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-security-management-transport-security-guarantees" ;
+        dcterms:created                "2015-09-08T07:42:33.043Z"^^xsd:dateTime ;
+        dcterms:identifier             "attr-security-management-transport-security-guarantees" ;
+        dcterms:modified               "2023-11-23T14:25:46.938Z"^^xsd:dateTime ;
+        dcterms:title                  "Transport Layer Security" ;
+        skos:broader                   attr:attr-security-management .
+
+attr:attr-financial-cost-data-inbound
+        a                    smi:SMI-OBJECT ;
+        dc:type              "CONCEPT" ;
+        dcterms:URI          "attr:attr-financial-cost-data-inbound" ;
+        dcterms:created      "2014-05-23T18:32:20Z"^^xsd:dateTime ;
+        dcterms:creator      "" ;
+        dcterms:description  "" ;
+        dcterms:identifier   "attr-financial-cost-data-inbound" ;
+        dcterms:modified     "2014-07-18T09:25:29Z"^^xsd:dateTime ;
+        dcterms:title        "Data - Inbound" ;
+        skos:broader         attr:attr-financial-cost .
+
+attr:attr-reputation-sustainability-carbon-footprint
+        a                    smi:SMI-OBJECT ;
+        dc:type              "CONCEPT" ;
+        dcterms:URI          "attr:attr-reputation-sustainability-carbon-footprint" ;
+        dcterms:created      "2014-07-18T13:35:43Z"^^xsd:dateTime ;
+        dcterms:creator      "" ;
+        dcterms:description  "" ;
+        dcterms:identifier   "attr-reputation-sustainability-carbon-footprint" ;
+        dcterms:modified     "2014-07-18T13:35:43Z"^^xsd:dateTime ;
+        dcterms:title        "Carbon footprint" ;
+        skos:broader         attr:attr-reputation-sustainability .
+
+attr:attr-financial-billing-process
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-financial-billing-process" ;
+        dcterms:created                "2014-07-18T09:23:02Z"^^xsd:dateTime ;
+        dcterms:description            "The level of integration that is available between the user and provider’s billing systems and the predictability of periodic bills." ;
+        dcterms:identifier             "attr-financial-billing-process" ;
+        dcterms:modified               "2023-11-23T14:02:56.694Z"^^xsd:dateTime ;
+        dcterms:title                  "Billing Process" ;
+        skos:broader                   attr:attr-financial .
+
+attr:attr-performance-capacity-storage-throughput
+        a                    smi:SMI-OBJECT ;
+        dc:type              "CONCEPT" ;
+        dcterms:URI          "attr:attr-performance-capacity-storage-throughput" ;
+        dcterms:created      "2014-07-18T11:58:20Z"^^xsd:dateTime ;
+        dcterms:creator      "" ;
+        dcterms:description  "" ;
+        dcterms:identifier   "attr-performance-capacity-storage-throughput" ;
+        dcterms:modified     "2014-07-18T11:58:20Z"^^xsd:dateTime ;
+        dcterms:title        "Storage Throughput" ;
+        skos:broader         attr:attr-performance-capacity .
+
+attr:attr-financial-cost-data-outbound
+        a                    smi:SMI-OBJECT ;
+        dc:type              "CONCEPT" ;
+        dcterms:URI          "attr:attr-financial-cost-data-outbound" ;
+        dcterms:created      "2014-05-23T18:32:35Z"^^xsd:dateTime ;
+        dcterms:creator      "" ;
+        dcterms:description  "" ;
+        dcterms:identifier   "attr-financial-cost-data-outbound" ;
+        dcterms:modified     "2014-07-18T09:25:36Z"^^xsd:dateTime ;
+        dcterms:title        "Data - Outbound" ;
+        skos:broader         attr:attr-financial-cost .
+
+attr:attr-assurance-recoverability-recovery-time
+        a                    smi:SMI-OBJECT ;
+        dc:type              "CONCEPT" ;
+        dcterms:URI          "attr:attr-assurance-recoverability-recovery-time" ;
+        dcterms:created      "2014-07-18T11:53:21+03:00"^^xsd:dateTime ;
+        dcterms:description  "" ;
+        dcterms:identifier   "attr-assurance-recoverability-recovery-time" ;
+        dcterms:modified     "2014-07-18T11:53:21+03:00"^^xsd:dateTime ;
+        dcterms:title        "Recovery Time" ;
+        skos:broader         attr:attr-assurance-recoverability .
+
+attr:attr-assurance-recoverability
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-assurance-recoverability" ;
+        dcterms:created                "2014-07-18T08:48:56Z"^^xsd:dateTime ;
+        dcterms:description            "It is the degree to which a resource is able to quickly resume a normal state of operation after an unplanned disruption." ;
+        dcterms:identifier             "attr-assurance-recoverability" ;
+        dcterms:modified               "2023-11-23T13:56:24.986Z"^^xsd:dateTime ;
+        dcterms:title                  "Recoverability" ;
+        skos:broader                   attr:attr-assurance .
+
+attr:attr-usability-reusability
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-usability-reusability" ;
+        dcterms:created                "2014-07-18T13:25:27Z"^^xsd:dateTime ;
+        dcterms:description            "How generic the resource interface is and how easy it is to be used in different cloud applications" ;
+        dcterms:identifier             "attr-usability-reusability" ;
+        dcterms:modified               "2023-11-23T14:33:28.753Z"^^xsd:dateTime ;
+        dcterms:title                  "Reusability" ;
+        skos:broader                   attr:attr-usability .
+
+attr:attr-agility-elasticity-time
+        a                    smi:SMI-OBJECT ;
+        dc:type              "CONCEPT" ;
+        dcterms:URI          "attr:attr-agility-elasticity-time" ;
+        dcterms:created      "2014-05-23T18:25:30Z"^^xsd:dateTime ;
+        dcterms:description  "" ;
+        dcterms:identifier   "attr-agility-elasticity-time" ;
+        dcterms:modified     "2014-05-23T18:25:30Z"^^xsd:dateTime ;
+        dcterms:title        "Time" ;
+        skos:broader         attr:attr-agility-elasticity .
+
+attr:attr-accountability-certifications
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-accountability-certifications" ;
+        dcterms:created                "2014-07-18T07:35:05Z"^^xsd:dateTime ;
+        dcterms:description            "The provider maintains current certifications for standards relevant to their user' requirements." ;
+        dcterms:identifier             "attr-accountability-certifications" ;
+        dcterms:modified               "2023-11-23T11:50:53.22Z"^^xsd:dateTime ;
+        dcterms:title                  "Provider Certifications" ;
+        skos:broader                   attr:attr-accountability .
+
+attr:attr-assurance-maintainability
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-assurance-maintainability" ;
+        dcterms:created                "2014-07-18T08:48:37Z"^^xsd:dateTime ;
+        dcterms:description            "It refers to the ability for the provider to make modifications to the resource to keep the offering in a condition of good repair." ;
+        dcterms:identifier             "attr-assurance-maintainability" ;
+        dcterms:modified               "2023-11-23T13:56:06.398Z"^^xsd:dateTime ;
+        dcterms:title                  "Maintainability" ;
+        skos:broader                   attr:attr-assurance .
+
+attr:attr-usability-learnability
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-usability-learnability" ;
+        dcterms:created                "2014-07-18T13:23:48Z"^^xsd:dateTime ;
+        dcterms:description            "The effort required of users to learn to access and use the resource." ;
+        dcterms:identifier             "attr-usability-learnability" ;
+        dcterms:modified               "2023-11-23T14:30:11.779Z"^^xsd:dateTime ;
+        dcterms:title                  "Learnability" ;
+        skos:broader                   attr:attr-usability .
+
+attr:attr-accountability-contract-sla-verification
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-accountability-contract-sla-verification" ;
+        dcterms:created                "2014-07-18T07:35:43Z"^^xsd:dateTime ;
+        dcterms:description            "The provider makes available to users SLAs adequate to manage the resource offered and mitigate risks of device unavailability." ;
+        dcterms:identifier             "attr-accountability-contract-sla-verification" ;
+        dcterms:modified               "2023-11-23T11:52:18.615Z"^^xsd:dateTime ;
+        dcterms:title                  "Provider Contract/SLA Verification" ;
+        skos:broader                   attr:attr-accountability .
+
+attr:attr-security-data-integrity
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-security-data-integrity" ;
+        dcterms:created                "2014-07-18T12:53:07Z"^^xsd:dateTime ;
+        dcterms:description            "Keeping the data that is created, used, and stored in its correct form so that users may be confident that it is accurate and valid." ;
+        dcterms:identifier             "attr-security-data-integrity" ;
+        dcterms:modified               "2023-11-23T14:23:21.403Z"^^xsd:dateTime ;
+        dcterms:title                  "Data Integrity" ;
+        skos:broader                   attr:attr-security .
+
+attr:attr-reputation-provider-business-stability
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-reputation-provider-business-stability" ;
+        dcterms:created                "2014-07-18T13:33:22Z"^^xsd:dateTime ;
+        dcterms:description            "The likelihood that a certain provider will continue to exist throughout the contracted term." ;
+        dcterms:identifier             "attr-reputation-provider-business-stability" ;
+        dcterms:modified               "2023-11-23T14:35:34.604Z"^^xsd:dateTime ;
+        dcterms:title                  "Provider business stability" ;
+        skos:broader                   attr:attr-reputation .
+
+attr:attr-assurance-serviceability-free-support
+        a                    smi:SMI-OBJECT ;
+        dc:type              "CONCEPT" ;
+        dcterms:URI          "attr:attr-assurance-serviceability-free-support" ;
+        dcterms:created      "2014-05-23T21:29:49+03:00"^^xsd:dateTime ;
+        dcterms:description  "" ;
+        dcterms:identifier   "attr-assurance-serviceability-free-support" ;
+        dcterms:modified     "2014-05-23T21:29:49+03:00"^^xsd:dateTime ;
+        dcterms:title        "Free Support" ;
+        skos:broader         attr:attr-assurance-serviceability .
+
+attr:attr-accountability-auditability
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-accountability-auditability" ;
+        dcterms:created                "2014-07-18T07:29:34Z"^^xsd:dateTime ;
+        dcterms:description            "The ability of a resource user to verify that the provider is adhering to the standards, processes, and policies that they follow." ;
+        dcterms:identifier             "attr-accountability-auditability" ;
+        dcterms:modified               "2023-11-23T11:49:27.182Z"^^xsd:dateTime ;
+        dcterms:title                  "Auditability" ;
+        skos:broader                   attr:attr-accountability .
+
+attr:attr-security-data-privacy-loss-audit-trailing
+        a                    smi:SMI-OBJECT ;
+        dc:type              "CONCEPT" ;
+        dcterms:URI          "attr:attr-security-data-privacy-loss-audit-trailing" ;
+        dcterms:created      "2014-07-18T15:54:00+03:00"^^xsd:dateTime ;
+        dcterms:description  "" ;
+        dcterms:identifier   "attr-security-data-privacy-loss-audit-trailing" ;
+        dcterms:modified     "2014-07-18T15:54:00+03:00"^^xsd:dateTime ;
+        dcterms:title        "Audit Trailing" ;
+        skos:broader         attr:attr-security-data-privacy-loss .
+
+attr:attr-usability-transparency
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-usability-transparency" ;
+        dcterms:created                "2014-07-18T13:24:46Z"^^xsd:dateTime ;
+        dcterms:description            "The extent to which users are able to determine when changes in a feature of the resource occur and whether these changes impact usability." ;
+        dcterms:identifier             "attr-usability-transparency" ;
+        dcterms:modified               "2023-11-23T14:30:46.765Z"^^xsd:dateTime ;
+        dcterms:title                  "Transparency" ;
+        skos:broader                   attr:attr-usability .
+
+attr:attr-accountability-ownership
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-accountability-ownership" ;
+        dcterms:created                "2014-07-18T07:34:26Z"^^xsd:dateTime ;
+        dcterms:description            "The level of rights a user has over his/her data, and intellectual property associated with the use of a cloud continuum resource." ;
+        dcterms:identifier             "attr-accountability-ownership" ;
+        dcterms:modified               "2023-11-23T11:50:27.771Z"^^xsd:dateTime ;
+        dcterms:title                  "Ownership" ;
+        skos:broader                   attr:attr-accountability .
+
+attr:attr-security-access-control-privilege-management-rbac
+        a                    smi:SMI-OBJECT ;
+        dc:type              "CONCEPT" ;
+        dcterms:URI          "attr:attr-security-access-control-privilege-management-rbac" ;
+        dcterms:created      "2014-07-18T12:51:44Z"^^xsd:dateTime ;
+        dcterms:creator      "" ;
+        dcterms:description  "" ;
+        dcterms:identifier   "attr-security-access-control-privilege-management-rbac" ;
+        dcterms:modified     "2014-07-18T12:51:44Z"^^xsd:dateTime ;
+        dcterms:title        "Role based Access Control (RBAC)" ;
+        skos:broader         attr:attr-security-access-control-privilege-management .
+
+attr:attr-accountability-supply-chain
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-accountability-supply-chain" ;
+        dcterms:created                "2014-07-18T08:10:41Z"^^xsd:dateTime ;
+        dcterms:description            "The provider ensures that any SLAs that must be supported by its suppliers are supported." ;
+        dcterms:identifier             "attr-accountability-supply-chain" ;
+        dcterms:modified               "2023-11-23T11:54:23.842Z"^^xsd:dateTime ;
+        dcterms:title                  "Provider Supply Chain" ;
+        skos:broader                   attr:attr-accountability .
+
+attr:attr-reputation-sustainability-energy-consumption
+        a                    smi:SMI-OBJECT ;
+        dc:type              "CONCEPT" ;
+        dcterms:URI          "attr:attr-reputation-sustainability-energy-consumption" ;
+        dcterms:created      "2014-07-18T16:35:29+03:00"^^xsd:dateTime ;
+        dcterms:description  "" ;
+        dcterms:identifier   "attr-reputation-sustainability-energy-consumption" ;
+        dcterms:modified     "2014-07-18T16:35:29+03:00"^^xsd:dateTime ;
+        dcterms:title        "Energy consumption" ;
+        skos:broader         attr:attr-reputation-sustainability .
+
+attr:attr-performance-capacity-num-of-cores
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-performance-capacity-num-of-cores" ;
+        dcterms:created                "2014-07-18T11:42:21Z"^^xsd:dateTime ;
+        dcterms:identifier             "attr-performance-capacity-num-of-cores" ;
+        dcterms:modified               "2023-11-23T14:06:36.611Z"^^xsd:dateTime ;
+        dcterms:title                  "Number of CPU Cores" ;
+        skos:broader                   attr:attr-performance-capacity .
+
+attr:attr-agility-scalability
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-agility-scalability" ;
+        dcterms:created                "2014-07-18T08:16:59Z"^^xsd:dateTime ;
+        dcterms:description            "The ability of a provider to increase or decrease the number of cloud continuum resources offered in a certain area to meet client requirements." ;
+        dcterms:identifier             "attr-agility-scalability" ;
+        dcterms:modified               "2023-11-23T13:51:19.581Z"^^xsd:dateTime ;
+        dcterms:title                  "Scalability" ;
+        skos:broader                   attr:attr-agility .
+
+attr:attr-performance-accuracy
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-performance-accuracy" ;
+        dcterms:created                "2014-07-18T12:01:37Z"^^xsd:dateTime ;
+        dcterms:description            "The extent to which a resource adheres to its requirements." ;
+        dcterms:identifier             "attr-performance-accuracy" ;
+        dcterms:modified               "2023-11-23T14:06:05.099Z"^^xsd:dateTime ;
+        dcterms:title                  "Accuracy" ;
+        skos:broader                   attr:attr-performance .
+
+attr:attr-agility-extensibility
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:attr-agility-extensibility" ;
+        dcterms:created                "2014-07-18T08:13:55Z"^^xsd:dateTime ;
+        dcterms:description            "The ability to add new features or services to existing offered resources." ;
+        dcterms:identifier             "attr-agility-extensibility" ;
+        dcterms:modified               "2023-11-23T13:48:24.873Z"^^xsd:dateTime ;
+        dcterms:title                  "Extensibility" ;
+        skos:broader                   attr:attr-agility .
+
+attr:78baf8b3-2d1d-4899-88ef-ca74990f07eb
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:78baf8b3-2d1d-4899-88ef-ca74990f07eb" ;
+        dcterms:created                "2023-11-23T11:49:02.671Z"^^xsd:dateTime ;
+        dcterms:description            "The level of provider support in case of resources malfunctions (e.g., High refers to the same day replacement of the faulty device)" ;
+        dcterms:identifier             "78baf8b3-2d1d-4899-88ef-ca74990f07eb" ;
+        dcterms:modified               "2023-11-23T11:49:02.671Z"^^xsd:dateTime ;
+        dcterms:title                  "Malfunctions Mitigation Support" ;
+        skos:broader                   attr:attr-accountability .
+
+attr:3f1319a2-95dc-43bb-854c-18d9035b5724
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:3f1319a2-95dc-43bb-854c-18d9035b5724" ;
+        dcterms:created                "2023-11-23T11:53:31.442Z"^^xsd:dateTime ;
+        dcterms:identifier             "3f1319a2-95dc-43bb-854c-18d9035b5724" ;
+        dcterms:modified               "2023-11-23T11:53:31.442Z"^^xsd:dateTime ;
+        dcterms:title                  "Technical competency w.r.t network connectivity " ;
+        skos:broader                   attr:attr-accountability-personnel-requirements .
+
+attr:e0194a71-c2af-4ccf-b342-29db1a49a3d0
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:e0194a71-c2af-4ccf-b342-29db1a49a3d0" ;
+        dcterms:created                "2023-11-23T13:44:39.726Z"^^xsd:dateTime ;
+        dcterms:description            "The likelihood that a certain fog or edge resource leased to be used by an external user, can be moved away from its original physical location, during the contracting period. This can have either a positive (resource move based on the application requirements) or negative (unforeseen resource move) impact on the application and its agility." ;
+        dcterms:identifier             "e0194a71-c2af-4ccf-b342-29db1a49a3d0" ;
+        dcterms:modified               "2023-11-23T13:45:52.44Z"^^xsd:dateTime ;
+        dcterms:title                  "Moveability" ;
+        skos:broader                   attr:attr-agility .
+
+attr:16030149-6fd5-4066-ac80-8da605dc964f
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:16030149-6fd5-4066-ac80-8da605dc964f" ;
+        dcterms:created                "2023-11-23T13:45:16.921Z"^^xsd:dateTime ;
+        dcterms:identifier             "16030149-6fd5-4066-ac80-8da605dc964f" ;
+        dcterms:modified               "2023-11-23T13:45:16.921Z"^^xsd:dateTime ;
+        dcterms:title                  "Desired Move Support" ;
+        skos:broader                   attr:e0194a71-c2af-4ccf-b342-29db1a49a3d0 .
+
+attr:e1591d3a-6665-4149-965c-32f3eb9e1c63
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:e1591d3a-6665-4149-965c-32f3eb9e1c63" ;
+        dcterms:created                "2023-11-23T13:45:35.787Z"^^xsd:dateTime ;
+        dcterms:identifier             "e1591d3a-6665-4149-965c-32f3eb9e1c63" ;
+        dcterms:modified               "2023-11-23T13:45:35.787Z"^^xsd:dateTime ;
+        dcterms:title                  "Unforeseen Move Likelihood" ;
+        skos:broader                   attr:e0194a71-c2af-4ccf-b342-29db1a49a3d0 .
+
+attr:fd871ec6-d953-430d-a354-f13c66fa8bc9
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:fd871ec6-d953-430d-a354-f13c66fa8bc9" ;
+        dcterms:created                "2023-11-23T13:47:32.127Z"^^xsd:dateTime ;
+        dcterms:identifier             "fd871ec6-d953-430d-a354-f13c66fa8bc9" ;
+        dcterms:modified               "2023-11-23T13:47:32.127Z"^^xsd:dateTime ;
+        dcterms:title                  "Extend offered processing capacity" ;
+        skos:broader                   attr:attr-agility-elasticity .
+
+attr:dcedb196-2c60-4c29-a66d-0e768cfd698a
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:dcedb196-2c60-4c29-a66d-0e768cfd698a" ;
+        dcterms:created                "2023-11-23T13:47:46.169Z"^^xsd:dateTime ;
+        dcterms:identifier             "dcedb196-2c60-4c29-a66d-0e768cfd698a" ;
+        dcterms:modified               "2023-11-23T13:47:46.168Z"^^xsd:dateTime ;
+        dcterms:title                  "Extend offered memory capacity" ;
+        skos:broader                   attr:attr-agility-elasticity .
+
+attr:0cf00a53-fd33-4887-bb38-e0bbb04e3f3e
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:0cf00a53-fd33-4887-bb38-e0bbb04e3f3e" ;
+        dcterms:created                "2023-11-23T13:48:01.21Z"^^xsd:dateTime ;
+        dcterms:identifier             "0cf00a53-fd33-4887-bb38-e0bbb04e3f3e" ;
+        dcterms:modified               "2023-11-23T13:48:01.21Z"^^xsd:dateTime ;
+        dcterms:title                  "Extend offered network capacity" ;
+        skos:broader                   attr:attr-agility-elasticity .
+
+attr:8968013b-e2af-487b-9140-25e6f857204c
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:8968013b-e2af-487b-9140-25e6f857204c" ;
+        dcterms:created                "2023-11-23T13:49:45.536Z"^^xsd:dateTime ;
+        dcterms:description            "Number of available locations in the world." ;
+        dcterms:identifier             "8968013b-e2af-487b-9140-25e6f857204c" ;
+        dcterms:modified               "2023-11-23T13:49:45.536Z"^^xsd:dateTime ;
+        dcterms:title                  "Geographic Coverage" ;
+        skos:broader                   attr:attr-agility-extensibility .
+
+attr:d95c1dae-1e22-4fb4-9cdc-743e96d0dddc
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:d95c1dae-1e22-4fb4-9cdc-743e96d0dddc" ;
+        dcterms:created                "2023-11-23T13:51:47.955Z"^^xsd:dateTime ;
+        dcterms:identifier             "d95c1dae-1e22-4fb4-9cdc-743e96d0dddc" ;
+        dcterms:modified               "2023-11-23T13:51:47.955Z"^^xsd:dateTime ;
+        dcterms:title                  "Cloud resources addition" ;
+        skos:broader                   attr:attr-agility-scalability .
+
+attr:8cd09fe9-c119-4ccd-b651-0f18334dbbe4
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:8cd09fe9-c119-4ccd-b651-0f18334dbbe4" ;
+        dcterms:created                "2023-11-23T13:52:06.092Z"^^xsd:dateTime ;
+        dcterms:identifier             "8cd09fe9-c119-4ccd-b651-0f18334dbbe4" ;
+        dcterms:modified               "2023-11-23T13:52:06.092Z"^^xsd:dateTime ;
+        dcterms:title                  "Fog resources addition" ;
+        skos:broader                   attr:attr-agility-scalability .
+
+attr:7147995c-8e68-4106-ab24-f0a7673eb5f5
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:7147995c-8e68-4106-ab24-f0a7673eb5f5" ;
+        dcterms:created                "2023-11-23T13:52:21.571Z"^^xsd:dateTime ;
+        dcterms:identifier             "7147995c-8e68-4106-ab24-f0a7673eb5f5" ;
+        dcterms:modified               "2023-11-23T13:52:21.571Z"^^xsd:dateTime ;
+        dcterms:title                  "Edge resources addition" ;
+        skos:broader                   attr:attr-agility-scalability .
+
+attr:2da82ab2-8ae9-4aa2-a842-0d3f846c4b47
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:2da82ab2-8ae9-4aa2-a842-0d3f846c4b47" ;
+        dcterms:created                "2023-11-23T13:52:40.819Z"^^xsd:dateTime ;
+        dcterms:identifier             "2da82ab2-8ae9-4aa2-a842-0d3f846c4b47" ;
+        dcterms:modified               "2023-11-23T13:52:40.819Z"^^xsd:dateTime ;
+        dcterms:title                  "Total number of available Fog resources" ;
+        skos:broader                   attr:attr-agility-scalability .
+
+attr:203ecada-25fd-469c-92f6-dd84f2c7cba6
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:203ecada-25fd-469c-92f6-dd84f2c7cba6" ;
+        dcterms:created                "2023-11-23T13:52:50.788Z"^^xsd:dateTime ;
+        dcterms:identifier             "203ecada-25fd-469c-92f6-dd84f2c7cba6" ;
+        dcterms:modified               "2023-11-23T13:52:50.788Z"^^xsd:dateTime ;
+        dcterms:title                  "Total number of available Edge devices" ;
+        skos:broader                   attr:attr-agility-scalability .
+
+attr:49c8d03f-5ceb-4994-8257-cd319190a62a
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:49c8d03f-5ceb-4994-8257-cd319190a62a" ;
+        dcterms:created                "2023-11-23T13:57:16.215Z"^^xsd:dateTime ;
+        dcterms:identifier             "49c8d03f-5ceb-4994-8257-cd319190a62a" ;
+        dcterms:modified               "2023-11-23T13:57:16.215Z"^^xsd:dateTime ;
+        dcterms:title                  "Uptime" ;
+        skos:broader                   attr:attr-assurance-reliability .
+
+attr:47a2c5e9-f74d-4ff3-98fe-4c66b98eaaef
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:47a2c5e9-f74d-4ff3-98fe-4c66b98eaaef" ;
+        dcterms:created                "2023-11-23T14:03:38.084Z"^^xsd:dateTime ;
+        dcterms:identifier             "47a2c5e9-f74d-4ff3-98fe-4c66b98eaaef" ;
+        dcterms:modified               "2023-11-23T14:03:38.084Z"^^xsd:dateTime ;
+        dcterms:title                  "Storage" ;
+        skos:broader                   attr:attr-financial-cost .
+
+attr:7a77f809-8aba-4550-9f0c-8b619183b1cd
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:7a77f809-8aba-4550-9f0c-8b619183b1cd" ;
+        dcterms:created                "2023-11-23T14:08:58.307Z"^^xsd:dateTime ;
+        dcterms:identifier             "7a77f809-8aba-4550-9f0c-8b619183b1cd" ;
+        dcterms:modified               "2023-11-23T14:08:58.307Z"^^xsd:dateTime ;
+        dcterms:title                  "Number of GPU Cores" ;
+        skos:broader                   attr:attr-performance-capacity .
+
+attr:3b414a80-83b4-472c-8166-715d4c9d7508
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:3b414a80-83b4-472c-8166-715d4c9d7508" ;
+        dcterms:created                "2023-11-23T14:09:19.412Z"^^xsd:dateTime ;
+        dcterms:identifier             "3b414a80-83b4-472c-8166-715d4c9d7508" ;
+        dcterms:modified               "2023-11-23T14:09:19.412Z"^^xsd:dateTime ;
+        dcterms:title                  "CPU MFLOPs" ;
+        skos:broader                   attr:attr-performance-capacity .
+
+attr:b945c916-2873-4528-bc4a-e3b0c9d603d9
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:b945c916-2873-4528-bc4a-e3b0c9d603d9" ;
+        dcterms:created                "2023-11-23T14:09:42.234Z"^^xsd:dateTime ;
+        dcterms:identifier             "b945c916-2873-4528-bc4a-e3b0c9d603d9" ;
+        dcterms:modified               "2023-11-23T14:09:42.234Z"^^xsd:dateTime ;
+        dcterms:title                  "GPU MFLOPs" ;
+        skos:broader                   attr:attr-performance-capacity .
+
+attr:c1c5b3c9-6178-4d67-a7e3-0285c2bf98ef
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:c1c5b3c9-6178-4d67-a7e3-0285c2bf98ef" ;
+        dcterms:created                "2023-11-23T14:10:20.077Z"^^xsd:dateTime ;
+        dcterms:identifier             "c1c5b3c9-6178-4d67-a7e3-0285c2bf98ef" ;
+        dcterms:modified               "2023-11-23T14:10:20.077Z"^^xsd:dateTime ;
+        dcterms:title                  "Solid State Drive " ;
+        skos:broader                   attr:attr-performance-capacity .
+
+attr:ffebba96-d53d-44c9-be75-3258de80ed70
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:ffebba96-d53d-44c9-be75-3258de80ed70" ;
+        dcterms:created                "2023-11-23T14:12:35.627Z"^^xsd:dateTime ;
+        dcterms:description            "The specific features provided by a resource." ;
+        dcterms:identifier             "ffebba96-d53d-44c9-be75-3258de80ed70" ;
+        dcterms:modified               "2023-11-23T14:12:35.627Z"^^xsd:dateTime ;
+        dcterms:title                  "Network Functionality" ;
+        skos:broader                   attr:attr-performance .
+
+attr:7104ee2b-52ba-4655-991f-845a1397d850
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:7104ee2b-52ba-4655-991f-845a1397d850" ;
+        dcterms:created                "2023-11-23T14:12:50.463Z"^^xsd:dateTime ;
+        dcterms:identifier             "7104ee2b-52ba-4655-991f-845a1397d850" ;
+        dcterms:modified               "2023-11-23T14:12:50.463Z"^^xsd:dateTime ;
+        dcterms:title                  "Features" ;
+        skos:broader                   attr:ffebba96-d53d-44c9-be75-3258de80ed70 .
+
+attr:876397bf-599f-40a7-91ec-93cca7c392b4
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:876397bf-599f-40a7-91ec-93cca7c392b4" ;
+        dcterms:created                "2023-11-23T14:13:02.112Z"^^xsd:dateTime ;
+        dcterms:identifier             "876397bf-599f-40a7-91ec-93cca7c392b4" ;
+        dcterms:modified               "2023-11-23T14:13:02.112Z"^^xsd:dateTime ;
+        dcterms:title                  "Bandwidth" ;
+        skos:broader                   attr:ffebba96-d53d-44c9-be75-3258de80ed70 .
+
+attr:ea2e12db-b52a-42f4-86cb-f654cfe09a92
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:ea2e12db-b52a-42f4-86cb-f654cfe09a92" ;
+        dcterms:created                "2023-11-23T14:13:13.355Z"^^xsd:dateTime ;
+        dcterms:identifier             "ea2e12db-b52a-42f4-86cb-f654cfe09a92" ;
+        dcterms:modified               "2023-11-23T14:13:13.355Z"^^xsd:dateTime ;
+        dcterms:title                  "Upload Speed" ;
+        skos:broader                   attr:ffebba96-d53d-44c9-be75-3258de80ed70 .
+
+attr:e8180e25-d58c-49d3-862e-cbb18dd1820e
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:e8180e25-d58c-49d3-862e-cbb18dd1820e" ;
+        dcterms:created                "2023-11-23T14:13:25.765Z"^^xsd:dateTime ;
+        dcterms:identifier             "e8180e25-d58c-49d3-862e-cbb18dd1820e" ;
+        dcterms:modified               "2023-11-23T14:13:25.765Z"^^xsd:dateTime ;
+        dcterms:title                  "Download Speed" ;
+        skos:broader                   attr:ffebba96-d53d-44c9-be75-3258de80ed70 .
+
+attr:6e648d7b-c09b-4c69-8c70-5030b2d21eed
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:6e648d7b-c09b-4c69-8c70-5030b2d21eed" ;
+        dcterms:created                "2023-11-23T14:13:47.587Z"^^xsd:dateTime ;
+        dcterms:identifier             "6e648d7b-c09b-4c69-8c70-5030b2d21eed" ;
+        dcterms:modified               "2023-11-23T14:13:47.587Z"^^xsd:dateTime ;
+        dcterms:title                  "Network Throughput" ;
+        skos:broader                   attr:ffebba96-d53d-44c9-be75-3258de80ed70 .
+
+attr:9f5706e3-08bd-412d-8d59-04f464e867a8
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:9f5706e3-08bd-412d-8d59-04f464e867a8" ;
+        dcterms:created                "2023-11-23T14:14:30.708Z"^^xsd:dateTime ;
+        dcterms:identifier             "9f5706e3-08bd-412d-8d59-04f464e867a8" ;
+        dcterms:modified               "2023-11-23T14:14:30.708Z"^^xsd:dateTime ;
+        dcterms:title                  "Proximity to Data Source" ;
+        skos:broader                   attr:attr-performance-suitability .
+
+attr:b9f4f982-3809-4eac-831c-37288c046133
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:b9f4f982-3809-4eac-831c-37288c046133" ;
+        dcterms:created                "2023-11-23T14:14:59.389Z"^^xsd:dateTime ;
+        dcterms:description            " Point/area of interest defined by the user." ;
+        dcterms:identifier             "b9f4f982-3809-4eac-831c-37288c046133" ;
+        dcterms:modified               "2023-11-23T14:14:59.389Z"^^xsd:dateTime ;
+        dcterms:title                  "Proximity to POI" ;
+        skos:broader                   attr:attr-performance-suitability .
+
+attr:bced9c2a-7234-44f8-9f51-ccd9da39f15e
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:bced9c2a-7234-44f8-9f51-ccd9da39f15e" ;
+        dcterms:created                "2023-11-23T14:22:36.87Z"^^xsd:dateTime ;
+        dcterms:identifier             "bced9c2a-7234-44f8-9f51-ccd9da39f15e" ;
+        dcterms:modified               "2023-11-23T14:22:36.87Z"^^xsd:dateTime ;
+        dcterms:title                  "Attribute based Access Control supported(ABAC)" ;
+        skos:broader                   attr:attr-security-access-control-privilege-management .
+
+attr:5759cddd-ec82-4273-88c4-5f55981469d0
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:5759cddd-ec82-4273-88c4-5f55981469d0" ;
+        dcterms:created                "2023-11-23T14:26:19.627Z"^^xsd:dateTime ;
+        dcterms:description            "This attribute refers to the availability of open source code, open source business processes and open source hardware from the cloud continuum provider side" ;
+        dcterms:identifier             "5759cddd-ec82-4273-88c4-5f55981469d0" ;
+        dcterms:modified               "2023-11-23T14:26:19.627Z"^^xsd:dateTime ;
+        dcterms:title                  "Process Transparency" ;
+        skos:broader                   attr:attr-security .
+
+attr:d503cabe-17d7-4b9b-9231-a8b211f3ce11
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:d503cabe-17d7-4b9b-9231-a8b211f3ce11" ;
+        dcterms:created                "2023-11-23T14:34:32.812Z"^^xsd:dateTime ;
+        dcterms:description            "It refers to the linguistic expression of the level of confidence that the provider is and will continue to abide to legal security and be compliant with local regulations" ;
+        dcterms:identifier             "d503cabe-17d7-4b9b-9231-a8b211f3ce11" ;
+        dcterms:modified               "2023-11-23T14:34:32.812Z"^^xsd:dateTime ;
+        dcterms:title                  "Provider Trust" ;
+        skos:broader                   attr:attr-reputation .
+
+attr:55a60ec3-55f7-48db-83bc-be2875c5210c
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:55a60ec3-55f7-48db-83bc-be2875c5210c" ;
+        dcterms:created                "2023-11-23T14:36:03.633Z"^^xsd:dateTime ;
+        dcterms:description            "The likelihood that certain resources, contracted to be exploited by an external user will not be moved and will continue to exist throughout the contracted term." ;
+        dcterms:identifier             "55a60ec3-55f7-48db-83bc-be2875c5210c" ;
+        dcterms:modified               "2023-11-23T14:36:03.633Z"^^xsd:dateTime ;
+        dcterms:title                  "Resources stability" ;
+        skos:broader                   attr:attr-reputation .
+
+attr:1153e8ec-301f-488b-92b2-ef978e390e6f
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:1153e8ec-301f-488b-92b2-ef978e390e6f" ;
+        dcterms:created                "2023-11-23T14:37:15.994Z"^^xsd:dateTime ;
+        dcterms:description            "The previous experience and performance history with respect to leasing cloud continuum resources from a certain provider" ;
+        dcterms:identifier             "1153e8ec-301f-488b-92b2-ef978e390e6f" ;
+        dcterms:modified               "2023-11-23T14:37:15.994Z"^^xsd:dateTime ;
+        dcterms:title                  "Provider Track record" ;
+        skos:broader                   attr:attr-reputation .
+
+attr:aba29c53-78ea-42fb-96c2-2ea135f10830
+        a                              smi:SMI-OBJECT ;
+        dc:type                        "CONCEPT" ;
+        dcterms:URI                    "attr:aba29c53-78ea-42fb-96c2-2ea135f10830" ;
+        dcterms:created                "2023-11-23T14:37:38.085Z"^^xsd:dateTime ;
+        dcterms:description            "The previous experience and performance history with respect to using certain cloud continuum resource types from a certain provider" ;
+        dcterms:identifier             "aba29c53-78ea-42fb-96c2-2ea135f10830" ;
+        dcterms:modified               "2023-11-23T14:37:38.085Z"^^xsd:dateTime ;
+        dcterms:title                  "Resource Track record" ;
+        skos:broader                   attr:attr-reputation .
