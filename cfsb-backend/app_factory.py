@@ -1,0 +1,11 @@
+# Created for application setup
+from flask import Flask, request, jsonify, render_template
+from flask_cors import CORS, cross_origin
+from routes import main_routes  # Adjusted to absolute import
+
+def create_app():
+    app = Flask(__name__)
+    # CORS(app)
+    CORS(app, supports_credentials=True)  # Enable CORS and allow credentials
+    app.register_blueprint(main_routes)
+    return app

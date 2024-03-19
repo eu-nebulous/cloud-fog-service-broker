@@ -1,4 +1,5 @@
 from rdflib import Graph, URIRef
+from data_types import get_attr_data_type
 
 # Create a new RDF graph
 g = Graph()
@@ -36,6 +37,9 @@ def get_level_1_items():
             item_dict["description"] = item_data_dict["description"]
             item_dict["name"] = attribute
             item_dict["children"] = []
+            criterion_type_values = get_attr_data_type(item_dict["name"])
+            item_dict["type"] = criterion_type_values['type']
+            # item_dict["values"] = criterion_type_values['values'] # they do not have all criteria
             items_list.append(item_dict)
     items_2_list = get_level_2_items(level_1_items_list, items_list)
     return items_2_list
@@ -59,6 +63,8 @@ def get_level_2_items(level_1_items_list, level_1_items_dict_list):
                 item_dict["parent"] = object_str
                 item_dict["name"] = level_2_attribute
                 item_dict["children"] = []
+                criterion_type_values = get_attr_data_type(item_dict["name"])
+                item_dict["type"] = criterion_type_values['type']
                 items_list.append(item_dict)
     items_3_list = get_level_3_items(level_2_items_list, items_list, level_1_items_dict_list)
     return items_3_list
@@ -82,6 +88,8 @@ def get_level_3_items(level_2_items_list, level_2_items_dict_list, level_1_items
                 item_dict["parent"] = object_str
                 item_dict["name"] = level_3_attribute
                 item_dict["children"] = []
+                criterion_type_values = get_attr_data_type(item_dict["name"])
+                item_dict["type"] = criterion_type_values['type']
                 items_list.append(item_dict)
     level_2_children_list = insert_level_2_children(level_1_items_dict_list, level_2_items_dict_list, items_list)
     return level_2_children_list
@@ -99,24 +107,39 @@ def insert_level_2_children(level_1_items_dict_list, level_2_items_dict_list, le
                 # level_2_children_list.append(item_dict)
                 level_2_children_list.append(level_3_item)
         # here to append the list at the correct position of level_2_items_dict_list
-        level_2_item["children"] = level_2_children_list
+        # Sort the children by their title
+        level_2_item["children"] = sorted(level_2_children_list, key=lambda x: x['title'])
         items_dict_list = insert_level_1_children(level_1_items_dict_list, level_2_items_dict_list)
     # return level_2_items_dict_list
     return items_dict_list
 
 
+# def insert_level_1_children(level_1_items_dict_list, level_2_items_dict_list):
+#     for level_1_item in level_1_items_dict_list:
+#         level_1_children_list = []
+#         # print("level_1_item = " + level_1_item["name"])
+#         for level_2_item in level_2_items_dict_list:
+#             # print("level_2_item = " + level_2_item["name"])
+#             if level_2_item["parent"] == level_1_item["name"]:
+#                 # print("Children of " + level_1_item["name"] + " is " + level_2_item["name"])
+#                 level_1_children_list.append(level_2_item)
+#         # here to append the list at the correct position of level_1_items_dict_list
+#         level_1_item["children"] = level_1_children_list
+#     return level_1_items_dict_list
+
 def insert_level_1_children(level_1_items_dict_list, level_2_items_dict_list):
     for level_1_item in level_1_items_dict_list:
         level_1_children_list = []
-        # print("level_1_item = " + level_1_item["name"])
         for level_2_item in level_2_items_dict_list:
-            # print("level_2_item = " + level_2_item["name"])
             if level_2_item["parent"] == level_1_item["name"]:
-                # print("Children of " + level_1_item["name"] + " is " + level_2_item["name"])
                 level_1_children_list.append(level_2_item)
-        # here to append the list at the correct position of level_1_items_dict_list
-        level_1_item["children"] = level_1_children_list
-    return level_1_items_dict_list
+
+        # Sort the children by their title
+        level_1_item["children"] = sorted(level_1_children_list, key=lambda x: x['title'])
+
+    # Now sort the level 1 items themselves
+    sorted_level_1_items_dict_list = sorted(level_1_items_dict_list, key=lambda x: x['title'])
+    return sorted_level_1_items_dict_list
 
 
 def get_subject_data(item_subject):

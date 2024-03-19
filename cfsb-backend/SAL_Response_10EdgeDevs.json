@@ -1,0 +1,1122 @@
+[
+    {
+        "name": "AWS-Raspberry-Madrid",
+        "loginCredential": {
+            "username": "ubuntu",
+            "password": "ProActive123",
+            "privateKey": ""
+        },
+        "ipAddresses": [
+            {
+                "IpAddressType": "PUBLIC_IP",
+                "IpVersion": "V4",
+                "value": "10.10.10.1"
+            },
+            {
+                "IpAddressType": "PRIVATE_IP",
+                "IpVersion": "V4",
+                "value": "18.203.158.193"
+            }
+        ],
+        "nodeProperties": {
+            "providerId": "15",
+            "numberOfCores": 6,
+            "memory": 7,
+            "disk": 11.0,
+            "operatingSystem": {
+                "operatingSystemFamily": "UBUNTU",
+                "operatingSystemArchitecture": "UNKNOWN",
+                "operatingSystemVersion": 1804.00
+            },
+            "geoLocation": {
+                "city": "Athens",
+                "country": "Greece",
+                "latitude": -31.018383,
+                "longitude": -26.717098
+            }
+        },
+        "reason": null,
+        "diagnostic": null,
+        "userId": null,
+        "allocated": null,
+        "jobId": "FCRnewLight0",
+        "systemArch": "ARMv8",
+        "scriptURL": "https://www.google.com",
+        "jarURL": "https://www.activeeon.com/public_content/7cde3381417ff3784639dc41fa7e7cd0544a5234-morphemic-7bulls/node_13.1.0-SNAPSHOT_armv8.jar",
+        "nodeCandidate": {
+            "id": "8a7482868df473cc018df47d8ea20002",
+            "nodeCandidateType": "EDGE",
+            "jobIdForByon": null,
+            "jobIdForEdge": "FCRnewLight0",
+            "price": 0.0,
+            "cloud": {
+                "id": "edge",
+                "endpoint": null,
+                "cloudType": "EDGE",
+                "api": null,
+                "credential": null,
+                "cloudConfiguration": {
+                    "nodeGroup": null,
+                    "properties": {}
+                },
+                "owner": "EDGE",
+                "state": null,
+                "diagnostic": null
+            },
+            "location": {
+                "id": "edge-location-Ehjjsq21EsRtesOu",
+                "name": null,
+                "providerId": null,
+                "locationScope": null,
+                "isAssignable": null,
+                "geoLocation": {
+                    "city": "Athens",
+                    "country": "Greece",
+                    "latitude": -31.018383,
+                    "longitude": -26.717098
+                },
+                "parent": null,
+                "state": null,
+                "owner": null
+            },
+            "image": {
+                "id": "edge-image-Ehjjsq21EsRtesOu",
+                "name": "edge-image-name-UBUNTU-UNKNOWN",
+                "providerId": null,
+                "operatingSystem": {
+                    "operatingSystemFamily": "UBUNTU",
+                    "operatingSystemArchitecture": "UNKNOWN",
+                    "operatingSystemVersion": 1804.00
+                },
+                "location": null,
+                "state": null,
+                "owner": null
+            },
+            "hardware": {
+                "id": "edge-hardware-Ehjjsq21EsRtesOu",
+                "name": null,
+                "providerId": null,
+                "cores": 6,
+                "ram": 7,
+                "disk": 11.0,
+                "fpga": 0,
+                "location": null,
+                "state": null,
+                "owner": null
+            },
+            "pricePerInvocation": 0.0,
+            "memoryPrice": 0.0,
+            "nodeId": null,
+            "environment": null
+        },
+        "id": "8a7482868df473cc018df47d8ea60003"
+    },
+    {
+        "name": "test2",
+        "loginCredential": {
+            "username": "ubuntu",
+            "password": "ProActive123",
+            "privateKey": ""
+        },
+        "ipAddresses": [
+            {
+                "IpAddressType": "PUBLIC_IP",
+                "IpVersion": "V4",
+                "value": "10.10.10.2"
+            },
+            {
+                "IpAddressType": "PRIVATE_IP",
+                "IpVersion": "V4",
+                "value": "18.203.158.193"
+            }
+        ],
+        "nodeProperties": {
+            "providerId": "10",
+            "numberOfCores": 1,
+            "memory": 6,
+            "disk": 28.0,
+            "operatingSystem": {
+                "operatingSystemFamily": "UBUNTU",
+                "operatingSystemArchitecture": "UNKNOWN",
+                "operatingSystemVersion": 1804.00
+            },
+            "geoLocation": {
+                "city": "Nice",
+                "country": "France",
+                "latitude": -72.342804,
+                "longitude": -17.023972
+            }
+        },
+        "reason": null,
+        "diagnostic": null,
+        "userId": null,
+        "allocated": null,
+        "jobId": "FCRnewLight0",
+        "systemArch": "ARMv8",
+        "scriptURL": "https://www.google.com",
+        "jarURL": "https://www.activeeon.com/public_content/7cde3381417ff3784639dc41fa7e7cd0544a5234-morphemic-7bulls/node_13.1.0-SNAPSHOT_armv8.jar",
+        "nodeCandidate": {
+            "id": "8a7482868df473cc018df47d8fc40004",
+            "nodeCandidateType": "EDGE",
+            "jobIdForByon": null,
+            "jobIdForEdge": "FCRnewLight0",
+            "price": 0.0,
+            "cloud": {
+                "id": "edge",
+                "endpoint": null,
+                "cloudType": "EDGE",
+                "api": null,
+                "credential": null,
+                "cloudConfiguration": {
+                    "nodeGroup": null,
+                    "properties": {}
+                },
+                "owner": "EDGE",
+                "state": null,
+                "diagnostic": null
+            },
+            "location": {
+                "id": "edge-location-sRI0g25q5kbxZYzK",
+                "name": null,
+                "providerId": null,
+                "locationScope": null,
+                "isAssignable": null,
+                "geoLocation": {
+                    "city": "Nice",
+                    "country": "France",
+                    "latitude": -72.342804,
+                    "longitude": -17.023972
+                },
+                "parent": null,
+                "state": null,
+                "owner": null
+            },
+            "image": {
+                "id": "edge-image-sRI0g25q5kbxZYzK",
+                "name": "edge-image-name-UBUNTU-UNKNOWN",
+                "providerId": null,
+                "operatingSystem": {
+                    "operatingSystemFamily": "UBUNTU",
+                    "operatingSystemArchitecture": "UNKNOWN",
+                    "operatingSystemVersion": 1804.00
+                },
+                "location": null,
+                "state": null,
+                "owner": null
+            },
+            "hardware": {
+                "id": "edge-hardware-sRI0g25q5kbxZYzK",
+                "name": null,
+                "providerId": null,
+                "cores": 1,
+                "ram": 6,
+                "disk": 28.0,
+                "fpga": 0,
+                "location": null,
+                "state": null,
+                "owner": null
+            },
+            "pricePerInvocation": 0.0,
+            "memoryPrice": 0.0,
+            "nodeId": null,
+            "environment": null
+        },
+        "id": "8a7482868df473cc018df47d8fc70005"
+    },
+    {
+        "name": "test3",
+        "loginCredential": {
+            "username": "ubuntu",
+            "password": "ProActive123",
+            "privateKey": ""
+        },
+        "ipAddresses": [
+            {
+                "IpAddressType": "PUBLIC_IP",
+                "IpVersion": "V4",
+                "value": "10.10.10.3"
+            },
+            {
+                "IpAddressType": "PRIVATE_IP",
+                "IpVersion": "V4",
+                "value": "18.203.158.193"
+            }
+        ],
+        "nodeProperties": {
+            "providerId": "13",
+            "numberOfCores": 13,
+            "memory": 6,
+            "disk": 16.0,
+            "operatingSystem": {
+                "operatingSystemFamily": "UBUNTU",
+                "operatingSystemArchitecture": "UNKNOWN",
+                "operatingSystemVersion": 1804.00
+            },
+            "geoLocation": {
+                "city": "Nice",
+                "country": "France",
+                "latitude": -18.325798,
+                "longitude": -2.8190002
+            }
+        },
+        "reason": null,
+        "diagnostic": null,
+        "userId": null,
+        "allocated": null,
+        "jobId": "FCRnewLight0",
+        "systemArch": "ARMv8",
+        "scriptURL": "https://www.google.com",
+        "jarURL": "https://www.activeeon.com/public_content/7cde3381417ff3784639dc41fa7e7cd0544a5234-morphemic-7bulls/node_13.1.0-SNAPSHOT_armv8.jar",
+        "nodeCandidate": {
+            "id": "8a7482868df473cc018df47d90e40006",
+            "nodeCandidateType": "EDGE",
+            "jobIdForByon": null,
+            "jobIdForEdge": "FCRnewLight0",
+            "price": 0.0,
+            "cloud": {
+                "id": "edge",
+                "endpoint": null,
+                "cloudType": "EDGE",
+                "api": null,
+                "credential": null,
+                "cloudConfiguration": {
+                    "nodeGroup": null,
+                    "properties": {}
+                },
+                "owner": "EDGE",
+                "state": null,
+                "diagnostic": null
+            },
+            "location": {
+                "id": "edge-location-WeVLDpisE2wPtRxB",
+                "name": null,
+                "providerId": null,
+                "locationScope": null,
+                "isAssignable": null,
+                "geoLocation": {
+                    "city": "Nice",
+                    "country": "France",
+                    "latitude": -18.325798,
+                    "longitude": -2.8190002
+                },
+                "parent": null,
+                "state": null,
+                "owner": null
+            },
+            "image": {
+                "id": "edge-image-WeVLDpisE2wPtRxB",
+                "name": "edge-image-name-UBUNTU-UNKNOWN",
+                "providerId": null,
+                "operatingSystem": {
+                    "operatingSystemFamily": "UBUNTU",
+                    "operatingSystemArchitecture": "UNKNOWN",
+                    "operatingSystemVersion": 1804.00
+                },
+                "location": null,
+                "state": null,
+                "owner": null
+            },
+            "hardware": {
+                "id": "edge-hardware-WeVLDpisE2wPtRxB",
+                "name": null,
+                "providerId": null,
+                "cores": 13,
+                "ram": 6,
+                "disk": 16.0,
+                "fpga": 0,
+                "location": null,
+                "state": null,
+                "owner": null
+            },
+            "pricePerInvocation": 0.0,
+            "memoryPrice": 0.0,
+            "nodeId": null,
+            "environment": null
+        },
+        "id": "8a7482868df473cc018df47d90e70007"
+    },
+    {
+        "name": "test4",
+        "loginCredential": {
+            "username": "ubuntu",
+            "password": "ProActive123",
+            "privateKey": ""
+        },
+        "ipAddresses": [
+            {
+                "IpAddressType": "PUBLIC_IP",
+                "IpVersion": "V4",
+                "value": "10.10.10.4"
+            },
+            {
+                "IpAddressType": "PRIVATE_IP",
+                "IpVersion": "V4",
+                "value": "18.203.158.193"
+            }
+        ],
+        "nodeProperties": {
+            "providerId": "15",
+            "numberOfCores": 1,
+            "memory": 8,
+            "disk": 51.0,
+            "operatingSystem": {
+                "operatingSystemFamily": "UBUNTU",
+                "operatingSystemArchitecture": "UNKNOWN",
+                "operatingSystemVersion": 1804.00
+            },
+            "geoLocation": {
+                "city": "Athens",
+                "country": "Greece",
+                "latitude": -45.349804,
+                "longitude": 15.921776
+            }
+        },
+        "reason": null,
+        "diagnostic": null,
+        "userId": null,
+        "allocated": null,
+        "jobId": "FCRnewLight0",
+        "systemArch": "ARMv8",
+        "scriptURL": "https://www.google.com",
+        "jarURL": "https://www.activeeon.com/public_content/7cde3381417ff3784639dc41fa7e7cd0544a5234-morphemic-7bulls/node_13.1.0-SNAPSHOT_armv8.jar",
+        "nodeCandidate": {
+            "id": "8a7482868df473cc018df47d92040008",
+            "nodeCandidateType": "EDGE",
+            "jobIdForByon": null,
+            "jobIdForEdge": "FCRnewLight0",
+            "price": 0.0,
+            "cloud": {
+                "id": "edge",
+                "endpoint": null,
+                "cloudType": "EDGE",
+                "api": null,
+                "credential": null,
+                "cloudConfiguration": {
+                    "nodeGroup": null,
+                    "properties": {}
+                },
+                "owner": "EDGE",
+                "state": null,
+                "diagnostic": null
+            },
+            "location": {
+                "id": "edge-location-40xmq8oI0kvATuAY",
+                "name": null,
+                "providerId": null,
+                "locationScope": null,
+                "isAssignable": null,
+                "geoLocation": {
+                    "city": "Athens",
+                    "country": "Greece",
+                    "latitude": -45.349804,
+                    "longitude": 15.921776
+                },
+                "parent": null,
+                "state": null,
+                "owner": null
+            },
+            "image": {
+                "id": "edge-image-40xmq8oI0kvATuAY",
+                "name": "edge-image-name-UBUNTU-UNKNOWN",
+                "providerId": null,
+                "operatingSystem": {
+                    "operatingSystemFamily": "UBUNTU",
+                    "operatingSystemArchitecture": "UNKNOWN",
+                    "operatingSystemVersion": 1804.00
+                },
+                "location": null,
+                "state": null,
+                "owner": null
+            },
+            "hardware": {
+                "id": "edge-hardware-40xmq8oI0kvATuAY",
+                "name": null,
+                "providerId": null,
+                "cores": 1,
+                "ram": 8,
+                "disk": 51.0,
+                "fpga": 0,
+                "location": null,
+                "state": null,
+                "owner": null
+            },
+            "pricePerInvocation": 0.0,
+            "memoryPrice": 0.0,
+            "nodeId": null,
+            "environment": null
+        },
+        "id": "8a7482868df473cc018df47d92090009"
+    },
+    {
+        "name": "test5",
+        "loginCredential": {
+            "username": "ubuntu",
+            "password": "ProActive123",
+            "privateKey": ""
+        },
+        "ipAddresses": [
+            {
+                "IpAddressType": "PUBLIC_IP",
+                "IpVersion": "V4",
+                "value": "10.10.10.5"
+            },
+            {
+                "IpAddressType": "PRIVATE_IP",
+                "IpVersion": "V4",
+                "value": "18.203.158.193"
+            }
+        ],
+        "nodeProperties": {
+            "providerId": "12",
+            "numberOfCores": 2,
+            "memory": 11,
+            "disk": 79.0,
+            "operatingSystem": {
+                "operatingSystemFamily": "UBUNTU",
+                "operatingSystemArchitecture": "UNKNOWN",
+                "operatingSystemVersion": 1804.00
+            },
+            "geoLocation": {
+                "city": "Warsaw",
+                "country": "Poland",
+                "latitude": 75.87384,
+                "longitude": -29.064651
+            }
+        },
+        "reason": null,
+        "diagnostic": null,
+        "userId": null,
+        "allocated": null,
+        "jobId": "FCRnewLight0",
+        "systemArch": "ARMv8",
+        "scriptURL": "https://www.google.com",
+        "jarURL": "https://www.activeeon.com/public_content/7cde3381417ff3784639dc41fa7e7cd0544a5234-morphemic-7bulls/node_13.1.0-SNAPSHOT_armv8.jar",
+        "nodeCandidate": {
+            "id": "8a7482868df473cc018df47d9320000a",
+            "nodeCandidateType": "EDGE",
+            "jobIdForByon": null,
+            "jobIdForEdge": "FCRnewLight0",
+            "price": 0.0,
+            "cloud": {
+                "id": "edge",
+                "endpoint": null,
+                "cloudType": "EDGE",
+                "api": null,
+                "credential": null,
+                "cloudConfiguration": {
+                    "nodeGroup": null,
+                    "properties": {}
+                },
+                "owner": "EDGE",
+                "state": null,
+                "diagnostic": null
+            },
+            "location": {
+                "id": "edge-location-SX9MUIDWB80wCnHi",
+                "name": null,
+                "providerId": null,
+                "locationScope": null,
+                "isAssignable": null,
+                "geoLocation": {
+                    "city": "Warsaw",
+                    "country": "Poland",
+                    "latitude": 75.87384,
+                    "longitude": -29.064651
+                },
+                "parent": null,
+                "state": null,
+                "owner": null
+            },
+            "image": {
+                "id": "edge-image-SX9MUIDWB80wCnHi",
+                "name": "edge-image-name-UBUNTU-UNKNOWN",
+                "providerId": null,
+                "operatingSystem": {
+                    "operatingSystemFamily": "UBUNTU",
+                    "operatingSystemArchitecture": "UNKNOWN",
+                    "operatingSystemVersion": 1804.00
+                },
+                "location": null,
+                "state": null,
+                "owner": null
+            },
+            "hardware": {
+                "id": "edge-hardware-SX9MUIDWB80wCnHi",
+                "name": null,
+                "providerId": null,
+                "cores": 2,
+                "ram": 11,
+                "disk": 79.0,
+                "fpga": 0,
+                "location": null,
+                "state": null,
+                "owner": null
+            },
+            "pricePerInvocation": 0.0,
+            "memoryPrice": 0.0,
+            "nodeId": null,
+            "environment": null
+        },
+        "id": "8a7482868df473cc018df47d9326000b"
+    },
+    {
+        "name": "test6",
+        "loginCredential": {
+            "username": "ubuntu",
+            "password": "ProActive123",
+            "privateKey": ""
+        },
+        "ipAddresses": [
+            {
+                "IpAddressType": "PUBLIC_IP",
+                "IpVersion": "V4",
+                "value": "10.10.10.6"
+            },
+            {
+                "IpAddressType": "PRIVATE_IP",
+                "IpVersion": "V4",
+                "value": "18.203.158.193"
+            }
+        ],
+        "nodeProperties": {
+            "providerId": "6",
+            "numberOfCores": 6,
+            "memory": 1,
+            "disk": 32.0,
+            "operatingSystem": {
+                "operatingSystemFamily": "UBUNTU",
+                "operatingSystemArchitecture": "UNKNOWN",
+                "operatingSystemVersion": 1804.00
+            },
+            "geoLocation": {
+                "city": "Nice",
+                "country": "France",
+                "latitude": -89.065475,
+                "longitude": 53.526062
+            }
+        },
+        "reason": null,
+        "diagnostic": null,
+        "userId": null,
+        "allocated": null,
+        "jobId": "FCRnewLight0",
+        "systemArch": "ARMv8",
+        "scriptURL": "https://www.google.com",
+        "jarURL": "https://www.activeeon.com/public_content/7cde3381417ff3784639dc41fa7e7cd0544a5234-morphemic-7bulls/node_13.1.0-SNAPSHOT_armv8.jar",
+        "nodeCandidate": {
+            "id": "8a7482868df473cc018df47d9441000c",
+            "nodeCandidateType": "EDGE",
+            "jobIdForByon": null,
+            "jobIdForEdge": "FCRnewLight0",
+            "price": 0.0,
+            "cloud": {
+                "id": "edge",
+                "endpoint": null,
+                "cloudType": "EDGE",
+                "api": null,
+                "credential": null,
+                "cloudConfiguration": {
+                    "nodeGroup": null,
+                    "properties": {}
+                },
+                "owner": "EDGE",
+                "state": null,
+                "diagnostic": null
+            },
+            "location": {
+                "id": "edge-location-2NId1nrSANd43V6J",
+                "name": null,
+                "providerId": null,
+                "locationScope": null,
+                "isAssignable": null,
+                "geoLocation": {
+                    "city": "Nice",
+                    "country": "France",
+                    "latitude": -89.065475,
+                    "longitude": 53.526062
+                },
+                "parent": null,
+                "state": null,
+                "owner": null
+            },
+            "image": {
+                "id": "edge-image-2NId1nrSANd43V6J",
+                "name": "edge-image-name-UBUNTU-UNKNOWN",
+                "providerId": null,
+                "operatingSystem": {
+                    "operatingSystemFamily": "UBUNTU",
+                    "operatingSystemArchitecture": "UNKNOWN",
+                    "operatingSystemVersion": 1804.00
+                },
+                "location": null,
+                "state": null,
+                "owner": null
+            },
+            "hardware": {
+                "id": "edge-hardware-2NId1nrSANd43V6J",
+                "name": null,
+                "providerId": null,
+                "cores": 6,
+                "ram": 1,
+                "disk": 32.0,
+                "fpga": 0,
+                "location": null,
+                "state": null,
+                "owner": null
+            },
+            "pricePerInvocation": 0.0,
+            "memoryPrice": 0.0,
+            "nodeId": null,
+            "environment": null
+        },
+        "id": "8a7482868df473cc018df47d9445000d"
+    },
+    {
+        "name": "test7",
+        "loginCredential": {
+            "username": "ubuntu",
+            "password": "ProActive123",
+            "privateKey": ""
+        },
+        "ipAddresses": [
+            {
+                "IpAddressType": "PUBLIC_IP",
+                "IpVersion": "V4",
+                "value": "10.10.10.7"
+            },
+            {
+                "IpAddressType": "PRIVATE_IP",
+                "IpVersion": "V4",
+                "value": "18.203.158.193"
+            }
+        ],
+        "nodeProperties": {
+            "providerId": "11",
+            "numberOfCores": 3,
+            "memory": 4,
+            "disk": 93.0,
+            "operatingSystem": {
+                "operatingSystemFamily": "UBUNTU",
+                "operatingSystemArchitecture": "UNKNOWN",
+                "operatingSystemVersion": 1804.00
+            },
+            "geoLocation": {
+                "city": "Athens",
+                "country": "Greece",
+                "latitude": 78.6129,
+                "longitude": -52.693478
+            }
+        },
+        "reason": null,
+        "diagnostic": null,
+        "userId": null,
+        "allocated": null,
+        "jobId": "FCRnewLight0",
+        "systemArch": "ARMv8",
+        "scriptURL": "https://www.google.com",
+        "jarURL": "https://www.activeeon.com/public_content/7cde3381417ff3784639dc41fa7e7cd0544a5234-morphemic-7bulls/node_13.1.0-SNAPSHOT_armv8.jar",
+        "nodeCandidate": {
+            "id": "8a7482868df473cc018df47d957c000e",
+            "nodeCandidateType": "EDGE",
+            "jobIdForByon": null,
+            "jobIdForEdge": "FCRnewLight0",
+            "price": 0.0,
+            "cloud": {
+                "id": "edge",
+                "endpoint": null,
+                "cloudType": "EDGE",
+                "api": null,
+                "credential": null,
+                "cloudConfiguration": {
+                    "nodeGroup": null,
+                    "properties": {}
+                },
+                "owner": "EDGE",
+                "state": null,
+                "diagnostic": null
+            },
+            "location": {
+                "id": "edge-location-69VJ8eBysHcIB2XU",
+                "name": null,
+                "providerId": null,
+                "locationScope": null,
+                "isAssignable": null,
+                "geoLocation": {
+                    "city": "Athens",
+                    "country": "Greece",
+                    "latitude": 78.6129,
+                    "longitude": -52.693478
+                },
+                "parent": null,
+                "state": null,
+                "owner": null
+            },
+            "image": {
+                "id": "edge-image-69VJ8eBysHcIB2XU",
+                "name": "edge-image-name-UBUNTU-UNKNOWN",
+                "providerId": null,
+                "operatingSystem": {
+                    "operatingSystemFamily": "UBUNTU",
+                    "operatingSystemArchitecture": "UNKNOWN",
+                    "operatingSystemVersion": 1804.00
+                },
+                "location": null,
+                "state": null,
+                "owner": null
+            },
+            "hardware": {
+                "id": "edge-hardware-69VJ8eBysHcIB2XU",
+                "name": null,
+                "providerId": null,
+                "cores": 3,
+                "ram": 4,
+                "disk": 93.0,
+                "fpga": 0,
+                "location": null,
+                "state": null,
+                "owner": null
+            },
+            "pricePerInvocation": 0.0,
+            "memoryPrice": 0.0,
+            "nodeId": null,
+            "environment": null
+        },
+        "id": "8a7482868df473cc018df47d957f000f"
+    },
+    {
+        "name": "test8",
+        "loginCredential": {
+            "username": "ubuntu",
+            "password": "ProActive123",
+            "privateKey": ""
+        },
+        "ipAddresses": [
+            {
+                "IpAddressType": "PUBLIC_IP",
+                "IpVersion": "V4",
+                "value": "10.10.10.8"
+            },
+            {
+                "IpAddressType": "PRIVATE_IP",
+                "IpVersion": "V4",
+                "value": "18.203.158.193"
+            }
+        ],
+        "nodeProperties": {
+            "providerId": "9",
+            "numberOfCores": 11,
+            "memory": 14,
+            "disk": 98.0,
+            "operatingSystem": {
+                "operatingSystemFamily": "UBUNTU",
+                "operatingSystemArchitecture": "UNKNOWN",
+                "operatingSystemVersion": 1804.00
+            },
+            "geoLocation": {
+                "city": "Nice",
+                "country": "France",
+                "latitude": -44.904438,
+                "longitude": 50.77269
+            }
+        },
+        "reason": null,
+        "diagnostic": null,
+        "userId": null,
+        "allocated": null,
+        "jobId": "FCRnewLight0",
+        "systemArch": "ARMv8",
+        "scriptURL": "https://www.google.com",
+        "jarURL": "https://www.activeeon.com/public_content/7cde3381417ff3784639dc41fa7e7cd0544a5234-morphemic-7bulls/node_13.1.0-SNAPSHOT_armv8.jar",
+        "nodeCandidate": {
+            "id": "8a7482868df473cc018df47d96a20010",
+            "nodeCandidateType": "EDGE",
+            "jobIdForByon": null,
+            "jobIdForEdge": "FCRnewLight0",
+            "price": 0.0,
+            "cloud": {
+                "id": "edge",
+                "endpoint": null,
+                "cloudType": "EDGE",
+                "api": null,
+                "credential": null,
+                "cloudConfiguration": {
+                    "nodeGroup": null,
+                    "properties": {}
+                },
+                "owner": "EDGE",
+                "state": null,
+                "diagnostic": null
+            },
+            "location": {
+                "id": "edge-location-bf3bxPhgBqe20gOB",
+                "name": null,
+                "providerId": null,
+                "locationScope": null,
+                "isAssignable": null,
+                "geoLocation": {
+                    "city": "Nice",
+                    "country": "France",
+                    "latitude": -44.904438,
+                    "longitude": 50.77269
+                },
+                "parent": null,
+                "state": null,
+                "owner": null
+            },
+            "image": {
+                "id": "edge-image-bf3bxPhgBqe20gOB",
+                "name": "edge-image-name-UBUNTU-UNKNOWN",
+                "providerId": null,
+                "operatingSystem": {
+                    "operatingSystemFamily": "UBUNTU",
+                    "operatingSystemArchitecture": "UNKNOWN",
+                    "operatingSystemVersion": 1804.00
+                },
+                "location": null,
+                "state": null,
+                "owner": null
+            },
+            "hardware": {
+                "id": "edge-hardware-bf3bxPhgBqe20gOB",
+                "name": null,
+                "providerId": null,
+                "cores": 11,
+                "ram": 14,
+                "disk": 98.0,
+                "fpga": 0,
+                "location": null,
+                "state": null,
+                "owner": null
+            },
+            "pricePerInvocation": 0.0,
+            "memoryPrice": 0.0,
+            "nodeId": null,
+            "environment": null
+        },
+        "id": "8a7482868df473cc018df47d96a50011"
+    },
+    {
+        "name": "test9",
+        "loginCredential": {
+            "username": "ubuntu",
+            "password": "ProActive123",
+            "privateKey": ""
+        },
+        "ipAddresses": [
+            {
+                "IpAddressType": "PUBLIC_IP",
+                "IpVersion": "V4",
+                "value": "10.10.10.9"
+            },
+            {
+                "IpAddressType": "PRIVATE_IP",
+                "IpVersion": "V4",
+                "value": "18.203.158.193"
+            }
+        ],
+        "nodeProperties": {
+            "providerId": "16",
+            "numberOfCores": 4,
+            "memory": 13,
+            "disk": 8.0,
+            "operatingSystem": {
+                "operatingSystemFamily": "UBUNTU",
+                "operatingSystemArchitecture": "UNKNOWN",
+                "operatingSystemVersion": 1804.00
+            },
+            "geoLocation": {
+                "city": "Athens",
+                "country": "Greece",
+                "latitude": -24.562317,
+                "longitude": 26.578308
+            }
+        },
+        "reason": null,
+        "diagnostic": null,
+        "userId": null,
+        "allocated": null,
+        "jobId": "FCRnewLight0",
+        "systemArch": "ARMv8",
+        "scriptURL": "https://www.google.com",
+        "jarURL": "https://www.activeeon.com/public_content/7cde3381417ff3784639dc41fa7e7cd0544a5234-morphemic-7bulls/node_13.1.0-SNAPSHOT_armv8.jar",
+        "nodeCandidate": {
+            "id": "8a7482868df473cc018df47d97c20012",
+            "nodeCandidateType": "EDGE",
+            "jobIdForByon": null,
+            "jobIdForEdge": "FCRnewLight0",
+            "price": 0.0,
+            "cloud": {
+                "id": "edge",
+                "endpoint": null,
+                "cloudType": "EDGE",
+                "api": null,
+                "credential": null,
+                "cloudConfiguration": {
+                    "nodeGroup": null,
+                    "properties": {}
+                },
+                "owner": "EDGE",
+                "state": null,
+                "diagnostic": null
+            },
+            "location": {
+                "id": "edge-location-3Hi1Qjr3nwDhHVKL",
+                "name": null,
+                "providerId": null,
+                "locationScope": null,
+                "isAssignable": null,
+                "geoLocation": {
+                    "city": "Athens",
+                    "country": "Greece",
+                    "latitude": -24.562317,
+                    "longitude": 26.578308
+                },
+                "parent": null,
+                "state": null,
+                "owner": null
+            },
+            "image": {
+                "id": "edge-image-3Hi1Qjr3nwDhHVKL",
+                "name": "edge-image-name-UBUNTU-UNKNOWN",
+                "providerId": null,
+                "operatingSystem": {
+                    "operatingSystemFamily": "UBUNTU",
+                    "operatingSystemArchitecture": "UNKNOWN",
+                    "operatingSystemVersion": 1804.00
+                },
+                "location": null,
+                "state": null,
+                "owner": null
+            },
+            "hardware": {
+                "id": "edge-hardware-3Hi1Qjr3nwDhHVKL",
+                "name": null,
+                "providerId": null,
+                "cores": 4,
+                "ram": 13,
+                "disk": 8.0,
+                "fpga": 0,
+                "location": null,
+                "state": null,
+                "owner": null
+            },
+            "pricePerInvocation": 0.0,
+            "memoryPrice": 0.0,
+            "nodeId": null,
+            "environment": null
+        },
+        "id": "8a7482868df473cc018df47d97c70013"
+    },
+    {
+        "name": "test10",
+        "loginCredential": {
+            "username": "ubuntu",
+            "password": "ProActive123",
+            "privateKey": ""
+        },
+        "ipAddresses": [
+            {
+                "IpAddressType": "PUBLIC_IP",
+                "IpVersion": "V4",
+                "value": "10.10.10.10"
+            },
+            {
+                "IpAddressType": "PRIVATE_IP",
+                "IpVersion": "V4",
+                "value": "18.203.158.193"
+            }
+        ],
+        "nodeProperties": {
+            "providerId": "20",
+            "numberOfCores": 8,
+            "memory": 1,
+            "disk": 13.0,
+            "operatingSystem": {
+                "operatingSystemFamily": "UBUNTU",
+                "operatingSystemArchitecture": "UNKNOWN",
+                "operatingSystemVersion": 1804.00
+            },
+            "geoLocation": {
+                "city": "Nice",
+                "country": "France",
+                "latitude": 26.856018,
+                "longitude": 0.13977814
+            }
+        },
+        "reason": null,
+        "diagnostic": null,
+        "userId": null,
+        "allocated": null,
+        "jobId": "FCRnewLight0",
+        "systemArch": "ARMv8",
+        "scriptURL": "https://www.google.com",
+        "jarURL": "https://www.activeeon.com/public_content/7cde3381417ff3784639dc41fa7e7cd0544a5234-morphemic-7bulls/node_13.1.0-SNAPSHOT_armv8.jar",
+        "nodeCandidate": {
+            "id": "8a7482868df473cc018df47d98e00014",
+            "nodeCandidateType": "EDGE",
+            "jobIdForByon": null,
+            "jobIdForEdge": "FCRnewLight0",
+            "price": 0.0,
+            "cloud": {
+                "id": "edge",
+                "endpoint": null,
+                "cloudType": "EDGE",
+                "api": null,
+                "credential": null,
+                "cloudConfiguration": {
+                    "nodeGroup": null,
+                    "properties": {}
+                },
+                "owner": "EDGE",
+                "state": null,
+                "diagnostic": null
+            },
+            "location": {
+                "id": "edge-location-rY42bNpWUlA7RHm7",
+                "name": null,
+                "providerId": null,
+                "locationScope": null,
+                "isAssignable": null,
+                "geoLocation": {
+                    "city": "Nice",
+                    "country": "France",
+                    "latitude": 26.856018,
+                    "longitude": 0.13977814
+                },
+                "parent": null,
+                "state": null,
+                "owner": null
+            },
+            "image": {
+                "id": "edge-image-rY42bNpWUlA7RHm7",
+                "name": "edge-image-name-UBUNTU-UNKNOWN",
+                "providerId": null,
+                "operatingSystem": {
+                    "operatingSystemFamily": "UBUNTU",
+                    "operatingSystemArchitecture": "UNKNOWN",
+                    "operatingSystemVersion": 1804.00
+                },
+                "location": null,
+                "state": null,
+                "owner": null
+            },
+            "hardware": {
+                "id": "edge-hardware-rY42bNpWUlA7RHm7",
+                "name": null,
+                "providerId": null,
+                "cores": 8,
+                "ram": 1,
+                "disk": 13.0,
+                "fpga": 0,
+                "location": null,
+                "state": null,
+                "owner": null
+            },
+            "pricePerInvocation": 0.0,
+            "memoryPrice": 0.0,
+            "nodeId": null,
+            "environment": null
+        },
+        "id": "8a7482868df473cc018df47d98e30015"
+    }
+]   

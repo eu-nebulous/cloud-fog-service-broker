@@ -1,0 +1,44 @@
+https://158.39.75.54/projects/nebulous-collaboration-hub/wiki/accessing-the-demo-activemq-broker
+https://openproject.nebulouscloud.eu/projects/nebulous-collaboration-hub/wiki/accessing-the-nebulous-dev-k8s
+
+activemq
+terminal στο Documents/projects/koronakos/nebulous_certs
+export KUBECONFIG=kubeconfig.yaml
+kubectl -n nebulous port-forward service/nebulous-activemq 5672:5672 8161:8161 61616:61616
+
+OPTIMIZER waits for a reply on eu.nebulouscloud.cfsb.get_node_candidates.reply,
+the reply body will be the list of node candidates as you got it from SAL, but augmented with ranking information.
+The optimiser will use the highest-ranked node candidates.
+
+το app name from message.subject
+το παραπάνω αντί για το "application_id": "app_id" στη γραμμη 74
+
+passwords
+gregkoron
+Olympi@kos789
+
+-------------
+SAL
+SAL POSTMAN: https://158.39.75.54/projects/nebulous-collaboration-hub/wiki/deployment-manager-sal-1
+
+Port Forwarding to enable POSTMAN for SAL:
+kubectl port-forward -n nebulous service/sal 8080:8080
+
+Use this in POSTMAN Request: https://localhost:8080/sal/pagateway/connect
+---
+kubectl port-forward -n nebulous service/sal1 8080:8080
+------If proplems It works with this-----
+kubectl -n nebulous get pod | findstr sal
+kubectl -n nebulous delete pod sal-all-6b8bbc54cf-hxsj6
+-----------
+
+----------FLUX--------------
+kubectl  scale -n flux-system --replicas=0 deploy/sal-all-flux
+
+kubectl  scale -n flux-system --replicas=1 deploy/sal-all-flux
+
+kubectl  -n flux-system port-forward service/sal-flux <YOUR_FAV_PORT>:8080
+
+kubectl  scale -n flux-system --replicas=0 deploy/sal-all-flux
+
+kubectl  scale -n flux-system --replicas=1 deploy/sal-all-flux

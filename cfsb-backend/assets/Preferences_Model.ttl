@@ -1151,7 +1151,7 @@ attr:c1c5b3c9-6178-4d67-a7e3-0285c2bf98ef
         dcterms:created                "2023-11-23T14:10:20.077Z"^^xsd:dateTime ;
         dcterms:identifier             "c1c5b3c9-6178-4d67-a7e3-0285c2bf98ef" ;
         dcterms:modified               "2023-11-23T14:10:20.077Z"^^xsd:dateTime ;
-        dcterms:title                  "Solid State Drive " ;
+        dcterms:title                  "Solid State Drive" ;
         skos:broader                   attr:attr-performance-capacity .
 
 attr:ffebba96-d53d-44c9-be75-3258de80ed70
