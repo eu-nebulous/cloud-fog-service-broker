@@ -340,147 +340,68 @@ def create_data_table(selected_criteria, extracted_data, field_mapping):
     return data_table
 
 
-# Used to Append "Score" and "Rank" for each node in SAL's response JSON
-# def append_evaluation_results(SALs_JSON_filename, raw_evaluation_results):
-#     # Load the JSON content from the file
-#     with open(SALs_JSON_filename, 'r') as file:
-#         SALs_JSON = json.load(file)
-#
-#     # Check if raw_evaluation_results is a string and parse it, otherwise use it directly
-#     if isinstance(raw_evaluation_results, str):
-#         try:
-#             evaluation_results = json.loads(raw_evaluation_results)
-#         except json.JSONDecodeError as e:
-#             print(f"An error occurred while decoding the JSON data: {e}")
-#             return
-#     else:
-#         evaluation_results = raw_evaluation_results
-#
-#     eval_results_dict = {result['Id']: (result['DEA Score'], result['Rank']) for result in evaluation_results}
-#
-#     for node in SALs_JSON:
-#         node_id = node.get("id")
-#         if node_id in eval_results_dict:
-#             score, rank = eval_results_dict[node_id]
-#             node["Score"] = score
-#             node["Rank"] = rank
-#
-#     return SALs_JSON
-#     # # Write the updated SALs_JSON to a new JSON file
-#     # with open('updated_SALs_JSON.json', 'w') as file:
-#     #     json.dump(SALs_JSON, file, indent=4)
 
-# def append_evaluation_results(sal_reply_body, scores_and_ranks):
-#     # Create a dictionary mapping Ids to scores and ranks
-#     eval_results_dict = {result['Id']: (result['DEA Score'], result['Rank'])
-#                          for result in scores_and_ranks}
-#
-#     # Iterate over each node in sal_reply_body and append Score and Rank
-#     for node in sal_reply_body:
-#         node_id = node.get('id')  # Assuming the ID is directly under the node
-#         if node_id in eval_results_dict:
-#             score, rank = eval_results_dict[node_id]
-#             node["Score"] = score
-#             node["Rank"] = rank
-#
-#     return sal_reply_body
-
-
+import random
 
 # def append_evaluation_results(sal_reply_body, scores_and_ranks):
 #     # Check if sal_reply_body is a string and convert it to a Python object
 #     if isinstance(sal_reply_body, str):
 #         sal_reply_body = json.loads(sal_reply_body)
 #
-#     # Create a dictionary mapping Ids to scores and ranks
-#     eval_results_dict = {result['Id']: (result['DEA Score'], result['Rank'])
-#                          for result in scores_and_ranks}
+#     if scores_and_ranks:
+#         # Create a dictionary mapping Ids to scores and ranks
+#         eval_results_dict = {result['Id']: (result['DEA Score'], result['Rank'])
+#                              for result in scores_and_ranks}
 #
-#     # Iterate over each node in sal_reply_body and append Score and Rank
-#     for node in sal_reply_body:
-#         node_id = node.get('id')  # Assuming the ID is directly under the node
-#         if node_id in eval_results_dict:
-#             score, rank = eval_results_dict[node_id]
-#             node["score"] = score
+#         # Iterate over each node in sal_reply_body and append Score and Rank
+#         for node in sal_reply_body:
+#             node_id = node.get('id')  # Assuming the ID is directly under the node
+#             if node_id in eval_results_dict:
+#                 score, rank = eval_results_dict[node_id]
+#                 node["score"] = score
+#                 node["rank"] = rank
+#     else:
+#         # If scores_and_ranks is empty
+#         for index, node in enumerate(sal_reply_body):
+#             if index == 0:
+#                 # First node gets a score of 1 and rank of 1
+#                 node["score"] = 1
+#                 node["rank"] = 1
+#             else:
+#                 # Assign random scores between 0.33 and 0.93 to the rest
+#                 node["score"] = random.uniform(0.33, 0.93)
+#
+#         # Sort nodes by score in descending order to calculate ranks
+#         sorted_nodes = sorted(sal_reply_body[1:], key=lambda x: x["score"], reverse=True)
+#
+#         # Assign ranks based on sorted order, starting from 2 since the first node is ranked 1
+#         for rank, node in enumerate(sorted_nodes, start=2):
 #             node["rank"] = rank
+#
+#         # Combine the first node with the rest
+#         sal_reply_body = [sal_reply_body[0]] + sorted_nodes
 #
 #     return sal_reply_body
 
-
-# Used to parse Patini's JSON
-def parse_device_info_from_file(file_path):
-    with open(file_path, 'r') as file:
-        json_data = json.load(file)
-        device_names = []
-        device_info = {
-        'id': json_data['_id'],
-        'name': json_data['name'],  # Save the device name
-        'deviceInfo': json_data['deviceInfo'],
-        'creationDate': json_data['creationDate'],
-        'lastUpdateDate': json_data['lastUpdateDate'],
-        'status': json_data['status'],
-        'metrics': {
-            'cpu': json_data['metrics']['metrics']['cpu'],
-            'uptime': json_data['metrics']['metrics']['uptime'],
-            'disk': json_data['metrics']['metrics']['disk'],
-            'ram': json_data['metrics']['metrics']['ram']
-        }
-    }
-
-    # Example of converting and handling ISODate strings, adjust accordingly
-    device_info['creationDate'] = datetime.fromisoformat(device_info['creationDate'].replace("ISODate('", "").replace("')", ""))
-    device_info['lastUpdateDate'] = datetime.fromisoformat(device_info['lastUpdateDate'].replace("ISODate('", "").replace("')", ""))
-    device_info['creationDate'] = device_info['creationDate'].isoformat()
-    device_info['lastUpdateDate'] = device_info['lastUpdateDate'].isoformat()
-
-    # Update the global device_names list
-    device_names.append({'id': device_info['id'], 'name': device_info['name']})
-    return device_names, device_info
-
-
-import json
-import random
 
 def append_evaluation_results(sal_reply_body, scores_and_ranks):
     # Check if sal_reply_body is a string and convert it to a Python object
     if isinstance(sal_reply_body, str):
         sal_reply_body = json.loads(sal_reply_body)
 
-    if scores_and_ranks:
-        # Create a dictionary mapping Ids to scores and ranks
-        eval_results_dict = {result['Id']: (result['DEA Score'], result['Rank'])
-                             for result in scores_and_ranks}
+    # Create a dictionary mapping Ids to scores and ranks
+    eval_results_dict = {result['Id']: (result['DEA Score'], result['Rank'])
+                         for result in scores_and_ranks}
 
-        # Iterate over each node in sal_reply_body and append Score and Rank
-        for node in sal_reply_body:
-            node_id = node.get('id')  # Assuming the ID is directly under the node
-            if node_id in eval_results_dict:
-                score, rank = eval_results_dict[node_id]
-                node["score"] = score
-                node["rank"] = rank
-    else:
-        # If scores_and_ranks is empty
-        for index, node in enumerate(sal_reply_body):
-            if index == 0:
-                # First node gets a score of 1 and rank of 1
-                node["score"] = 1
-                node["rank"] = 1
-            else:
-                # Assign random scores between 0.33 and 0.93 to the rest
-                node["score"] = random.uniform(0.33, 0.93)
-
-        # Sort nodes by score in descending order to calculate ranks
-        sorted_nodes = sorted(sal_reply_body[1:], key=lambda x: x["score"], reverse=True)
-
-        # Assign ranks based on sorted order, starting from 2 since the first node is ranked 1
-        for rank, node in enumerate(sorted_nodes, start=2):
+    # Iterate over each node in sal_reply_body and append Score and Rank
+    for node in sal_reply_body:
+        node_id = node.get('id')  # Assuming the ID is directly under the node
+        if node_id in eval_results_dict:
+            score, rank = eval_results_dict[node_id]
+            node["score"] = score
             node["rank"] = rank
 
-        # Combine the first node with the rest
-        sal_reply_body = [sal_reply_body[0]] + sorted_nodes
-
     return sal_reply_body
-
 
 
 

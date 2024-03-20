@@ -36,8 +36,9 @@ class SyncedHandler(Handler):
             # Save the correlation_id (We do not have it from the app_side)
             uuid.uuid4().hex.encode("utf-8") # for Correlation id
 
-            # Optimizer_correlation_id = '88334290cad34ad9b21eb468a9f8ff11' # dummy correlation_id
             correlation_id_optimizer = message.correlation_id
+            if not correlation_id_optimizer:
+                correlation_id_optimizer = '88334290cad34ad9b21eb468a9f8ff11'  # dummy correlation_id
             # logging.info(f"Optimizer_correlation_id {message.correlation_id}")
             print("Optimizer Correlation Id: ", correlation_id_optimizer)
 
@@ -67,85 +68,6 @@ class SyncedHandler(Handler):
 
                 # 58 Nodes
                 # body_sent_from_optimizer = [
-                #     {
-                #         "type": "NodeTypeRequirement",
-                #         "nodeTypes": ["IAAS"],
-                #         "jobIdForByon": "dummy-app-id",
-                #         "jobIdForEDGE": "dummy-app-id"
-                #     },
-                #     {
-                #         "type": "AttributeRequirement",
-                #         "requirementClass": "hardware",
-                #         "requirementAttribute": "cores",
-                #         "requirementOperator": "EQ",
-                #         "value": "2"
-                #     },
-                #     {
-                #         "type": "AttributeRequirement",
-                #         "requirementClass": "hardware",
-                #         "requirementAttribute": "ram",
-                #         "requirementOperator": "EQ",
-                #         "value": "4096"
-                #     }
-                # ]
-
-                # "jobIdForByon": "null",
-                # "jobIdForEDGE": "null"
-                # body_sent_from_optimizer =[
-                # {
-                #     "type": "NodeTypeRequirement",
-                #     "nodeTypes": ["IAAS"]
-                # },
-                # {
-                #     "type": "AttributeRequirement",
-                #     "requirementClass": "image",
-                #     "requirementAttribute": "operatingSystem.family",
-                #      "requirementOperator": "IN","value":"UBUNTU"},
-                # {
-                #     "type":"AttributeRequirement",
-                #     "requirementClass":"hardware",
-                #     "requirementAttribute":"ram",
-                #     "requirementOperator":"GEQ",
-                #     "value":"4096"
-                # },
-                # {"type":"AttributeRequirement","requirementClass":"hardware","requirementAttribute":"cores",
-                #  "requirementOperator":"GEQ","value":"4"}
-                # ]
-
-                # body_sent_from_optimizer = [
-                #     {
-                #         "type": "NodeTypeRequirement",
-                #         "nodeTypes": ["IAAS"]
-                #     }
-                # ]
-                # "nodeTypes": ["EDGE"]
-                # "nodeTypes": ["IAAS", "PAAS", "FAAS", "BYON", "EDGE", "SIMULATION"]
-                # "jobIdForEDGE": "FCRnewLight0"
-                # "jobIdForByon":"dummy-app-id",
-                # "jobIdForEDGE":"dummy-app-id"
-
-                # body_sent_from_optimizer = [
-                #     {
-                #         "type": "NodeTypeRequirement",
-                #         "nodeTypes": ["IAAS"]
-                #     },
-                #     {
-                #         "type": "AttributeRequirement",
-                #         "requirementClass": "hardware",
-                #         "requirementAttribute": "cores",
-                #         "requirementOperator": "EQ",
-                #         "value": "2"
-                #     },
-                #     {
-                #         "type": "AttributeRequirement",
-                #         "requirementClass": "hardware",
-                #         "requirementAttribute": "ram",
-                #         "requirementOperator": "EQ",
-                #         "value": "4096"
-                #     }
-                # ]
-
-                # body_sent_from_optimizer =[
                 #     {
                 #         "type": "NodeTypeRequirement",
                 #         "nodeTypes": ["IAAS"],
@@ -216,17 +138,16 @@ class SyncedHandler(Handler):
                 #    sal_reply_body = json.load(file)
                 #    print("SAL's Reply from JSON File:", sal_reply_body)
 
-
                 try:
                     # Parse the JSON string to a Python object
                     nodes_data = json.loads(sal_body)
                     total_nodes = len(nodes_data)  # Get the total number of nodes
 
                     # Check if more than 58 nodes exist
-                    if total_nodes > 58:
+                    if total_nodes > 400:
                         print("More than 58 nodes exist. Only the first 51 nodes will be processed.")
                         # Filter to only include the first 51 nodes and convert back to JSON string
-                        sal_reply_body = json.dumps(nodes_data[:15])
+                        sal_reply_body = json.dumps(nodes_data[:400])
                     else:
                         print(f"Total {total_nodes} nodes found. Processing all nodes.")
                         # Keep sal_reply_body as is since it's already a JSON string
@@ -341,7 +262,7 @@ def start_exn_connector_in_background():
         addressOPTtriggering = 'eu.nebulouscloud.cfsb.get_node_candidates'
         addressSendToOPT = 'eu.nebulouscloud.cfsb.get_node_candidates.reply'
 
-        connector = EXN('ui', url="localhost", port=5672, username="admin", password="admin",
+        connector = EXN('ui', url=os.getenv('NEBULOUS_BROKER_URL'), port=os.getenv('NEBULOUS_BROKER_PORT'), username=os.getenv('NEBULOUS_BROKER_USERNAME'), password=os.getenv('NEBULOUS_BROKER_PASSWORD'),
                         handler=Bootstrap(),
                         publishers=[
                             SyncedPublisher('SAL-GET', addressSAL_GET, True, True),

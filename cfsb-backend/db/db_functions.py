@@ -1,9 +1,11 @@
+import os
+
 import psycopg2
 
 
 def db_open():
     # Connect to the database
-    conn = psycopg2.connect(database="fog_broker", user="dbuser", password="pass123", host="localhost", port="5432")
+    conn = psycopg2.connect(database=os.getenv('POSTGRES_DB_NAME'), user=os.getenv('POSTGRES_DB_USER'), password=os.getenv('POSTGRES_DB_PASS'), host=os.getenv('POSTGRES_DB_HOST'), port=os.getenv('POSTGRES_DB_PORT'))
     # create a cursor
     cur = conn.cursor()
     return conn, cur
