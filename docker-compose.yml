@@ -1,0 +1,41 @@
+version: '3.0'
+services:
+  backend:
+    build:
+      context: ./cfsb-backend
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    env_file:
+      - ./cfsb-backend/.env.prod
+    depends_on:
+      - db
+    networks:
+      cfsb-network:
+  db:
+    image: postgres:16
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=dbuser
+      - POSTGRES_PASSWORD=pass123
+      - POSTGRES_DB=fog_broker
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+      - ./cfsb-backend/db/db_script.sql:/docker-entrypoint-initdb.d/db_script.sql
+    networks:
+      cfsb-network:
+  frontend:
+    build:
+      context: ./cfsb-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    networks:
+      cfsb-network:
+
+networks:
+  cfsb-network:
+
+volumes:
+  postgres_data:

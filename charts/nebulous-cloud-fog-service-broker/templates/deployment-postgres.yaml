@@ -1,0 +1,61 @@
+{{ if .Values.postgresql.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "nebulous-cloud-fog-service-broker.fullname" . }}-postgresql
+  labels:
+    {{- include "nebulous-cloud-fog-service-broker.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "nebulous-cloud-fog-service-broker.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "nebulous-cloud-fog-service-broker.selectorLabels" . | nindent 8 }}
+    spec:
+      volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: {{ .Values.postgresql.volumeMounts.data.claimName }}
+        - name: init-script
+          configMap:
+            name: {{ .Values.postgresql.volumeMounts.initScript.configMapName }}
+      containers:
+        - name: postgresql
+          image: "{{ .Values.postgresql.image }}"
+          ports:
+            - name: postgresql
+              containerPort: {{ .Values.postgresql.port }}
+              protocol: TCP
+          env:
+            - name: POSTGRES_USER
+              value: "{{ .Values.postgresql.user }}"
+            - name: POSTGRES_PASSWORD
+              value: "{{ .Values.postgresql.password }}"
+            - name: POSTGRES_DB
+              value: "{{ .Values.postgresql.dbName }}"
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data/
+            - name: init-script
+              mountPath: /docker-entrypoint-initdb.d
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "nebulous-cloud-fog-service-broker.fullname" . }}-postgresql
+  labels:
+    {{- include "nebulous-cloud-fog-service-broker.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.postgresql.port }}
+      targetPort: postgresql
+      protocol: TCP
+      name: postgresql
+  selector:
+    {{- include "nebulous-cloud-fog-service-broker.selectorLabels" . | nindent 4 }}
+{{ end }}

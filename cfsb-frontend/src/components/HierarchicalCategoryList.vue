@@ -3,35 +3,37 @@
     <form v-if="!isChild" @submit.prevent="submitSelection">
       <ul class="list-group">
         <li v-for="item in items" :key="item.name" class="list-group-item criteria-card">
-          <span v-if="item.children.length > 0" @click="toggleCategory(item)" class="float-end" v-bind:title="'Expand ' + item.title"><i class="bi bi-arrow-bar-down" v-bind:aria-label="'Expand ' + item.title"></i></span>
+          <span v-if="item.children.length > 0" @click="toggleCategory(item)" class="float-end" v-bind:title="'Expand ' + item.title">
+            <i class="bi bi-arrow-bar-down" v-bind:aria-label="'Expand ' + item.title"></i>
+          </span>
           <label>
-            <!--
-            <input v-model="item.checked" type="checkbox" @change="handleCheckboxChange(item)" />
-            <span @click="toggleCategory(item)" v-bind:title="item.description">{{ item.title }}</span>  -->
+            <!-- <input v-model="item.checked" type="checkbox" @change="handleCheckboxChange(item)" /> -->
             <input type="checkbox" :checked="item.checked" @change="() => handleCheckboxChange(item)" />
-            <span @click="toggleCategory(item)">{{ item.title }}</span>
+            <span @click="toggleCategory(item)" v-bind:title="item.description"> {{ item.title }} ({{ getTypeName(item.type) }}) </span>
           </label>
           <ul v-show="item.showChildren" class="list-group">
             <!-- Recursive call without Submit button -->
-            <HierarchicalCategoryList :isChild="true" :items="item.children" @selected-items="updateSelectedItems" />
+            <!-- <HierarchicalCategoryList :isChild="true" :items="item.children" @selected-items="updateSelectedItems" /> -->
+              <HierarchicalCategoryList :isChild="true" :items="item.children" />
           </ul>
         </li>
       </ul>
+      <button @click="goBackToHome" class="bg-color-primary">Back</button>
       <!-- Submit button outside the recursive structure -->
-      <button type="submit" class="bg-color-primary">Submit</button>
+      <button type="submit" class="bg-color-primary">Next</button>
     </form>
     <div v-else>
       <li v-for="item in items" :key="item.name" class="list-group-item criteria-card">
         <span v-if="item.children.length > 0" @click="toggleCategory(item)" class="float-end" v-bind:title="'Expand ' + item.title"><i class="bi bi-arrow-bar-down" v-bind:aria-label="'Expand ' + item.title"></i></span>
         <label>
-          <!--   <input v-model="item.checked" type="checkbox" @change="handleCheckboxChange(item)" />
-           <span @click="toggleCategory(item)" v-bind:title="item.description">{{ item.title }}</span>  -->
+          <!--   <input v-model="item.checked" type="checkbox" @change="handleCheckboxChange(item)" />-->
           <input type="checkbox" :checked="item.checked" @change="() => handleCheckboxChange(item)" />
-          <span @click="toggleCategory(item)">{{ item.title }}</span>
-        </label>
-        <ul v-show="item.showChildren">
-          <!-- Recursive call without Submit button -->
-          <HierarchicalCategoryList :isChild="true" :items="item.children" @selected-items="updateSelectedItems" />
+          <span @click="toggleCategory(item)" v-bind:title="item.description"> {{ item.title }} ({{ getTypeName(item.type) }}) </span>
+         </label>
+         <ul v-show="item.showChildren">
+           <!-- Recursive call without Submit button
+          <HierarchicalCategoryList :isChild="true" :items="item.children" @selected-items="updateSelectedItems" /> -->
+           <HierarchicalCategoryList :isChild="true" :items="item.children" />
         </ul>
       </li>
     </div>
@@ -46,11 +48,12 @@ export default {
       type: Boolean,
       default: false,
     },
+    updateItemType: Function,
+
   },
   data() {
     return {
       localSelectedItems: [],
-      selectedItemsFromBack: [],
     };
   },
   computed: {
@@ -95,50 +98,91 @@ export default {
       }
       return null;
     },
+    setChildrenVisibility(items, visible) {
+      items.forEach(item => {
+        item.showChildren = visible;
+        if (item.children && item.children.length > 0) {
+          this.setChildrenVisibility(item.children, visible);
+        }
+      });
+    },
     updateSelectedItems() {
-      // Update the selected items list
-      this.localSelectedItems = this.collectSelectedItems(this.items);
-      // Emit the updated list
-      this.$emit('selected-items', this.localSelectedItems);
+      // Update the selected items list with additional type information
+      const selectedItemsWithType = this.items
+          .filter(item => item.checked)
+          .map(item => ({ name: item.name, type: item.type }));
+    },
+    getTypeName(type) {
+      switch (type) {
+        case 2: return 'Numeric';
+        case 1: return 'Ordinal';
+        case 5: return 'Boolean';
+        case 7: return 'Ordinal';
+        default: return 'Numeric';
+      }
     },
     collectSelectedItems(items) {
       let selectedItems = [];
       for (const item of items) {
         if (item.checked) {
-          selectedItems.push(item.name);
+          console.log(`Selected item: ${item.name}, Type: ${item.type}, Title: ${item.title}`);
+          selectedItems.push({ name: item.name, type: item.type, title: item.title });
+          //console.log('Selected items in collectSelectedItems:', selectedItems); // Log selected items
         }
-        if (item.children) {
-          selectedItems = selectedItems.concat(this.collectSelectedItems(item.children));
+        if (item.children && item.children.length > 0) {
+          const childSelectedItems = this.collectSelectedItems(item.children);
+          selectedItems = selectedItems.concat(childSelectedItems);
         }
       }
       return selectedItems;
     },
-    submitSelection() {
+    async submitSelection() {
       const selectedItems = this.collectSelectedItems(this.items);
+      //console.log('Selected items in Submit:', selectedItems); // Log selected items
 
-      if (selectedItems.length < 2) {
-        alert('Please select at least two items before submitting.');
+      let nonBooleanCriteriaCount = 0;
+      let selectedItemsWithType = selectedItems.map(item => ({
+        name: item.name,
+        type: item.type,
+        title: item.title
+      }));
+
+      for (const item of selectedItemsWithType) {
+        console.log(`Item: ${item.name}, Type: ${item.type}`); // Add this line for debugging
+        if (item.type !== 5) { // Or item.type !== 'Boolean' depending on the actual format
+          nonBooleanCriteriaCount++;
+        }
+      }
+
+      //console.log('Non-boolean criteria count:', nonBooleanCriteriaCount); // Log non-boolean criteria count
+      console.log('selectedItemsWithType:', selectedItemsWithType);
+
+      if (selectedItemsWithType.length < 2) {
+        //console.log('Blocking submission due to insufficient criteria selection.');
+        alert('Please select at least two criteria to proceed.');
         return;
       }
 
-      // Emitting the selected items - useful if there's a parent component listening to this event
-      this.$emit('selected-items', selectedItems);
+      if (nonBooleanCriteriaCount < 2) {
+        //console.log('Blocking submission due to insufficient non-boolean criteria selection.');
+        alert('Please select at least two non-boolean criteria.');
+        return;
+      }
 
-      // Programmatic navigation to the DataGrid page, passing the selected items as route parameters
-      this.$router.push({ name: 'DataGrid', params: { selectedItems: selectedItems } });
+      // Save the selected items with types to Local Storage
+      localStorage.setItem('selectedCriteria', JSON.stringify(selectedItemsWithType));
+
+      // Emitting the selected items with types to the DataGrid.vue
+      // this.$emit('selected-items', selectedItemsWithType);
+
+      // Navigate to DataGrid.vue, passing only the item names as route parameters
+      const itemNames = selectedItemsWithType.map(item => item.name);
+      this.$router.push({ name: 'DataGrid', params: { selectedItems: itemNames } });
     },
-    async postSelectedItems(selectedItems) {
-      const requestOptions = {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({selectedItems}),
-      };
-      const response = await fetch('http://127.0.0.1:5000/process_selected_items', requestOptions);
-      const data = await response.json();
-      //console.log('Send Selected items to back', data);
-      this.selectedItemsFromBack = data;
-    },
-  },
+    goBackToHome() {
+      this.$router.push({ name: 'HomePage' });
+    }
+  }
 };
 </script>
 
@@ -193,6 +237,8 @@ button {
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  margin-bottom: 10px;
+  margin-top: 10px;
 }
 
 button:hover {
@@ -217,4 +263,5 @@ ul {
   background-color: var(--light-gray-color);
   color: var(--main-color);
 }
+
 </style>

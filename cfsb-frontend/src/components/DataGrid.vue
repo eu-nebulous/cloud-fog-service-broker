@@ -1,25 +1,68 @@
 <template>
   <div>
     <div class="p-4">
-      <h2>Edge / Fog Nodes Data</h2>
+      <h2>Nodes Data</h2>
     </div>
+<!--    <table v-if="gridData.length" class="grid-cell-class">-->
+<!--      <thead>-->
+<!--      <tr>-->
+<!--        <th>Node</th>-->
+<!--        &lt;!&ndash; Assuming all entries have the same criteria, using the first one to generate headers &ndash;&gt;-->
+<!--        <th v-for="(criterion, index) in gridData[0].criteria" :key="index">-->
+<!--          {{ criterion.title }}-->
+<!--        </th>-->
+<!--      </tr>-->
+<!--      </thead>-->
+<!--      <tbody>-->
+<!--      <tr v-for="(entry, entryIndex) in gridData" :key="entry.name">-->
+<!--        <td>{{ entry.name }}</td>-->
+<!--        <td v-for="(dataValue, dataIndex) in entry.data_values" :key="`${entry.name}-${dataIndex}`">-->
+<!--          &lt;!&ndash; Numeric data type &ndash;&gt;-->
+<!--          <template v-if="dataValue.data_type.type === 2">-->
+<!--            <input type="number" v-model="dataValue.value" @blur="validateNumeric(entry.data_values, dataIndex)" step="0.5"/>-->
+<!--          </template>-->
 
-    <table v-if="Object.keys(gridData).length" class="grid-cell-class">
+<!--          &lt;!&ndash; Ordinal data type &ndash;&gt;-->
+<!--          <template v-else-if="dataValue.data_type.type === 1">-->
+<!--            <select v-model="dataValue.value">-->
+<!--              <option v-for="option in dataValue.data_type.values" :value="option" :key="option">{{ option }}</option>-->
+<!--            </select>-->
+<!--          </template>-->
+
+<!--          &lt;!&ndash; Boolean data type &ndash;&gt;-->
+<!--          <template v-else-if="dataValue.data_type.type === 5">-->
+<!--            <select v-model="dataValue.value">-->
+<!--              <option v-for="option in ['True', 'False']" :value="option" :key="option">{{ option }}</option>-->
+<!--            </select>-->
+<!--          </template>-->
+
+<!--          &lt;!&ndash; Fallback or other data types &ndash;&gt;-->
+<!--          <template v-else>-->
+<!--            <input type="text" v-model="dataValue.value" />-->
+<!--          </template>-->
+<!--        </td>-->
+<!--      </tr>-->
+<!--      </tbody>-->
+<!--    </table>-->
+    <table v-if="gridData.length" class="grid-cell-class">
       <thead>
       <tr>
-        <th>Edge / Fog Nodes</th>
-        <th v-for="(values, column) in gridData" :key="column">{{ values.title }}</th>
+        <th>Node</th>
+        <th v-for="(criterion, index) in gridData[0].criteria" :key="index">{{ criterion.title }}</th>
       </tr>
       </thead>
       <tbody>
-      <tr v-for="index in rowCount" :key="index">
-        <!-- (-1) Because there is a different indexing in the gridData and the fog node titles that starts from 0 -->
-        <td>{{ fogNodesTitles[index-1] }}</td>
-        <td v-for="(values, column) in gridData" :key="`${column}-${index}`">
-          <select v-if="Ordinal_Variables.includes(column)" v-model="values.data_values[index - 1]">
-            <option v-for="option in dropdownOptions" :value="option" :key="option">{{ option }}</option>
+      <tr v-for="(entry, entryIndex) in gridData" :key="entry.name">
+        <td>{{ entry.name }}</td>
+        <td v-for="(criterion, criterionIndex) in entry.criteria" :key="`${entry.name}-${criterionIndex}`">
+          <input v-if="criterion.data_type.type === 2" type="number" v-model="criterion.value" />
+          <select v-else-if="criterion.data_type.type === 1" v-model="criterion.value">
+            <option v-for="option in criterion.data_type.values" :value="option" :key="option">{{ option }}</option>
           </select>
-          <input v-else type="text" v-model="values.data_values[index - 1]" />
+          <select v-else-if="criterion.data_type.type === 5" v-model="criterion.value">
+            <option v-for="option in ['True', 'False']" :value="option">{{ option }}</option>
+          </select>
+          <input v-else type="text" v-model="criterion.value" />
         </td>
       </tr>
       </tbody>
@@ -28,58 +71,62 @@
       No data to display.
     </div>
     <div class="pt-4"></div>
-    <!-- <button @click="SaveDataforEvaluation" class="bg-color-primary">Save and Run Evaluation</button> -->
+    <button @click="goBackToCriteriaSelection" class="bg-color-primary">Back to Criteria Selection</button>
     <button @click="SaveDataforWR" class="bg-color-primary">Save and Add Weight Restrictions</button>
   </div>
-
 </template>
 
 <script>
-import { useRouter } from 'vue-router';
-
+export const backendURL = import.meta.env.VITE_BACKEND_URL;
+const apiURL = backendURL;
 export default {
   data() {
     return {
-      fogNodesTitles: [],
-      gridData: [], // Data for the grid
-      selectedItemsFromBack: [],
-      Ordinal_Variables: ['attr-reputation', 'attr-assurance', 'attr-security'],
-      dropdownOptions: ['High', 'Medium', 'Low'], // Options for the dropdown
-    };
-  },
-  setup() {
-    const router = useRouter();
-    return {
-      router
+      NodeNames: [],
+      gridData: [], // Updated to be an array to match the structure provided by the backend
     };
   },
   mounted() {
-    const selectedItems = this.$route.params.selectedItems || [];
-    if (selectedItems.length > 0) {
-      this.fetchGridData(selectedItems);
+    let selectedItemsWithTypes = this.getSelectedItemsFromStorage();
+    if (!selectedItemsWithTypes.length) {
+      selectedItemsWithTypes = this.$route.params.selectedItems || [];
     }
-    this.fetchFogNodesTitles();
-  },
-  computed: {
-    rowCount() {
-      // Check if gridData has any keys and use the first key to find the row count
-      const firstKey = Object.keys(this.gridData)[0];
-      return firstKey ? this.gridData[firstKey].data_values.length : 0;
+    if (selectedItemsWithTypes.length > 0) {
+      this.fetchGridData(selectedItemsWithTypes.map(item => item.name));
     }
   },
   methods: {
-    // Receives the Grid  Data 1st time
+    getSelectedItemsFromStorage() {
+      const storedItems = localStorage.getItem('selectedCriteria');
+      return storedItems ? JSON.parse(storedItems) : [];
+    },
     async fetchGridData(selectedItems) {
       try {
-        const response = await fetch('http://127.0.0.1:5000/process_selected_items', {
+        // Retrieve app_id and user_id from local storage directly within this method
+        const app_id = localStorage.getItem('fog_broker_app_id');
+        const user_id = localStorage.getItem('fog_broker_user_uuid');
+        const response = await fetch(apiURL+'/process_selected_criteria', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({selectedItems}),
+          // body: JSON.stringify({selectedItems}),
+          body: JSON.stringify({
+            selectedItems,
+            app_id,  // Include app_id from local storage
+            user_id  // Include user_id from local storage
+          })
         });
+
         if (response.ok) {
-          const criteria_data = await response.json();
-          this.gridData = criteria_data.gridData; // Assigning the gridData from the response
-          console.log('DataGrid.vue received the criteria data from the Backend:', this.gridData); // Log the received grid data
+          const { gridData, NodeNames } = await response.json();
+          // Initialize data_values for each entry in gridData
+          this.gridData = gridData.map(entry => ({
+            ...entry,
+            data_values: entry.criteria.map(criterion => ({
+              value: criterion.value,
+              data_type: criterion.data_type
+            }))
+          }));
+          this.NodeNames = NodeNames || [];
         } else {
           throw new Error('Failed to fetch grid data');
         }
@@ -87,81 +134,136 @@ export default {
         console.error('Error fetching grid data:', error);
       }
     },
-    fetchFogNodesTitles() { // Receives the names of fog nodes (grid's 1st column)
-      fetch('http://127.0.0.1:5000/get-fog-nodes-titles')
-          .then(response => response.json())
-          .then(data => {
-            // 'data' is an array like ['Fog Node 1', 'Fog Node 2', ...]
-            this.fogNodesTitles = data;
-          })
-          .catch(error => console.error('Error fetching fog nodes titles:', error));
+    validateNumeric(entry, criterionIndex) {
+      // Directly modify and validate numeric value within the entry's criteria
+      const numericValue = parseFloat(entry.criteria[criterionIndex].value);
+      if (isNaN(numericValue) || numericValue <= 0) {
+        alert('Please enter a number greater than zero.');
+        entry.criteria[criterionIndex].value = ''; // Reset invalid value
+        return false; // Halt further processing
+      } else {
+        entry.criteria[criterionIndex].value = numericValue; // Update with valid numeric value
+      }
     },
     validateGridData() {
-      for (const key in this.gridData) {
-        if (this.gridData.hasOwnProperty(key)) {
-          const dataValues = this.gridData[key].data_values;
-          for (const value of dataValues) {
-            if (value === 0 || value === null || value === '') {
-              return false; // Invalid data found
-            }
+      for (const entry of this.gridData) {
+        for (const criterion of entry.criteria) {
+          // Convert value to string to handle trimming and empty checks
+          const valueAsString = String(criterion.value).trim();
+
+          switch (criterion.data_type.type) {
+            case 2: // Numeric
+              const numericValue = parseFloat(valueAsString);
+              if (isNaN(numericValue) || numericValue <= 0) {
+                alert('Please enter a valid number for all numeric fields.');
+                return false; // Prevent further processing
+              }
+              break;
+
+            case 1: // Ordinal
+              if (!criterion.data_type.values.includes(criterion.value)) {
+                alert(`Please select a valid option for ${criterion.title}.`);
+                return false; // Prevent further processing
+              }
+              break;
+
+            case 5: // Boolean
+              if (!["True", "False"].includes(valueAsString)) {
+                alert(`Please select a valid boolean value for ${criterion.title}.`);
+                return false; // Prevent further processing
+              }
+              break;
+
+            default:
+              // Check for empty values for any other data types
+              if (valueAsString === '') {
+                alert(`Please ensure all fields are filled for ${criterion.title}.`);
+                return false; // Prevent further processing
+              }
           }
         }
       }
-      return true; // All data is valid
+      return true; // All validations passed
     },
-     async SaveDataforWR() {
-       if (!this.validateGridData()) {
-         alert('Invalid input: Zero or null values are not accepted.');
-         return; // Stop submission if validation fails
-       }
-       else{
-         try {
-           const DataforWR = JSON.stringify({
-             gridData: this.gridData
-           });
-             // Navigate to WR component with data
-           this.router.push({ name: 'WR', params: { data: DataforWR } });
-         } catch (error) {
-           console.error('Error:', error);
-         }
-       }
+    goBackToCriteriaSelection() {
+      this.$router.push({ name: 'CriteriaSelection' });
     },
-    async SaveDataforEvaluation() {
+    async SaveDataforWR() {
+      if (!this.validateGridData()) {
+        return;
+      }
+      // Log the current state of gridData
+      console.log("Before saving, gridData is:", JSON.parse(JSON.stringify(this.gridData)));
+
+      try {
+        const formattedGridData = this.gridData.map(node => ({
+          name: node.name,
+          id: node.id,
+          criteria: node.criteria.map(criterion => ({
+            title: criterion.title,
+            value: criterion.value,
+            data_type: criterion.data_type.type
+          }))
+        }));
+
+        const DataforWR = JSON.stringify(formattedGridData);
+        localStorage.setItem('gridData', DataforWR); // Save gridData to localStorage
+        // console.log("Save DataforWR DataGrid.VUE to localstorage:", JSON.stringify(JSON.parse(DataforWR), null, 2));
+
+        // Save the NodeNames to localStorage
+        const NodeNames = JSON.stringify(this.NodeNames);
+        localStorage.setItem('NodeNames', NodeNames);
+
+        // Navigate to WR component with prepared data and NodeNames
+        this.$router.push({
+          name: 'WR',
+          params: {
+            data: DataforWR,
+            NodeNames: NodeNames // Include NodeNames in the route parameters
+          }
+        });
+      } catch (error) {
+        console.error('Error:', error);
+      }
     }
+
+
   }
 };
 </script>
 
+
 <style>
 /* Basic table styling */
 table {
-width: 100%;
-border-collapse: collapse;
+  width: 100%;
+  border-collapse: collapse;
 }
 
 /* Header styling */
 th {
-background-color: #813F8F; /* Primary color */
-color: #FFFFFF; /* White text */
-padding: 10px;
-text-align: center;
+  background-color: #232d45; /* Primary color */
+  color: #FFFFFF; /* White text */
+  padding: 10px;
+  text-align: center;
 }
 
 /* Row styling */
 td {
-background-color: #E7E7E7; /* Light grey */
-color: #374591; /* Secondary color */
-padding: 8px;
+  background-color: #E7E7E7; /* Light grey */
+  color: #172135; /* Secondary color */
+  padding: 8px;
+  font-weight: bold;
 }
 
 /* Alternate row colors for better readability */
 tr:nth-child(even) {
-background-color: #E4DCD5; /* Light tan */
+  background-color: #155e75; /* Light tan */
 }
 
 /* Hover effect on rows */
 tr:hover {
-background-color: #6FBFFF; /* Light blue */
+  background-color: #6FBFFF; /* Light blue */
 }
 
 /* Additional styles for editable input fields in the table */
@@ -200,10 +302,11 @@ button:hover {
 select {
   width: 100%;
   padding: 8px;
-  border: 1px solid #ccc;
+  border: 1px solid #1b253b;
 }
 
 .grid-cell-class {
   text-align: center;
 }
+
 </style>

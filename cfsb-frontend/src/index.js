@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import DataGrid from '@/components/DataGrid.vue';
 import CriteriaSelection from '@/components/CriteriaSelection.vue'; // Import the new component
-//import SummedData from '@/components/SummedData.vue';
 import Evaluation from '@/components/Evaluation.vue'; // Import the Evaluation component
 import WR from '@/components/WR.vue';
 import Results from '@/components/Results.vue'; // Import the Results component

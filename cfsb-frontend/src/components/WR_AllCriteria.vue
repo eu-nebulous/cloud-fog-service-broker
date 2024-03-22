@@ -2,7 +2,7 @@
   <div class="wr-container">
     <!-- Relative constraints section -->
     <div class="relative-constraints">
-      <h2>Relative Constraints</h2>
+      <h3>Relative Constraints</h3>
       <p class="description">
         Set relative constraints between the criteria. For example, "Weight of Criterion A >= 2* Weight of Criterion B".
       </p>
@@ -17,11 +17,6 @@
           <option v-for="op in operators" :key="op" :value="op">{{ op }}</option>
         </select>
 
-<!--        <select v-model="condition.operator">-->
-<!--          <option value="" disabled>Select Operator</option>-->
-<!--          <option v-for="(value, key) in operatorMapping" :key="key" :value="value">{{ key }}</option>-->
-<!--        </select>-->
-
         <input type="number" v-model.number="condition.value" :min="0" step="0.5" placeholder="Value" />
 
         <select v-model="condition.column2" @change="updateDropdowns(index)">
@@ -32,10 +27,8 @@
       </div>
       <button @click="addCondition">+ Add Relative Constraint</button>
     </div>
-    <!-- Separator Line -->
-    <div class="separator-line"></div>
     <div class="immediate-constraints">
-      <h2>Immediate Constraints</h2>
+      <h3>Immediate Constraints</h3>
       <p class="description">
         Set immediate constraints on individual criteria. For example, "Weight of Criterion A >= 0.25".
       </p>
@@ -50,11 +43,6 @@
           <option v-for="op in operators" :key="op" :value="op">{{ op }}</option>
         </select>
 
-<!--        <select v-model="immediateCondition.operator">-->
-<!--          <option value="" disabled>Select Operator</option>-->
-<!--          <option v-for="(value, key) in operatorMapping" :key="key" :value="value">{{ key }}</option>-->
-<!--        </select>-->
-
         <input type="number" v-model.number="immediateCondition.value" :min="0" step="0.1" placeholder="Value" />
 
         <button @click="removeImmediateCondition(index)">-</button>
@@ -62,51 +50,43 @@
 
       <button @click="addImmediateCondition">+ Add Immediate Constraint</button>
     </div>
-    <!-- Separator Line -->
-    <div class="separator-line"></div>
-    <div class="pt-4"></div>
-    <div class="button-container">
-        <button @click="goBackToCriteriaSelection" class="bg-color-primary">Back to Criteria Selection</button>
-        <button @click="sendWRData" class="bg-color-primary">Run Evaluation</button>
-    </div>
+    <button @click="sendWRData">Run Evaluation</button>
   </div>
 </template>
 
 <script>
 export const backendURL = import.meta.env.VITE_BACKEND_URL;
 const apiURL = backendURL;
+import {useRouter} from 'vue-router';
+
 export default {
   data() {
     return {
       receivedGridData: null,
-      relativeConditions: [{ column1: '', operator: '', value: 0, column2: '' }],
+      relativeConditions: [{column1: '', operator: '', value: 0, column2: ''}],
       criteria_titles: [], // This is populated with the column titles
       operators: ['>=', '=', '<='],
-      immediateConditions: [{ criterion: '', operator: '', value: 0 }],
+      immediateConditions: [{criterion: '', operator: '', value: 0}],
       operatorMapping: {
-        '>=': 1,
+        '<=': -1,
         '=': 0,
-        '<=': -1
+        '>=': 1
       },
-      errorMessage: '', // Add this line
     };
   },
   mounted() {
-    // Prioritize data from route parameters
     if (this.$route.params.data) {
       // Parse the JSON string back into an object
       this.receivedGridData = JSON.parse(this.$route.params.data);
-    } else {
-      // Fallback to localStorage if route params are not available
-      const gridDataFromStorage = localStorage.getItem('gridData');
-      if (gridDataFromStorage) {
-        this.receivedGridData = JSON.parse(gridDataFromStorage);
-      }
     }
 
-    // Continue with other localStorage checks
+    const gridDataFromStorage = localStorage.getItem('gridData');
     const wrDataFromStorage = localStorage.getItem('wrData');
     const immediateWRDataFromStorage = localStorage.getItem('immediateWRData');
+
+    if (gridDataFromStorage) {
+      this.receivedGridData = JSON.parse(gridDataFromStorage);
+    }
 
     if (wrDataFromStorage) {
       this.wrData = JSON.parse(wrDataFromStorage);
@@ -115,28 +95,29 @@ export default {
     if (immediateWRDataFromStorage) {
       this.immediateConditions = JSON.parse(immediateWRDataFromStorage);
     } else {
-      this.immediateConditions = [{ criterion: '', operator: '', value: 0 }];
+      // Reset immediateConditions if there is no stored data
+      this.immediateConditions = [{criterion: '', operator: '', value: 0}];
     }
 
-    // Retrieve selectedCriteria from local storage
-    const selectedCriteriaJson = localStorage.getItem('selectedCriteria');
-    if (selectedCriteriaJson) {
-      try {
-        const selectedCriteria = JSON.parse(selectedCriteriaJson);
-        // Use selectedCriteria to populate criteria_titles and filter out boolean criteria (type 5)
-        this.criteria_titles = selectedCriteria
-            .filter(info => info.type !== 5)
-            .map(info => info.title);
-      } catch (e) {
-        console.error('Error parsing selected criteria information:', e);
-        this.$router.push({ name: 'CriteriaSelection' });
-      }
-    } else {
-      console.error('Error: Selected criteria information not found in local storage.');
-      this.$router.push({ name: 'CriteriaSelection' });
-    }
+    this.fetchCriteriaTitles();
+
   },
   methods: {
+    fetchCriteriaTitles() {
+      fetch(apiURL+'/get-criteria-titles')
+          .then(response => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+          })
+          .then(data => {
+            this.criteria_titles = data;
+          })
+          .catch(error => {
+            console.error('Error fetching criteria titles:', error);
+          });
+    },
     addCondition() {
       this.relativeConditions.push({column1: '', column2: '', operator: '', value: 0});
     },
@@ -259,12 +240,13 @@ export default {
       return isValid;
     },
     addImmediateCondition() {
-      this.immediateConditions.push({ criterion: '', operator: '', value: 0 });
+      this.immediateConditions.push({criterion: '', operator: '', value: 0});
     },
     removeImmediateCondition(index) {
       this.immediateConditions.splice(index, 1);
     },
     async sendWRData() {
+      const operatorMapping = {'<=': -1, '=': 0, '>=': 1};
       // Check if any relative or immediate condition is set
       const isAnyRelativeConditionSet = this.relativeConditions.some(condition => condition.column1 && condition.column2 && condition.operator);
       const isAnyImmediateConditionSet = this.immediateConditions.some(condition => condition.criterion && condition.operator);
@@ -292,7 +274,7 @@ export default {
       }
 
       // Process Relative constraints
-      const relativeWRData = validRelativeConditions.map(condition => ({
+      const RelativeWRData = validRelativeConditions.map(condition => ({
         LHSCriterion: condition.column1,
         Operator: this.operatorMapping[condition.operator],
         Intense: condition.value,
@@ -306,23 +288,14 @@ export default {
         Value: condition.value
       }));
 
-      // Retrieve node names from local storage
-      let nodeNamesArray = [];
-      const NodeNamesString = localStorage.getItem('NodeNames');
-      if (NodeNamesString) {
-        nodeNamesArray = JSON.parse(NodeNamesString);
-      }
-
       // Prepare payload with filtered conditions
       const payload = {
         gridData: this.receivedGridData,
-        relativeWRData: relativeWRData,
-        immediateWRData: immediateWRData,
-        nodeNames: nodeNamesArray
+        wrData: RelativeWRData,
+        immediateWRData: immediateWRData
       };
-      console.log('Payload being sent to backend from WR.vue:', payload);
 
-      // Ask the backend to perform evaluation
+
       try {
         const response = await fetch(apiURL+'/process-evaluation-data', {
           method: 'POST',
@@ -330,50 +303,29 @@ export default {
           body: JSON.stringify(payload)
         });
 
-        if (!response.ok) {
-          // If the HTTP response is not OK, throw an error
-          throw new Error('Network response was not ok');
-        }
-
         const data = await response.json();
-        console.log('Response from backend process-evaluation-data():', data);
-        console.log('Response data.results.LPstatus:', data.results.LPstatus);
+        console.log('Response from backend:', data);
 
-        // First, check the general status of the response to confirm the request was processed successfully
-        // Check the LP problem's feasibility status
-        if (data.status === 'success') {
-          if (data.results.LPstatus === 'feasible') {
-            localStorage.setItem('evaluationResults', JSON.stringify(data.results));
-            localStorage.setItem('relativeWRData', JSON.stringify(relativeWRData));
-            localStorage.setItem('immediateWRData', JSON.stringify(immediateWRData));
+        // Check if the response was successful
+        if (response.ok && data.status === 'success') {
+          localStorage.setItem('gridData', JSON.stringify(this.receivedGridData));
+          localStorage.setItem('wrData', JSON.stringify(RelativeWRData));
 
-            // Navigate to Results.vue
-            this.$router.push({ name: 'Results', params: { evaluationResults: data.results.results } });
-          } else if (data.results.LPstatus === 'infeasible') {
-            // Set the error message for infeasible LP solution
-            this.errorMessage = data.results.message; // Accessing the message directly
-            alert(this.errorMessage); // Show the message to the user via alert
-          }
+          this.$router.push({name: 'Results'});
         } else {
-          // Handle other unexpected 'status'
-          this.errorMessage = 'An unexpected error occurred.';
+          console.error('Error in response:', data.message);
+          alert('Failed to process data: ' + data.message);
         }
       } catch (error) {
-        console.error('Error:', error);
-        this.errorMessage = error.message || 'Failed to send data to backend.';
+        console.error('Error sending data to backend:', error);
+        alert('Failed to send data to backend.');
       }
-
-    },
-    goBackToCriteriaSelection() {
-      this.$router.push({ name: 'CriteriaSelection' });
     }
   }
 };
 </script>
 
 <style scoped>
-input{height: 40px;}
-
 .wr-container {
   display: flex;
   flex-direction: column;
@@ -384,7 +336,6 @@ input{height: 40px;}
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 15px;
 }
 
 button {

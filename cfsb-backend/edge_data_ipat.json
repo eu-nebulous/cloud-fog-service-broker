@@ -1,0 +1,80 @@
+{
+  "_id": "b4ce322c-698a-43b9-a889-bf0da2a4dcb9",
+  "os": "LINUX",
+  "name": "Test VM #0001",
+  "owner": "admin",
+  "ipAddress": "10.10.0.6",
+  "location": {
+    "name": "laptop",
+    "latitude": 12.345,
+    "longitude": 56.789
+  },
+  "username": "ubuntu",
+  "password": [
+    "u",
+    "b",
+    "u",
+    "n",
+    "t",
+    "u"
+  ],
+  "publicKey": [],
+  "deviceInfo": {
+    "CPU_SOCKETS": "1",
+    "CPU_CORES": "10",
+    "CPU_PROCESSORS": "20",
+    "RAM_TOTAL_KB": "16218480",
+    "RAM_AVAILABLE_KB": "13366788",
+    "RAM_FREE_KB": "10943372",
+    "RAM_USED_KB": "5275108",
+    "RAM_UTILIZATION": "32.5253",
+    "DISK_TOTAL_KB": "1055762868",
+    "DISK_FREE_KB": "976527612",
+    "DISK_USED_KB": "79235256",
+    "DISK_UTILIZATION": "7.50502",
+    "OS_ARCHITECTURE": "x86_64",
+    "OS_KERNEL": "Linux",
+    "OS_KERNEL_RELEASE": "5.15.133.1-microsoft-standard-WSL2"
+  },
+  "requestId": "eb6441fc-613a-482e-ba94-b16db57ecd36",
+  "creationDate": "2024-01-15T13:23:40.602Z",
+  "lastUpdateDate": "2024-01-15T14:32:43.485Z",
+  "status": "HEALTHY",
+  "nodeReference": "40ed1989-49ba-4496-a5c5-3d8ca1a18972",
+  "messages": [],
+  "statusUpdate": {
+    "ipAddress": "10.10.0.6",
+    "clientId": "VM-LINUX-TEST-VM-0001-Test VM #0001-DEFAULT-10.10.0.6-_",
+    "state": "REGISTERED",
+    "stateLastUpdate": "2024-01-15T13:23:47.463Z",
+    "reference": "40ed1989-49ba-4496-a5c5-3d8ca1a18972",
+    "errors": []
+  },
+  "metrics": {
+    "ipAddress": "10.10.0.6",
+    "clientId": "VM-LINUX-TEST-VM-0001-Test VM",
+    "timestamp": "2024-01-15T14:32:33.467Z",
+    "metrics": {
+      "count-total-events-failures": 0,
+      "count-total-events-text": 0,
+      "tx": 0,
+      "count-total-events-other": 0,
+      "count-event-forwards-success": 0,
+      "count-event-forwards-failure": 0,
+      "rx": 0,
+      "count-total-events": 0,
+      "cpu": 0.6,
+      "uptime": 10742,
+      "count-event-local-publish-failure": 0,
+      "count-total-events-object": 0,
+      "disk": 2.48262,
+      "count-event-local-publish-success": 0,
+      "updatetime": 1705318391,
+      "currdatetime": 1705329133,
+      "ram": 23.7719
+    },
+    "latestEvents": []
+  },
+  "retries": 0,
+  "_class": "eu.nebulous.resource.discovery.monitor.model.Device"
+}

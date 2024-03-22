@@ -6,7 +6,7 @@ from scipy.stats import rankdata
 def perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_names, node_ids):
     print("Evaluation begun with perform_evaluation():")
     # print("Data Table:", data_table)
-    # Identify the boolean criteria columns  by checking if all values are either 0 or 1
+    # Identify the boolean criteria columns by checking if all values are either 0 or 1
     # boolean_criteria = [criterion for criterion in data_table if set(data_table[criterion]) <= {0, 1}]
     boolean_criteria = [criterion for criterion in data_table if 'boolean' in criterion.lower()]
     # print("Boolean Criteria:", boolean_criteria)
@@ -18,10 +18,10 @@ def perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_nam
         # The first category is for the all False and the last for the all True values
         fog_node_categories = {i: [] for i in range(len(boolean_criteria) + 1)}
 
-        # Iterate over the list of fog nodes to count the '1' (True) values and assign categories
-        for i in range(len(node_names)):
+        # Iterate over the list of nodes to count the '1' (True) values and assign categories
+        for i in range(len(node_ids)):
             true_count = sum(data_table[boolean][i] for boolean in boolean_criteria)
-            fog_node_categories[true_count].append(node_names[i])
+            fog_node_categories[true_count].append(node_ids[i])
 
         # Remove the boolean criteria from the data_table
         for boolean in boolean_criteria:
@@ -41,8 +41,8 @@ def perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_nam
             for fog_node_high in fog_node_categories[sorted_categories[higher_cat]]:
                 for fog_node_low in fog_node_categories[sorted_categories[higher_cat + 1]]:
                     # Create a constraint for each pair of fog nodes (high > low)
-                    high_scores = [-data_table[criterion][node_names.index(fog_node_high)] for criterion in data_table]
-                    low_scores = [-data_table[criterion][node_names.index(fog_node_low)] for criterion in data_table]
+                    high_scores = [-data_table[criterion][node_ids.index(fog_node_high)] for criterion in data_table]
+                    low_scores = [-data_table[criterion][node_ids.index(fog_node_low)] for criterion in data_table]
                     constraint = [h - l for h, l in zip(high_scores, low_scores)]
                     A_boolean.append(constraint)
                     b_boolean.append(0)  # The score difference must be greater than 0
@@ -124,8 +124,8 @@ def perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_nam
     num_of_dmus = len(next(iter(data_table.values())))
     Cols_No = len(criteria_list)
     DEA_Scores = []
-    epsilon = 0.00000  # Lower bound of the variables
-
+    # epsilon = 0.000001  # Lower bound of the variables
+    epsilon = 0
     # Iterating over each DMU to Perform DEA
     for dmu_index in range(num_of_dmus):
         # Gathering values for the current DMU
@@ -171,7 +171,7 @@ def perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_nam
             "DEA Score": DEA_Scores[i],
             "Rank": int(DEA_Scores_Ranked[i])
         }
-        for i in range(len(node_names))
+        for i in range(len(node_ids))
     ]
 
     # Return successful results
@@ -184,9 +184,9 @@ def perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_nam
 # relative_wr_data: [{'LHSCriterion': 'Accountability', 'Operator': 1, 'Intense': 2, 'RHSCriterion': 'Compliance'}]
 # immediate_wr_data: [{'Criterion': 'Compliance', 'Operator': 1, 'Value': 0.5}]
 #
-# node_names = ['2ad4bd97-d932-42a5-860e-e607a50f161d', 'e917581d-1a62-496b-9d2e-05972fe309e9', '78aca9a8-8c14-4c7d-af34-72cef0da992d', 'd2bddce9-4118-41a9-b528-3bac32b13312']
+# node_ids = ['2ad4bd97-d932-42a5-860e-e607a50f161d', 'e917581d-1a62-496b-9d2e-05972fe309e9', '78aca9a8-8c14-4c7d-af34-72cef0da992d', 'd2bddce9-4118-41a9-b528-3bac32b13312']
 #
-# Evaluation_JSON = perform_evaluation(data_table, [], [], node_names)
+# Evaluation_JSON = perform_evaluation(data_table, [], [], node_ids)
 # pretty_json = json.dumps(Evaluation_JSON)
 
 
@@ -218,13 +218,13 @@ def perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_nam
 # # # "immediate_wr_data":[{"Criterion":"Accountability","Operator":1,"Value":0.2}]}
 # # # w1>=0.2 and w1<=0.5
 # #
-# node_names = ['Fog Node 1', 'Fog Node 2', 'Fog Node 3', 'Fog Node 4', 'Fog Node 5']
+# node_ids = ['Fog Node 1', 'Fog Node 2', 'Fog Node 3', 'Fog Node 4', 'Fog Node 5']
 #
-# Evaluation_JSON = perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_names)
+# Evaluation_JSON = perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_ids)
 # print("Evaluation_JSON:", Evaluation_JSON)
 
 
-# Evaluation_JSON = perform_evaluation(data_table, [], [], node_names)
+# Evaluation_JSON = perform_evaluation(data_table, [], [], node_ids)
 # pretty_json = json.dumps(Evaluation_JSON)
 # print(pretty_json)
 # print("Evaluation_JSON:", Evaluation_JSON)

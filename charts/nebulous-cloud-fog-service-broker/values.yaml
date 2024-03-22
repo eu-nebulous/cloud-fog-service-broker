@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: "quay.io/nebulous/cloud-fog-service-broker-java-spring-boot-demo"
+  repository: "quay.io/nebulous/cloud-fog-service-broker-backend"
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
@@ -80,3 +80,27 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+customEnv:
+  NEBULOUS_BROKER_URL: "nebulous-activemq"
+  NEBULOUS_BROKER_PORT: "61616"
+  NEBULOUS_BROKER_USERNAME: "admin"
+  NEBULOUS_BROKER_PASSWORD: "admin"
+  POSTGRES_DB_HOST: "localhost"
+  POSTGRES_DB_NAME: "fog_broker"
+  POSTGRES_DB_PORT: "5432"
+  POSTGRES_DB_USER: "dbuser"
+  POSTGRES_DB_PASS: "pass123"
+
+postgresql:
+  enabled: true
+  image: "docker.io/postgres:16"
+  user: "dbuser"
+  password: "pass123"
+  dbName: "fog_broker"
+  port: 5432
+  volumeMounts:
+    data:
+      claimName: "postgresql-pvc"
+    initScript:
+      configMapName: "db-init-script"

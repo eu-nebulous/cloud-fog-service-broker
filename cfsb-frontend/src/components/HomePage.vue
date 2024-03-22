@@ -1,18 +1,45 @@
 <script>
 export default {
-  name: "HomePage"
+  name: "HomePage",
+  // methods: {
+  //   async saveIds(appId, userId) {
+  //     fetch(' http://127.0.0.1:5000/save_ids', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({
+  //         app_id: appId,
+  //         user_id: userId,
+  //       }),
+  //     })
+  //     .then(response => response.json())
+  //     .then(data => {
+  //           console.log('Success:', data);
+  //           // Save to local storage
+  //           localStorage.setItem('app_id', appId);
+  //           localStorage.setItem('user_id', userId);
+  //     })
+  //     .catch((error) => {
+  //          console.error('Error:', error);
+  //     });
+  //   }
+  // },
+  // mounted() {
+  //   // Example usage
+  //   // this.saveIds('d535cf554ea66fbebfc415ac837a5828', 'e3ff4006-be5f-4e00-bbe1-e49a88b2541a');
+  // },
 }
 </script>
 
 <template>
-
   <div class="container">
     <div class="row p-4 text-center">
       <div class="col col-12">
-        <h1 class="display-2">Welcome to <span style="color: var(--main-color);">NebulOus</span></h1>
+        <h1 class="display-2">Welcome to <span style="color: var(--main-color);">Cloud Fog Service Broker</span></h1>
       </div>
     </div>
-
+    <!--
     <div class="row align-items-center">
       <div class="col col-12 col-md-6 col-lg-6">
         <p class="lead">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p>
@@ -30,7 +57,7 @@ export default {
         <p class="lead">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p>
       </div>
     </div>
-
+    -->
     <div class="spacer-sm"></div>
 
     <div class="row text-center p-4 bg-row border-radius-sm">
@@ -43,7 +70,7 @@ export default {
 
     <div class="row p-4 text-center">
       <div class="col col-12">
-        <h2 class="display-4">How does it work</h2>
+        <h2 class="display-4">Architecture</h2>
       </div>
       <div class="col col-12">
         <img src="/images/Broker.png" class="img-fluid border-radius-md" alt="...">
@@ -54,9 +81,16 @@ export default {
 </template>
 
 <style scoped>
-
-.bg-row {
-  background-color: var(--secondary-color);
+button-primary:hover{
+  border: 2px #172135;
 }
-
+.bg-row {
+  background-color: #e9ebed;
+}
+.row{text-align: justify;
+}
+.img-fluid {
+  max-width: 75%;
+  height: auto;
+}
 </style>

@@ -6,17 +6,24 @@
         soft: false
     provides:
       - nebulous-cloud-fog-service-broker-container-images
-    description: Build the container images.
+    description: Build the container images for both the backend and frontend.
     files: &image_files
-      - ^java-spring-boot-demo/
+      - ^cfsb-backend/
+      - ^cfsb-frontend/
     vars: &image_vars
       promote_container_image_job: nebulous-cloud-fog-service-broker-upload-container-images
       container_images:
-        - context: java-spring-boot-demo
+        - context: cfsb-backend
           registry: quay.io
-          repository: quay.io/nebulous/cloud-fog-service-broker-java-spring-boot-demo
+          repository: quay.io/nebulous/cloud-fog-service-broker-backend
           namespace: nebulous
-          repo_shortname: cloud-fog-service-broker-java-spring-boot-demo
+          repo_shortname: cloud-fog-service-broker
+          repo_description: ""
+        - context: cfsb-frontend
+          registry: quay.io
+          repository: quay.io/nebulous/cloud-fog-service-broker-frontend
+          namespace: nebulous
+          repo_shortname: cloud-fog-service-broker
           repo_description: ""
 
 - job:
@@ -27,14 +34,14 @@
         soft: false
     provides:
       - nebulous-cloud-fog-service-broker-container-images
-    description: Build and upload the container images.
+    description: Build and upload both the backend and frontend container images.
     files: *image_files
     vars: *image_vars
 
 - job:
     name: nebulous-cloud-fog-service-broker-promote-container-images
     parent: nebulous-promote-container-images
-    description: Promote previously uploaded container images.
+    description: Promote previously uploaded backend and frontend container images.
     files: *image_files
     vars: *image_vars
 
@@ -44,7 +51,8 @@
     description: Run Hadolint on Dockerfile(s).
     vars:
       dockerfiles:
-        - java-spring-boot-demo/Dockerfile
+        - cfsb-backend/Dockerfile
+        - cfsb-frontend/Dockerfile
 
 - job:
     name: nebulous-cloud-fog-service-broker-helm-lint
