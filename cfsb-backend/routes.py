@@ -1,6 +1,5 @@
 from flask import Blueprint, request, jsonify, render_template, session
 from User_Functions import *
-from API_Functions import *
 import data_types as attr_data_types
 from Evaluation import perform_evaluation
 from data_types import get_attr_data_type
