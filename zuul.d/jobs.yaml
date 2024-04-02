@@ -17,13 +17,13 @@
           registry: quay.io
           repository: quay.io/nebulous/cloud-fog-service-broker-backend
           namespace: nebulous
-          repo_shortname: cloud-fog-service-broker
+          repo_shortname: cloud-fog-service-broker-backend
           repo_description: ""
         - context: cfsb-frontend
           registry: quay.io
           repository: quay.io/nebulous/cloud-fog-service-broker-frontend
           namespace: nebulous
-          repo_shortname: cloud-fog-service-broker
+          repo_shortname: cloud-fog-service-broker-frontend
           repo_description: ""
 
 - job:
