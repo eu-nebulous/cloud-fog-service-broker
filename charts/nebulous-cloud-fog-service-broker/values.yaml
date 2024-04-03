@@ -83,7 +83,7 @@ affinity: {}
 
 customEnv:
   NEBULOUS_BROKER_URL: "nebulous-activemq"
-  NEBULOUS_BROKER_PORT: "61616"
+  NEBULOUS_BROKER_PORT: "5672"
   NEBULOUS_BROKER_USERNAME: "admin"
   NEBULOUS_BROKER_PASSWORD: "admin"
   POSTGRES_DB_HOST: "localhost"
