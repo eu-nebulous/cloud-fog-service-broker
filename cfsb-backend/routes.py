@@ -323,6 +323,8 @@ def process_evaluation_data():
         # print("# node_names:", len(node_names))
         # print("# node_ids:", len(node_ids))
 
+        # Convert RAM and Cores
+        data_table = convert_data_table(data_table)
         # Run Optimization - Perform evaluation
         results = perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_names, node_ids)
         # print(results)

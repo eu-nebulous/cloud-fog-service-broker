@@ -160,6 +160,10 @@ class SyncedHandler(Handler):
                         # Check the number of nodes before Evaluation
                         print("There are " + str(len(node_ids)) + " nodes for Evaluation")
 
+                        print("Original created_data_table:", data_table)
+                        # Convert RAM and Cores
+                        data_table = convert_data_table(data_table)
+                        print("Converted created_data_table:", data_table)
                         ## Run evaluation
                         evaluation_results = perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_names, node_ids)
                         # print("Evaluation Results:", evaluation_results)

@@ -287,6 +287,20 @@ def create_data_table(selected_criteria, extracted_data, field_mapping):
 
     return data_table
 
+
+# Used to convert RAM and # of Cores
+def convert_data_table(created_data_table):
+    # Check if 'Number of CPU Cores' exists in the dictionary and convert its values
+    if 'Number of CPU Cores' in created_data_table:
+        created_data_table['Number of CPU Cores'] = [1/x for x in created_data_table['Number of CPU Cores']]
+
+    # Check if 'Memory Size' exists in the dictionary and convert its values
+    if 'Memory Size' in created_data_table:
+        created_data_table['Memory Size'] = [1/x for x in created_data_table['Memory Size']]
+
+    return created_data_table
+
+
 # Used to Append "Score" and "Rank" for each node in SAL's response JSON
 def append_evaluation_results(sal_reply_body, scores_and_ranks):
     # Check if sal_reply_body is a string and convert it to a Python object

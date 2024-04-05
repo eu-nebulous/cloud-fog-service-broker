@@ -34,7 +34,7 @@ def perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_nam
         sorted_categories = sorted(fog_node_categories, reverse=True)
         # Create constraint matrices
         A_boolean = []  # This is the inequality constraint matrix
-        b_boolean = []  # This is be the inequality constraint vector
+        b_boolean = []  # This is the inequality constraint vector
 
         # Create constraints for each category having higher scores than the next lower category
         for higher_cat in range(len(sorted_categories) - 1):
