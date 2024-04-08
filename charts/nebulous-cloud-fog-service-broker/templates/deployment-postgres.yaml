@@ -4,15 +4,15 @@ kind: Deployment
 metadata:
   name: {{ include "nebulous-cloud-fog-service-broker.fullname" . }}-postgresql
   labels:
-    {{- include "nebulous-cloud-fog-service-broker.labels" . | nindent 4 }}
+    {{- include "nebulous-cloud-fog-service-broker.labels" . | nindent 4 }}-postgresql
 spec:
   selector:
     matchLabels:
-      {{- include "nebulous-cloud-fog-service-broker.selectorLabels" . | nindent 6 }}
+      {{- include "nebulous-cloud-fog-service-broker.selectorLabels" . | nindent 6 }}-postgresql
   template:
     metadata:
       labels:
-        {{- include "nebulous-cloud-fog-service-broker.selectorLabels" . | nindent 8 }}
+        {{- include "nebulous-cloud-fog-service-broker.selectorLabels" . | nindent 8 }}-postgresql
     spec:
       volumes:
         - name: postgres-data
@@ -48,7 +48,7 @@ kind: Service
 metadata:
   name: {{ include "nebulous-cloud-fog-service-broker.fullname" . }}-postgresql
   labels:
-    {{- include "nebulous-cloud-fog-service-broker.labels" . | nindent 4 }}
+    {{- include "nebulous-cloud-fog-service-broker.labels" . | nindent 4 }}-postgresql
 spec:
   type: ClusterIP
   ports:
@@ -57,5 +57,5 @@ spec:
       protocol: TCP
       name: postgresql
   selector:
-    {{- include "nebulous-cloud-fog-service-broker.selectorLabels" . | nindent 4 }}
+    {{- include "nebulous-cloud-fog-service-broker.selectorLabels" . | nindent 4 }}-postgresql
 {{ end }}
