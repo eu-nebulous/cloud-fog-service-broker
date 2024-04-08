@@ -42,11 +42,39 @@ app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
+{{- define "nebulous-cloud-fog-service-broker.frontend.labels" -}}
+helm.sh/chart: {{ include "nebulous-cloud-fog-service-broker.chart" . }}
+{{ include "nebulous-cloud-fog-service-broker.frontend.selectorLabels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end }}
+
+{{- define "nebulous-cloud-fog-service-broker.postgresql.labels" -}}
+helm.sh/chart: {{ include "nebulous-cloud-fog-service-broker.chart" . }}
+{{ include "nebulous-cloud-fog-service-broker.postgresql.selectorLabels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end }}
+
 {{/*
 Selector labels
 */}}
 {{- define "nebulous-cloud-fog-service-broker.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "nebulous-cloud-fog-service-broker.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
+{{- define "nebulous-cloud-fog-service-broker.frontend.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "nebulous-cloud-fog-service-broker.name" . }}-frontend
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
+{{- define "nebulous-cloud-fog-service-broker.postgresql.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "nebulous-cloud-fog-service-broker.name" . }}-postgresql
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 

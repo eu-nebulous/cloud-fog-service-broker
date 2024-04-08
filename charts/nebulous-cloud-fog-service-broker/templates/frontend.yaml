@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "nebulous-cloud-fog-service-broker.fullname" . }}-frontend
+  labels:
+    {{- include "nebulous-cloud-fog-service-broker.frontend.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "nebulous-cloud-fog-service-broker.frontend.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "nebulous-cloud-fog-service-broker.frontend.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: nebulous-cloud-fog-service-broker-frontend
+          image: "{{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          env:
+            - name: VUE_APP_BACKEND_HOST
+              value: {{ .Values.env.backendHost }}
+            - name: VITE_BACKEND_URL
+              value: {{ .Values.env.backendHost }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "nebulous-cloud-fog-service-broker.fullname" . }}-frontend
+  labels:
+    {{- include "nebulous-cloud-fog-service-broker.frontend.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.service.guiPort }}
+      targetPort: http
+      protocol: TCP
+      name: gui
+  selector:
+    {{- include "nebulous-cloud-fog-service-broker.frontend.selectorLabels" . | nindent 4 }}

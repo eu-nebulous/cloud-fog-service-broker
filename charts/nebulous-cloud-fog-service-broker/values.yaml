@@ -110,6 +110,7 @@ env:
   backendHost: "http://cloud-fog-service-broker:8001"
 
 frontend:
+  resources: {}
   image:
     repository: "quay.io/nebulous/cloud-fog-service-broker-backend"
     tag: ""

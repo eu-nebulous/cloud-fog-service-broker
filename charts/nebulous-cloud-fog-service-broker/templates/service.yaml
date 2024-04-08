@@ -11,9 +11,5 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
-    - port: {{ .Values.service.guiPort }}
-      targetPort: http
-      protocol: TCP
-      name: gui
   selector:
     {{- include "nebulous-cloud-fog-service-broker.selectorLabels" . | nindent 4 }}
