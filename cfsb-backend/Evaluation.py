@@ -4,7 +4,7 @@ from scipy.optimize import linprog
 from scipy.stats import rankdata
 
 def perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_names, node_ids):
-    print("Evaluation begun with perform_evaluation():")
+    # print("Evaluation begun with perform_evaluation():")
     # print("Data Table:", data_table)
     # Identify the boolean criteria columns by checking if all values are either 0 or 1
     # boolean_criteria = [criterion for criterion in data_table if set(data_table[criterion]) <= {0, 1}]

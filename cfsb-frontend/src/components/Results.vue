@@ -170,8 +170,8 @@
         const ranks = this.results.map(result => result.Rank);
 
         this.$nextTick(() => {
-          this.createBarChart(titles, deaScores, 'deascoresChart', 'Fog Node Scores');
-          this.createHorizontalBarChart(titles, ranks, 'ranksChart', 'Fog Node Ranking');
+          this.createBarChart(titles, deaScores, 'deascoresChart', 'Scores');
+          this.createHorizontalBarChart(titles, ranks, 'ranksChart', 'Ranking');
         });
       },
       createBarChart(labels, data, chartId, label) {

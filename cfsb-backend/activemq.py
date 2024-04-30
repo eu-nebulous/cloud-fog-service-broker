@@ -31,14 +31,12 @@ class SyncedHandler(Handler):
         # if address == "topic://eu.nebulouscloud.cfsb.get_node_candidates":
         if key == "OPT-triggering":
             # logging.info("Entered in OPT-triggering'")
-
             # Save the correlation_id (We do not have it from the app_side)
             uuid.uuid4().hex.encode("utf-8")  # for Correlation id
             correlation_id_optimizer = message.correlation_id
             if not correlation_id_optimizer:
                 correlation_id_optimizer = '88334290cad34ad9b21eb468a9f8ff11'  # dummy correlation_id
 
-            # logging.info(f"Optimizer_correlation_id {message.correlation_id}")
             # print("Optimizer Correlation Id: ", correlation_id_optimizer)
 
             # application_id_optimizer = message.properties.application # can be taken also from message.annotations.application
@@ -47,44 +45,55 @@ class SyncedHandler(Handler):
             # print("Application Id: ", application_id_optimizer)
 
             try:
-                # Read the Message Sent from Optimizer
+                ###--- For Review, use ONLY ONE block, Optimizer's body or Dummy body ----------------------###
+
+                ###-------- Extract body from Optimizer's message --------###
+                ## Read the Message Sent from Optimizer
                 opt_message_data = body
                 # print("Whole Message Sent from Optimizer:", opt_message_data)
-
-                # Extract 'body' from opt_message_data
+                ## Extract 'body' from opt_message_data
                 body_sent_from_optimizer = opt_message_data.get('body', {})
+                body_json_string = body_sent_from_optimizer
+                ###-------- Extract body from Optimizer's message --------###
 
-                ## Example body
+                ###-------- Dummy body for DEMO when we emulate the message sent from Optimizer--------###
                 # body_sent_from_optimizer = [
                 #     {
                 #         "type": "NodeTypeRequirement",
-                #         # "nodeTypes": ["EDGES"]
                 #         "nodeTypes": ["IAAS", "PAAS", "FAAS", "BYON", "EDGE", "SIMULATION"]
+                #         # "nodeTypes": ["EDGES"]
                 #         # ,"jobIdForEDGE": "FCRnewLight0"
                 #     }
+                #     # ,{
+                #     #     "type": "AttributeRequirement",
+                #     #     "requirementClass": "hardware",
+                #     #     "requirementAttribute": "cores",
+                #     #     "requirementOperator": "GEQ",
+                #     #     "value": "64"
+                #     # }
                 #     # ,{
                 #     #         "type": "AttributeRequirement",
                 #     #         "requirementClass": "hardware",
                 #     #         "requirementAttribute": "ram",
-                #     #         "requirementOperator": "EQ",
-                #     #         "value": "2"
+                #     #         "requirementOperator": "GEQ",
+                #     #         "value": "131072"
                 #     # }
                 # ]
 
-                # logging.info(body_sent_from_optimizer)
+                # body_json_string = json.dumps(body_sent_from_optimizer)  # Convert the body data to a JSON string
+                ###-------- Dummy body for DEMO when we emulate the message sent from Optimizer--------###
+
+                ###--- For Review, use ONLY ONE block, Optimizer's body or dummy body ----------------------###
+
+                print("-------------------------------------------------")
                 print("Extracted body from Optimizer Message:", body_sent_from_optimizer)
 
                 ## Prepare message to be send to SAL
-                # Convert the body data to a JSON string
-                # body_json_string = json.dumps(body_sent_from_optimizer)  # For Sender
-                body_json_string = body_sent_from_optimizer # For Optimizer
-
                 RequestToSal = {  # Dictionary
                     "metaData": {"user": "admin"},   # key [String "metaData"] value [dictionary]
                     "body": body_json_string   # key [String "body"] value [JSON String]
                 }
-                # logging.info("RequestToSal: %s", RequestToSal)
-                # print("RequestToSal:", RequestToSal)
+                print("Request to SAL:", RequestToSal)
                 # print("Is RequestToSal a valid dictionary:", isinstance(RequestToSal, dict))
                 # print("Is the 'body' string in RequestToSal a valid JSON string:", is_json(RequestToSal["body"]))
 
@@ -99,22 +108,21 @@ class SyncedHandler(Handler):
                     nodes_data = json.loads(sal_body)
                     # Check if there is any error in SAL's reply body
                     if 'key' in nodes_data and any(keyword in nodes_data['key'].lower() for keyword in ['error', 'exception']):
-                        print("Error found in message body:", nodes_data['message'])
+                        print("Error found in SAL's message body:", nodes_data['message'])
                         sal_reply_body = []
                     else:  # No error found in SAL's reply body
                         total_nodes = len(nodes_data)  # Get the total number of nodes
-                        print("Total Nodes in SAL's reply:", total_nodes)
+                        # print("Total Nodes in SAL's reply:", total_nodes)
 
                         if total_nodes > 400: # Check if more than 400 nodes received
-                            print("More than 400 nodes returned from SAL.")
+                            # print("More than 400 nodes returned from SAL.")
                             # Filter to only include the first 400 nodes and convert back to JSON string
                             sal_reply_body = json.dumps(nodes_data[:400])
                         elif total_nodes > 0 and total_nodes <= 400:
-                            print(f"Total {total_nodes} nodes returned from SAL. Processing all nodes.")
+                            # print(f"Total {total_nodes} nodes returned from SAL. Processing all nodes.")
                             # Keep sal_reply_body as is since it's already a JSON string
                             sal_reply_body = sal_body
                         else:
-                            print(f"Total {total_nodes} nodes returned from SAL.")
                             sal_reply_body = []
 
                 except json.JSONDecodeError as e:
@@ -122,7 +130,6 @@ class SyncedHandler(Handler):
                     sal_reply_body = []  # Default to an empty JSON array as a string in case of error
 
                 if sal_reply_body:  # Check whether SAL's reply body is empty
-                    # logging.info(f"Reply Received from SAL: {sal_reply}")
                     # print("SAL reply Body:", sal_reply_body)
 
                     # Check the number of nodes before Evaluation
@@ -130,20 +137,32 @@ class SyncedHandler(Handler):
                         # Search for application_id, Read JSON and create data to pass to Evaluation
                         if check_json_file_exists(application_id_optimizer): # Application JSON exist in DB
                             print(f"JSON file for application ID {application_id_optimizer} exists.")
+
+                            ###-------- Extract data from dummy JSON file --------###
+                            # json_file_path = 'dummySALresponse.json'
+                            # sal_reply_body = read_json_file_as_string(json_file_path)
+                            ###-------- Extract data from dummy JSON file --------###
+
                             # Check if there are differences in available nodes between saved data in JSON file and SAL's reply
                             data_table, relative_wr_data, immediate_wr_data, node_names, node_ids = read_application_data(application_id_optimizer, sal_reply_body)
-                            # print("sal_reply_body:", sal_reply_body)
-                            # print("data_table filtered from JSON and SAL:", data_table)
-                            # print("node_ids filtered from JSON and SAL:", node_ids)
                             # print("relative_wr_data:", relative_wr_data)
                             # print("immediate_wr_data:", immediate_wr_data)
-                            # print("node_names filtered from JSON and SAL:", node_names)
-
                         else:  # Application does not exist in directory
-                            print(f"JSON file for application ID {application_id_optimizer} does not exist.")
-                            # Read data from SAL's response by calling the function extract_node_candidate_data()
-                            # extracted_data_SAL, node_ids, node_names = extract_node_candidate_data('SAL_Response_11EdgeDevs.json')
+                            # print(f"JSON file for application ID {application_id_optimizer} does not exist.")
+
+                            ###-------- Extract data from SAL's response --------###
+                            # Extract data from SAL's response
                             extracted_data_SAL, node_ids, node_names = extract_SAL_node_candidate_data(sal_reply_body)
+                            ###-------- Extract data from SAL's response --------###
+
+                            ###-------- Extract data from dummy JSON file --------###
+                            # json_file_path = 'dummySALresponse.json'
+                            # sal_reply_body = read_json_file_as_string(json_file_path)
+                            # if sal_reply_body:
+                            #     extracted_data_SAL, node_ids, node_names = extract_SAL_node_candidate_data(sal_reply_body)
+                            ###-------- Extract data from dummy JSON file --------###
+
+
                             # print("extracted_data_SAL:", extracted_data_SAL)
                             # print("node_ids:", node_ids)
 
@@ -155,27 +174,29 @@ class SyncedHandler(Handler):
                             data_table = create_data_table(selected_criteria, extracted_data_SAL, field_mapping)
                             relative_wr_data = []
                             immediate_wr_data = []
-                            # print("created_data_table:", data_table)
+
 
                         # Check the number of nodes before Evaluation
                         print("There are " + str(len(node_ids)) + " nodes for Evaluation")
 
+                        # Convert the original data of RAM and # of Cores, e.g. 1/X, if they are selected
                         print("Original created_data_table:", data_table)
-                        # Convert RAM and Cores
-                        data_table = convert_data_table(data_table)
+                        data_table = convert_data_table(data_table)  # Convert RAM and # of Cores, e.g. 1/X
                         print("Converted created_data_table:", data_table)
+
                         ## Run evaluation
                         evaluation_results = perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_names, node_ids)
                         # print("Evaluation Results:", evaluation_results)
 
-                        ## Extract and save the results
+                        ## Extract and Save the Results
                         # ScoresAndRanks = evaluation_results['results']
                         ScoresAndRanks = evaluation_results.get('results', [])
-                        # print("Scores and Ranks:", ScoresAndRanks)
+                        print("Scores and Ranks:", ScoresAndRanks)
 
                         # Append the Score and Rank of each node to SAL's Response
                         SAL_and_Scores_Body = append_evaluation_results(sal_reply_body, ScoresAndRanks)
                         #  print("SAL_and_Scores_Body:", SAL_and_Scores_Body)
+
                     else:
                         print("There is only one node!")
                         # Append the Score and Rank of each node to SAL's Response
@@ -193,7 +214,7 @@ class SyncedHandler(Handler):
                     formatted_json = json.dumps(CFSBResponse, indent=4)
                     with open('CFSBResponse.json', 'w') as file:
                          file.write(formatted_json)
-                         print("Formatted JSON has been saved to CFSBResponse.json")
+                         print("Data with Scores and Ranks for Nodes are saved to CFSBResponse.json")
 
                 else:  # Then SAL's reply body is empty send an empty body to Optimizer
                     print("No Body in reply from SAL!")
@@ -205,10 +226,11 @@ class SyncedHandler(Handler):
 
                 ## Send message to OPTIMIZER
                 context.get_publisher('SendToOPT').send(CFSBResponse, application_id_optimizer, properties={'correlation_id': correlation_id_optimizer}, raw=True)
+                print("Message to Optimizer has been sent")
+                print("-------------------------------------------------")
 
             except json.JSONDecodeError as e:
                 logging.error(f"Failed to parse message body from Optimizer as JSON: {e}")
-
 
 
     def requestSAL(self, RequestToSal):
@@ -277,4 +299,3 @@ def is_json(myjson):
     except TypeError as e:  # includes simplejson.decoder.JSONDecodeError
         return False
     return True
-
