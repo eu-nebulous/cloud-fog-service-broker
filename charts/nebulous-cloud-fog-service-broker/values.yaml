@@ -112,5 +112,7 @@ env:
 frontend:
   resources: {}
   image:
-    repository: "quay.io/nebulous/cloud-fog-service-broker-backend"
+    repository: "quay.io/nebulous/cloud-fog-service-broker-frontend"
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
     tag: ""
