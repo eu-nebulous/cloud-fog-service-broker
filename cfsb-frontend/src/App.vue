@@ -132,7 +132,7 @@
 </style>
 
 <script>
-export const backendURL = import.meta.env.VITE_BACKEND_URL;
+export const backendURL = process.env.VITE_BACKEND_URL;
 const apiURL = backendURL;
 export default {
   name: 'App',
