@@ -194,6 +194,10 @@ export default {
         console.error('Error fetching user:', error);
       }
     },
+    setDefaultUser() {
+      localStorage.setItem('fog_broker_user_uuid', 'e3ff4006-be5f-4e00-bbe1-e49a88b2541a');
+      localStorage.setItem('fog_broker_app_id', '2f7cc63df4b1da7532756f44345758da');
+    },
     getURLparams() {
       let app_in_url = false
       let user_in_url = false
@@ -226,7 +230,8 @@ export default {
   },
   mounted() {
     this.getURLparams();
-    this.checkUserLogin();
+    // this.checkUserLogin();
+    this.setDefaultUser();
   }
 };
 </script>
