@@ -19,12 +19,14 @@
           namespace: nebulous
           repo_shortname: cloud-fog-service-broker-backend
           repo_description: ""
+          tags: ["r1-latest"]
         - context: cfsb-frontend
           registry: quay.io
           repository: quay.io/nebulous/cloud-fog-service-broker-frontend
           namespace: nebulous
           repo_shortname: cloud-fog-service-broker-frontend
           repo_description: ""
+          tags: ["r1-latest"]
 
 - job:
     name: nebulous-cloud-fog-service-broker-upload-container-images
