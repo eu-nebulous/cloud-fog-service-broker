@@ -8,6 +8,7 @@
       - nebulous-cloud-fog-service-broker-container-images
     description: Build the container images for both the backend and frontend.
     files: &image_files
+      - ^zuul\.d/jobs\.yaml$
       - ^cfsb-backend/
       - ^cfsb-frontend/
     vars: &image_vars
