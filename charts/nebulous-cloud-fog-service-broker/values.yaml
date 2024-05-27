@@ -115,7 +115,7 @@ frontend:
     repository: "quay.io/nebulous/cloud-fog-service-broker-frontend"
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: ""
+    tag: "r1-latest"
   ingress:
     enabled: false
     className: ""
