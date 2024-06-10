@@ -1,0 +1,27 @@
+name: CI
+on:
+  push:
+    branches:
+      - main
+      - r[1-9]
+  pull_request:
+    branches:
+      - main
+      - r[1-9]
+jobs:
+  build-and-push-cloud-fog-service-broker-frontend:
+    name: Build and push exn-middleware
+    uses: eu-nebulous/github-actions/.github/workflows/build-and-push-container-image.yml@main
+    with:
+      context: cfsb-frontend
+      image-name: cloud-fog-service-broker-frontend
+    secrets: inherit
+
+  build-and-push-exn-cloud-fog-service-broker-backend:
+    name: Build and push cloud-fog-service-broker-backend
+    uses: eu-nebulous/github-actions/.github/workflows/build-and-push-container-image.yml@main
+    with:
+      context: cfsb-backend
+      image-name: cloud-fog-service-broker-backend
+    secrets: inherit
+~
