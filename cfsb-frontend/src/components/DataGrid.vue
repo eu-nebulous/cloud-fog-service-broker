@@ -1,5 +1,13 @@
 <template>
-  <div>
+  <div v-show="isLoading">
+    <div class="alert alert-info">
+      Loading Nodes. Please wait
+      <div class="spinner-border text-secondary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  </div>
+  <div v-show="!isLoading">
     <div class="p-4">
       <h2>Nodes Data</h2>
     </div>
@@ -84,6 +92,7 @@ export default {
     return {
       NodeNames: [],
       gridData: [], // Updated to be an array to match the structure provided by the backend
+      isLoading: null
     };
   },
   mounted() {
@@ -101,6 +110,7 @@ export default {
       return storedItems ? JSON.parse(storedItems) : [];
     },
     async fetchGridData(selectedItems) {
+      this.isLoading = true;
       try {
         // Retrieve app_id and user_id from local storage directly within this method
         const app_id = localStorage.getItem('fog_broker_app_id');
@@ -117,6 +127,7 @@ export default {
         });
 
         if (response.ok) {
+          this.isLoading = false;
           const { gridData, NodeNames } = await response.json();
           // Initialize data_values for each entry in gridData
           this.gridData = gridData.map(entry => ({
@@ -308,5 +319,35 @@ select {
 .grid-cell-class {
   text-align: center;
 }
+
+/*CSS for spinner*/
+/* HTML: <div class="loader"></div> */
+.loader {
+  width: 108px;
+  height: 60px;
+  color: #269af2;
+  --c: radial-gradient(farthest-side,currentColor 96%,#0000);
+  background:
+    var(--c) 100% 100% /30% 60%,
+    var(--c) 70%  0    /50% 100%,
+    var(--c) 0    100% /36% 68%,
+    var(--c) 27%  18%  /26% 40%,
+    linear-gradient(currentColor 0 0) bottom/67% 58%;
+  background-repeat: no-repeat;
+  position: relative;
+}
+.loader:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: inherit;
+  opacity: 0.4;
+  animation: l7 1s infinite;
+}
+@keyframes l7 {
+  to {transform:scale(1.8);opacity:0}
+}
+
+
 
 </style>

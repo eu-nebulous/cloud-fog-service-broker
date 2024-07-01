@@ -124,8 +124,8 @@ def perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_nam
     num_of_dmus = len(next(iter(data_table.values())))
     Cols_No = len(criteria_list)
     DEA_Scores = []
-    # epsilon = 0.000001  # Lower bound of the variables
-    epsilon = 0
+    epsilon = 0.000001  # Lower bound of the variables
+    # epsilon = 0
     # Iterating over each DMU to Perform DEA
     for dmu_index in range(num_of_dmus):
         # Gathering values for the current DMU
