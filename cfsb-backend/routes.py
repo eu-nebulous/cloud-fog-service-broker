@@ -58,6 +58,9 @@ def process_selected_criteria():
             }
         ]
 
+        # message_for_SAL =[{"type":"AttributeRequirement","requirementClass":"image","requirementAttribute":"operatingSystem.family","requirementOperator":"IN","value":"UBUNTU"},{"type":"AttributeRequirement","requirementClass":"image","requirementAttribute":"name","requirementOperator":"INC","value":"22"},{"type":"AttributeRequirement","requirementClass":"location","requirementAttribute":"name","requirementOperator":"EQ","value":"bgo"},{"type":"AttributeRequirement","requirementClass":"hardware","requirementAttribute":"ram","requirementOperator":"GEQ","value":"8192"},
+        #  {"type":"AttributeRequirement","requirementClass":"hardware","requirementAttribute":"cores","requirementOperator":"GEQ","value":"4"}]
+
         body_json_string_for_SAL = json.dumps(message_for_SAL)
 
         RequestToSal = {
@@ -69,7 +72,8 @@ def process_selected_criteria():
         sal_reply = activemq.call_publisher(RequestToSal)
         # Parse the JSON string to a Python object
         nodes_data = json.loads(sal_reply) if isinstance(sal_reply, str) else sal_reply
-        print("nodes_data", nodes_data)
+        # print("nodes_data", nodes_data)
+        print("Request from front-end")
 
         # Check if there is any error in SAL's reply body
         if 'key' in nodes_data and any(keyword in nodes_data['key'].lower() for keyword in ['error', 'exception']):
@@ -84,9 +88,8 @@ def process_selected_criteria():
             ###-------- Extract data from SAL's response --------###
             print("Use of SAL's response")
             extracted_data, node_ids, node_names = extract_SAL_node_candidate_data_Front(nodes_data)
-            print("SAL's extracted_data: ", extracted_data)
+            # print("SAL's extracted_data: ", extracted_data)
             ###-------- Extract data from SAL's response --------###
-
 
             ###-------- Extract data from dummy JSON file --------###
             # print("Use of dummy JSON file")
@@ -281,5 +284,5 @@ def send():
     application_id = data['application_id']
     correlation_id = data['correlation_id']
     key = data['key']
-    sender = activemq.test_send(data)
+    sender = activemq.call_otp_publisher(data)
     return data

@@ -69,6 +69,14 @@
         <button @click="goBackToCriteriaSelection" class="bg-color-primary">Back to Criteria Selection</button>
         <button @click="sendWRData" class="bg-color-primary">Run Evaluation</button>
     </div>
+    <div v-show="isLoading">
+      <div class="alert alert-info">
+        Running Optimization. Please wait
+        <div class="spinner-border text-secondary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -89,6 +97,7 @@ export default {
         '<=': -1
       },
       errorMessage: '', // Add this line
+      isLoading: null
     };
   },
   mounted() {
@@ -321,6 +330,7 @@ export default {
         nodeNames: nodeNamesArray
       };
       console.log('Payload being sent to backend from WR.vue:', payload);
+      this.isLoading = true;
 
       // Ask the backend to perform evaluation
       try {
@@ -338,6 +348,9 @@ export default {
         const data = await response.json();
         console.log('Response from backend process-evaluation-data():', data);
         console.log('Response data.results.LPstatus:', data.results.LPstatus);
+
+        //Loading message should stop here
+        this.isLoading = false;
 
         // First, check the general status of the response to confirm the request was processed successfully
         // Check the LP problem's feasibility status
