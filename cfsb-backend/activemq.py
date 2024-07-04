@@ -1,4 +1,4 @@
-# ActiveMQ communication logic
+# ActiveMQ Communication Logic
 import sys
 import threading
 sys.path.insert(0,'../exn')
@@ -10,7 +10,6 @@ from exn import core
 from exn.connector import EXN
 from exn.core.consumer import Consumer
 from exn.core.synced_publisher import SyncedPublisher
-from exn.core.publisher import Publisher
 from exn.core.context import Context
 from exn.core.handler import Handler
 from exn.handler.connector_handler import ConnectorHandler
@@ -36,23 +35,22 @@ class SyncedHandler(Handler):
             correlation_id_optimizer = message.correlation_id
             if not correlation_id_optimizer:
                 correlation_id_optimizer = '88334290cad34ad9b21eb468a9f8ff11'  # dummy correlation_id
-
             # print("Optimizer Correlation Id: ", correlation_id_optimizer)
+
             # application_id_optimizer = message.properties.application # can be taken also from message.annotations.application
             application_id_optimizer = message.subject
-            # application_id_optimizer = 'd535cf554ea66fbebfc415ac837a5828' #dummy application_id_optimizer
+            if not application_id_optimizer:
+                application_id_optimizer = 'd535cf554ea66fbebfc415ac837a5828' #dummy application_id_optimizer
             # print("Application Id: ", application_id_optimizer)
 
             try:
-                ###--- For Review, use ONLY ONE block, Optimizer's body or Dummy body ----------------------###
-
                 ###-------- Extract body from Optimizer's message --------###
                 ## Read the Message Sent from Optimizer
                 opt_message_data = body
-                print("Whole Message Sent from Optimizer:", opt_message_data)
+                print("Whole Message Sent from Optimizer Single:", opt_message_data)
                 ## Extract 'body' from opt_message_data
                 body_sent_from_optimizer = opt_message_data.get('body', {})
-                bodybody_json_string = body_sent_from_optimizer
+                # body_json_string = body_sent_from_optimizer
                 ###-------- Extract body from Optimizer's message --------###
 
                 ###-------- Dummy body for DEMO when we emulate the message sent from Optimizer--------###
@@ -79,7 +77,7 @@ class SyncedHandler(Handler):
                     # }
                 # ]
 
-                body_json_string = json.dumps(body_sent_from_optimizer)  # Convert the body data to a JSON string when SENDER is used
+                body_json_string = json.dumps(body_sent_from_optimizer) # When SENDER is used then Convert the body data to a JSON string
                 ###-------- Dummy body for DEMO when we emulate the message sent from Optimizer--------###
 
                 ###--- For Review, use ONLY ONE block, Optimizer's body or dummy body ----------------------###
@@ -163,7 +161,7 @@ class SyncedHandler(Handler):
 
 
                             # print("extracted_data_SAL:", extracted_data_SAL)
-                            print("node_ids:", node_ids)
+                            # print("node_ids:", node_ids)
 
                             # Use the create_criteria_mapping() to get the criteria mappings
                             # selected_criteria = ["Operating cost", "Memory Price", "Number of CPU Cores", "Memory Size", "Storage Capacity"]
@@ -179,9 +177,9 @@ class SyncedHandler(Handler):
                         print("There are " + str(len(node_ids)) + " nodes for Evaluation")
 
                         # Convert the original data of RAM and # of Cores, e.g. 1/X, if they are selected
-                        print("Original created_data_table:", data_table)
+                        # print("Original created_data_table:", data_table)
                         data_table = convert_data_table(data_table)  # Convert RAM and # of Cores, e.g. 1/X
-                        print("Converted created_data_table:", data_table)
+                        # print("Converted created_data_table:", data_table)
 
                         ## Run evaluation
                         evaluation_results = perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_names, node_ids)
@@ -225,54 +223,48 @@ class SyncedHandler(Handler):
 
                 ## Send message to OPTIMIZER
                 context.get_publisher('SendToOPT').send(CFSBResponse, application_id_optimizer, properties={'correlation_id': correlation_id_optimizer}, raw=True)
-                print("Message to Optimizer has been sent")
+                print("Message to Optimizer has been sent from OPT-Triggering")
                 print("-------------------------------------------------")
 
             except json.JSONDecodeError as e:
                 logging.error(f"Failed to parse message body from Optimizer as JSON: {e}")
 
         elif key == "OPT-Triggering-Multi":  # Handle Multiple Requests from Optimizer
-            print("Entered in OPT-Multi-triggering")
-            print(key)
-            # USE a while for this purpose?
-            # For each request send to SAL
-            # Save - Gather all data from every SAL reply
-            # Before Run Evaluation Check for Duplicates using the id
-            # Evaluate the Aggregated List and send to Optimizer
+            print("-------------------------------------------------")
+            print("Entered in OPT-Multi-triggering with key: ", key)
 
             uuid.uuid4().hex.encode("utf-8")  # for Correlation id
             correlation_id_optimizer = message.correlation_id
             if not correlation_id_optimizer:
                 correlation_id_optimizer = '88334290cad34ad9b21eb468a9f8ff11'  # dummy correlation_id
 
-            # print("Optimizer Correlation Id: ", correlation_id_optimizer)
-            # application_id_optimizer = message.properties.application # can be taken also from message.annotations.application
+            print("Optimizer Correlation Id: ", correlation_id_optimizer)
+
             application_id_optimizer = message.subject
-            # application_id_optimizer = 'd535cf554ea66fbebfc415ac837a5828' #dummy application_id_optimizer
-            # print("Application Id: ", application_id_optimizer)
+            if not application_id_optimizer:
+                application_id_optimizer = 'd535cf554ea66fbebfc415ac837a5828'   # dummy application_id_optimizer
 
             try:
                 ## Read the Message Sent from Optimizer
                 opt_message_data = body
-                print("Whole Message Sent from Optimizer:", opt_message_data)
-                ## Extract 'body' from opt_message_data
-                body_sent_from_optimizer = opt_message_data.get('body', {})
-                bodybody_json_string = body_sent_from_optimizer
-
-
-                body_json_string = json.dumps(body_sent_from_optimizer)  # Convert the body data to a JSON string when SENDER is used
-
+                print("Whole Message Sent from Optimizer Multi:", opt_message_data)
                 print("-------------------------------------------------")
+
+                ## Extract 'body' from opt_message_data
+                # body_sent_from_optimizer = opt_message_data.get('body', {}) # Use ONLY for SENDER !!!
+                body_sent_from_optimizer = json.loads(opt_message_data['body'])  # Parse the JSON string in body into a Python object (a list of lists in this case)
                 print("Extracted body from Optimizer Message:", body_sent_from_optimizer)
+                print("-------------------------------------------------")
 
-                # initialize a dictionary for inserting every node by id
-                unique_nodes_dict = {}
-
+                # Initialize a dictionary to insert every node by id
+                unique_nodes_dict = {}   # Before Evaluation Check for Duplicates using the id
+                list_number = 0 # Count the # of Lists and requests to SAL
                 for requirement in body_sent_from_optimizer:
-                    print("In requirements loop")
-                    print(requirement)
-                    requirement = json.dumps(
-                        requirement)  # Convert the body data to a JSON string when SENDER is used
+                    list_number += 1
+                    print("Process List: ", list_number)
+                    # print("Within requirements loop:", requirement)
+                    requirement = json.dumps(requirement)   # Convert the body data to a JSON string
+
                     ## Prepare message to be sent to SAL
                     RequestToSal = {  # Dictionary
                         "metaData": {"user": "admin"},  # key [String "metaData"] value [dictionary]
@@ -287,11 +279,22 @@ class SyncedHandler(Handler):
 
                     ## Process SAL's Reply
                     sal_body = sal_reply.get('body')  # Get the 'body' as a JSON string
+                    if sal_body:
+                        print("Request to SAL is OK: ", list_number)
 
-                    # iterate over all nodes to keep unique nodes
-                    nodes_by_requirement = json.loads(sal_body)
-                    for node in nodes_by_requirement:
-                        unique_nodes_dict[node["id"]] = node
+                        # iterate over all nodes to keep unique nodes
+                        nodes_by_requirement = json.loads(sal_body)
+                        # print("nodes_by_requirement from OPT-Triggering-Multi: ", nodes_by_requirement)
+                        nodes_per_list = len(nodes_by_requirement)
+                        # print("Nuber of Nodes: ", nodes_per_list + "in List:", list_number)
+                        print(f"Number of Nodes: {nodes_per_list} in List: {list_number}")
+
+                        for node in nodes_by_requirement:
+                            unique_nodes_dict[node["id"]] = node
+                        print("------------------------------------------------------------")
+
+                print("----------------List Loop is Ended--------------------------")
+                print("Total Lists and Requests to SAL: ", list_number)
                 print("Total unique nodes: " + str(len(unique_nodes_dict)))
                 unique_list = list(unique_nodes_dict.values())
 
@@ -376,9 +379,9 @@ class SyncedHandler(Handler):
                         print("There are " + str(len(node_ids)) + " nodes for Evaluation")
 
                         # Convert the original data of RAM and # of Cores, e.g. 1/X, if they are selected
-                        print("Original created_data_table:", data_table)
+                        # print("Original created_data_table:", data_table)
                         data_table = convert_data_table(data_table)  # Convert RAM and # of Cores, e.g. 1/X
-                        print("Converted created_data_table:", data_table)
+                        # print("Converted created_data_table:", data_table)
 
                         ## Run evaluation
                         evaluation_results = perform_evaluation(data_table, relative_wr_data, immediate_wr_data,
@@ -421,12 +424,13 @@ class SyncedHandler(Handler):
                         "body": {}
                     }
 
-                # ## Send message to OPTIMIZER
-                # context.get_publisher('SendToOPT').send(CFSBResponse, application_id_optimizer,
-                #                                         properties={'correlation_id': correlation_id_optimizer},
-                #                                         raw=True)
-                # print("Message to Optimizer has been sent")
-                # print("-------------------------------------------------")
+                ## Send message to OPTIMIZER
+                context.get_publisher('SendToOPTMulti').send(CFSBResponse, application_id_optimizer,
+                                                        properties={'correlation_id': correlation_id_optimizer},
+                                                        raw=True)
+                print("Message to Optimizer has been sent from OPT-Triggering-Multi")
+                print("-------------------------------------------------")
+                print("Correlation Id sent from OPT-Triggering-Multi: ", correlation_id_optimizer)
 
             except json.JSONDecodeError as e:
                 logging.error(f"Failed to parse message body from Optimizer as JSON: {e}")
@@ -458,6 +462,7 @@ def start_exn_connector_in_background():
         addressOPTtriggering = 'eu.nebulouscloud.cfsb.get_node_candidates'
         addressOPTtriggeringMulti = 'eu.nebulouscloud.cfsb.get_node_candidates_multi'
         addressSendToOPT = 'eu.nebulouscloud.cfsb.get_node_candidates.reply'
+        addressSendToOPTMulti = 'eu.nebulouscloud.cfsb.get_node_candidates_multi.reply'
 
 
         connector = EXN('ui', url=os.getenv('NEBULOUS_BROKER_URL'), port=os.getenv('NEBULOUS_BROKER_PORT'), username=os.getenv('NEBULOUS_BROKER_USERNAME'), password=os.getenv('NEBULOUS_BROKER_PASSWORD'),
@@ -465,7 +470,8 @@ def start_exn_connector_in_background():
                         publishers=[
                             SyncedPublisher('SAL-GET', addressSAL_GET, True, True),
                             core.publisher.Publisher('SendToOPT', addressSendToOPT, True, True),
-                            SyncedPublisher('OPT-Triggering-Multi', addressOPTtriggeringMulti, True, True), # Publisher to emulate OTP multi
+                            core.publisher.Publisher('SendToOPTMulti', addressSendToOPTMulti, True, True),
+                            # SyncedPublisher('OPT-Triggering-Multi', addressOPTtriggeringMulti, True, True) # Publisher for OTP multi
                         ],
                         consumers=[
                             # Consumer('SAL-GET-REPLY', addressSAL_GET, handler=SyncedHandler(), topic=True, fqdn=True),

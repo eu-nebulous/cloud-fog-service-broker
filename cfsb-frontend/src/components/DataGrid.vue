@@ -1,7 +1,7 @@
 <template>
   <div v-show="isLoading">
     <div class="alert alert-info">
-      Loading Nodes. Please wait
+      Loading Nodes. Please wait...
       <div class="spinner-border text-secondary" role="status">
         <span class="visually-hidden">Loading...</span>
       </div>
@@ -332,7 +332,7 @@ select {
     var(--c) 70%  0    /50% 100%,
     var(--c) 0    100% /36% 68%,
     var(--c) 27%  18%  /26% 40%,
-    linear-gradient(currentColor 0 0) bottom/67% 58%;
+    linear-gradient(to bottom, currentColor 0%, transparent 100%) bottom/67% 58%;
   background-repeat: no-repeat;
   position: relative;
 }
@@ -347,7 +347,6 @@ select {
 @keyframes l7 {
   to {transform:scale(1.8);opacity:0}
 }
-
 
 
 </style>
