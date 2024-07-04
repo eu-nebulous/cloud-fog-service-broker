@@ -29,6 +29,7 @@
     <!--  <router-view></router-view>
       <button v-if="showCriteriaSelectionButton" @click="goToCriteriaSelection">Go to Criteria Selection</button> -->
 
+    <!-- LOGIN FORM -->
     <div class="modal fade" id="userLoginModal" aria-hidden="false">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -65,6 +66,7 @@
         </div>
       </div>
     </div>
+    <!-- LOGIN FORM -->
 
     <footer class="footer text-center p-2">
       <span class="text-white">&copy NebulOus - Cloud Fog Service Broker</span>
@@ -159,17 +161,17 @@ export default {
         myModal.show();
       }
     },
-    async submitUserLoginForm() {
-      console.log('username = :', this.username);
-      let user_data = {
-        'username': this.username,
-        'password': this.password,
-        'app_id': this.app_id,
-      }
-      let result = await this.fetchUser(user_data)
-      this.username = "";
-      this.password = "";
-    },
+    // async submitUserLoginForm() {
+    //   console.log('username = :', this.username);
+    //   let user_data = {
+    //     'username': this.username,
+    //     'password': this.password,
+    //     'app_id': this.app_id,
+    //   }
+    //   let result = await this.fetchUser(user_data)
+    //   this.username = "";
+    //   this.password = "";
+    // },
     async fetchUser(user_data) {
       try {
         const response = await fetch(apiURL+'/login', {
@@ -193,10 +195,6 @@ export default {
       } catch (error) {
         console.error('Error fetching user:', error);
       }
-    },
-    setDefaultUser() {
-      localStorage.setItem('fog_broker_user_uuid', 'e3ff4006-be5f-4e00-bbe1-e49a88b2541a');
-      localStorage.setItem('fog_broker_app_id', '2f7cc63df4b1da7532756f44345758da');
     },
     getURLparams() {
       let app_in_url = false
@@ -222,6 +220,10 @@ export default {
         return false
       }
     },
+    setDefaultUser() {
+      localStorage.setItem('fog_broker_user_uuid', 'e3ff4006-be5f-4e00-bbe1-e49a88b2541a');
+      localStorage.setItem('fog_broker_app_id', '2f7cc63df4b1da7532756f44345758da');
+    }
   },
   computed: {
     showCriteriaSelectionButton() {
@@ -231,7 +233,7 @@ export default {
   mounted() {
     this.getURLparams();
     // this.checkUserLogin();
-    this.setDefaultUser();
+    this.setDefaultUser()
   }
 };
 </script>
