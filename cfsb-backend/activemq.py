@@ -50,7 +50,7 @@ class SyncedHandler(Handler):
                 print("Whole Message Sent from Optimizer Single:", opt_message_data)
                 ## Extract 'body' from opt_message_data
                 body_sent_from_optimizer = opt_message_data.get('body', {})
-                # body_json_string = body_sent_from_optimizer
+                body_json_string = body_sent_from_optimizer
                 ###-------- Extract body from Optimizer's message --------###
 
                 ###-------- Dummy body for DEMO when we emulate the message sent from Optimizer--------###
@@ -77,7 +77,7 @@ class SyncedHandler(Handler):
                     # }
                 # ]
 
-                body_json_string = json.dumps(body_sent_from_optimizer) # When SENDER is used then Convert the body data to a JSON string
+                # body_json_string = json.dumps(body_sent_from_optimizer) # When SENDER is used then Convert the body data to a JSON string
                 ###-------- Dummy body for DEMO when we emulate the message sent from Optimizer--------###
 
                 ###--- For Review, use ONLY ONE block, Optimizer's body or dummy body ----------------------###
