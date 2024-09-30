@@ -185,42 +185,55 @@ class SyncedHandler(Handler):
                         evaluation_results = perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_names, node_ids)
                         # print("Evaluation Results:", evaluation_results)
 
-                        ## Extract and Save the Results
-                        # ScoresAndRanks = evaluation_results['results']
-                        ScoresAndRanks = evaluation_results.get('results', [])
-                        print("Scores and Ranks:", ScoresAndRanks)
+                        if evaluation_results.get('LPstatus') == 'feasible':
+                            feasibility = True
+                            ## Extract and Save the Results
+                            # ScoresAndRanks = evaluation_results['results']
+                            ScoresAndRanks = evaluation_results.get('results', [])
+                            print("Scores and Ranks:", ScoresAndRanks)
 
-                        # Append the Score and Rank of each node to SAL's Response
-                        SAL_and_Scores_Body = append_evaluation_results(sal_reply_body, ScoresAndRanks)
-                        #  print("SAL_and_Scores_Body:", SAL_and_Scores_Body)
-
+                            # Append the Score and Rank of each node to SAL's Response
+                            Evaluation_Results = append_evaluation_results(sal_reply_body, ScoresAndRanks)
+                            #  print("Evaluation_Results:", Evaluation_Results)
+                        else:
+                            # problem is infeasible
+                            feasibility = False
+                            results = evaluation_results.get('results')
+                            Evaluation_Results = results  # Evaluation_Results variable may contain info about the infeasible case also
+                    # when SAL returns only one node thus no evaluation needed
                     else:
+                        feasibility = True
                         print("There is only one node!")
                         # Append the Score and Rank of each node to SAL's Response
-                        SAL_and_Scores_Body = append_evaluation_results(sal_reply_body, [])
+                        Evaluation_Results = append_evaluation_results(sal_reply_body, [])
 
                     ## Prepare message to be sent to OPTIMIZER
                     # CFSBResponse = read_dummy_response_data_toOpt('CFSB_Body_Response.json')  # Data and Scores for 5 Nodes
                     CFSBResponse = {
                         "metaData": {"user": "admin"},
-                        "body": SAL_and_Scores_Body
+                        "body": Evaluation_Results
                     }
 
-                    # print("CFSBResponse:", CFSBResponse)
-                    # Writing the formatted JSON to a json file
-                    formatted_json = json.dumps(CFSBResponse, indent=4)
-                    with open('CFSBResponse.json', 'w') as file:
-                         file.write(formatted_json)
-                         print("Data with Scores and Ranks for Nodes are saved to CFSBResponse.json")
+                    if feasibility:
+                        # print("CFSBResponse:", CFSBResponse)
+                        # Writing the formatted JSON to a json file
+                        formatted_json = json.dumps(CFSBResponse, indent=4)
+                        with open('CFSBResponse.json', 'w') as file:
+                             file.write(formatted_json)
+                             print("Data with Scores and Ranks for Nodes are saved to CFSBResponse.json")
 
                 else:  # Then SAL's reply body is empty send an empty body to Optimizer
                     print("No Body in reply from SAL!")
-                    # Send empty body [] to Optimizer
+                    sal_reply_body_empty = {
+                        "message": "No resources returned from SAL"
+                    }
                     CFSBResponse = {
                         "metaData": {"user": "admin"},
-                        "body": {}
+                        # "body": {} # Send empty body [] to Optimizer
+                        "body": sal_reply_body_empty
                     }
 
+                print(CFSBResponse)
                 ## Send message to OPTIMIZER
                 context.get_publisher('SendToOPT').send(CFSBResponse, application_id_optimizer, properties={'correlation_id': correlation_id_optimizer}, raw=True)
                 print("Message to Optimizer has been sent from OPT-Triggering")
@@ -306,7 +319,7 @@ class SyncedHandler(Handler):
                     # Check if there is any error in SAL's reply body
                     if 'key' in nodes_data and any(
                             keyword in nodes_data['key'].lower() for keyword in ['error', 'exception']):
-                        print("Error found in SAL's message body:", nodes_data['message'])
+                        print("Error found in SAL's message body using Multi:", nodes_data['message'])
                         sal_reply_body = []
                     else:  # No error found in SAL's reply body
                         total_nodes = len(nodes_data)  # Get the total number of nodes
@@ -387,42 +400,57 @@ class SyncedHandler(Handler):
                         evaluation_results = perform_evaluation(data_table, relative_wr_data, immediate_wr_data,
                                                                 node_names, node_ids)
                         # print("Evaluation Results:", evaluation_results)
+                        print("lp status = " + str(evaluation_results.get('LPstatus')))
 
-                        ## Extract and Save the Results
-                        # ScoresAndRanks = evaluation_results['results']
-                        ScoresAndRanks = evaluation_results.get('results', [])
-                        print("Scores and Ranks:", ScoresAndRanks)
+                        if evaluation_results.get('LPstatus') == 'feasible':
+                            feasibility = True
+                            ## Extract and Save the Results
+                            # ScoresAndRanks = evaluation_results['results']
+                            ScoresAndRanks = evaluation_results.get('results', [])
+                            print("Scores and Ranks:", ScoresAndRanks)
 
-                        # Append the Score and Rank of each node to SAL's Response
-                        SAL_and_Scores_Body = append_evaluation_results(sal_reply_body, ScoresAndRanks)
-                        #  print("SAL_and_Scores_Body:", SAL_and_Scores_Body)
-
+                            # Append the Score and Rank of each node to SAL's Response
+                            Evaluation_Results = append_evaluation_results(sal_reply_body, ScoresAndRanks)
+                            #  print("Evaluation_Results:", Evaluation_Results)
+                        else:
+                            # problem is infeasible
+                            feasibility = False
+                            results = evaluation_results.get('results')
+                            Evaluation_Results = results #  Evaluation_Results variable may contain info about the infeasible case also
+                            print(results)
+                    # when SAL returns only one node thus no evaluation needed
                     else:
+                        feasibility = True
                         print("There is only one node!")
                         # Append the Score and Rank of each node to SAL's Response
-                        SAL_and_Scores_Body = append_evaluation_results(sal_reply_body, [])
+                        Evaluation_Results = append_evaluation_results(sal_reply_body, [])
 
                     ## Prepare message to be sent to OPTIMIZER
                     # CFSBResponse = read_dummy_response_data_toOpt('CFSB_Body_Response.json')  # Data and Scores for 5 Nodes
                     CFSBResponse = {
                         "metaData": {"user": "admin"},
-                        "body": SAL_and_Scores_Body
+                        "body": Evaluation_Results
                     }
 
-                    # print("CFSBResponse:", CFSBResponse)
-                    # Writing the formatted JSON to a json file
-                    formatted_json = json.dumps(CFSBResponse, indent=4)
-                    with open('CFSBResponse.json', 'w') as file:
-                        file.write(formatted_json)
-                        print("Data with Scores and Ranks for Nodes are saved to CFSBResponse.json")
+                    if feasibility:
+                        # print("CFSBResponse:", CFSBResponse)
+                        # Writing the formatted JSON to a json file
+                        formatted_json = json.dumps(CFSBResponse, indent=4)
+                        with open('CFSBResponse.json', 'w') as file:
+                            file.write(formatted_json)
+                            print("Data with Scores and Ranks for Nodes are saved to CFSBResponse.json")
 
                 else:  # Then SAL's reply body is empty send an empty body to Optimizer
                     print("No Body in reply from SAL!")
-                    # Send empty body [] to Optimizer
+                    sal_reply_body_empty = {
+                        "message": "No resources returned from SAL"
+                    }
                     CFSBResponse = {
                         "metaData": {"user": "admin"},
-                        "body": {}
+                        # "body": {} # Send empty body [] to Optimizer
+                        "body": sal_reply_body_empty
                     }
+                    # print(CFSBResponse)
 
                 ## Send message to OPTIMIZER
                 context.get_publisher('SendToOPTMulti').send(CFSBResponse, application_id_optimizer,
