@@ -143,16 +143,16 @@ def perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_nam
 
         DEA_Scores.append(-res.fun if res.success else None)
 
-    # Check if the optimization problem is infeasible
-    if not res.success:
-        # Return an appropriate JSON response indicating infeasibility
-        infeasibility_response = {
-            "LPstatus": "infeasible",
-            "message": f"The optimization problem is infeasible with the given weight restrictions. Please review them."
-            # In case no weight restrictions are used, then the infeasibility is caused due to the data of the criteria. Please make changes on the data.
-        }
-        return infeasibility_response
-        # return {'LPstatus': 'infeasible', 'results': infeasibility_response}
+        # Check if the optimization problem is infeasible
+        if not res.success:
+            # Return an appropriate JSON response indicating infeasibility
+            infeasibility_response = {
+                # "LPstatus": "infeasible",
+                "message": "The optimization problem is infeasible with the given weight restrictions. Please review them."
+                # In case no weight restrictions are used, then the infeasibility is caused due to the data of the criteria. Please make changes on the data.
+            }
+            # return infeasibility_response
+            return {'LPstatus': 'infeasible', 'results': infeasibility_response}
 
     # Round the DEA scores to 2 decimal places
     DEA_Scores_Rounded = np.round(DEA_Scores, 2)
