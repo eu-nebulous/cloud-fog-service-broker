@@ -333,8 +333,8 @@ class SyncedHandler(Handler):
                             sal_reply_body = json.dumps(sliced_data)
                         elif total_nodes > 0 and total_nodes <= 400:
                             # print(f"Total {total_nodes} nodes returned from SAL. Processing all nodes.")
-                            # Keep sal_reply_body as is since it's already a JSON string
-                            sal_reply_body = sal_body
+                            # here we use nodes_data for multi requests instead of sal_reply_body = sal_body
+                            sal_reply_body = json.dumps(nodes_data)
                         else:
                             sal_reply_body = []
 
@@ -343,7 +343,7 @@ class SyncedHandler(Handler):
                     sal_reply_body = []  # Default to an empty JSON array as a string in case of error
 
                 if sal_reply_body:  # Check whether SAL's reply body is empty
-                    # print("SAL reply Body:", sal_reply_body)
+                    print("SAL reply Body:", sal_reply_body)
 
                     # Check the number of nodes before Evaluation
                     if total_nodes > 1:
