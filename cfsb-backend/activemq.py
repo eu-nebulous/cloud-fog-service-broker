@@ -264,8 +264,8 @@ class SyncedHandler(Handler):
                 print("-------------------------------------------------")
 
                 ## Extract 'body' from opt_message_data
-                # body_sent_from_optimizer = opt_message_data.get('body', {}) # Use ONLY for SENDER !!!
-                body_sent_from_optimizer = json.loads(opt_message_data['body'])  # Parse the JSON string in body into a Python object (a list of lists in this case)
+                body_sent_from_optimizer = opt_message_data.get('body', {}) # Use ONLY for SENDER !!!
+                # body_sent_from_optimizer = json.loads(opt_message_data['body'])  # Parse the JSON string in body into a Python object (a list of lists in this case)
                 print("Extracted body from Optimizer Message:", body_sent_from_optimizer)
                 print("-------------------------------------------------")
 
@@ -303,7 +303,11 @@ class SyncedHandler(Handler):
                         print(f"Number of Nodes: {nodes_per_list} in List: {list_number}")
 
                         for node in nodes_by_requirement:
-                            unique_nodes_dict[node["id"]] = node
+                            # in case of single body but on multi topic. Check if node is dictionary
+                            if isinstance(node, dict) and "id" in node:
+                                unique_nodes_dict[node["id"]] = node
+                            else:
+                                print(f"Is single")
                         print("------------------------------------------------------------")
 
                 print("----------------List Loop is Ended--------------------------")
@@ -313,9 +317,17 @@ class SyncedHandler(Handler):
 
                 try:
                     # here we do a change from the non multi request
-                    nodes_data = unique_list
-                    # Parse the JSON string to a Python object
-                    # nodes_data = json.loads(sal_body)
+                    # in case of single body but on multi topic. Check if node is dictionary
+                    # check if body is single
+                    for requirement in body_sent_from_optimizer:
+                        if isinstance(requirement, list):
+                            print(f"has multi requirement: ", body_sent_from_optimizer)
+                            nodes_data = unique_list
+                        else:
+                            print(f"has single requirement: ", body_sent_from_optimizer)
+                            # Parse the JSON string to a Python object
+                            nodes_data = json.loads(sal_body)
+
                     # Check if there is any error in SAL's reply body
                     if 'key' in nodes_data and any(
                             keyword in nodes_data['key'].lower() for keyword in ['error', 'exception']):
