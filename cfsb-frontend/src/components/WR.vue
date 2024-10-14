@@ -64,7 +64,8 @@
     </div>
     <!-- Separator Line -->
     <div class="separator-line"></div>
-    <div class="pt-4"></div>
+    <div class="pt-4"> More information can be found on <a href="https://github.com/eu-nebulous/cloud-fog-service-broker/wiki">Github Wiki</a>
+ </div>
     <div class="button-container">
         <button @click="goBackToCriteriaSelection" class="bg-color-primary">Back to Criteria Selection</button>
         <button @click="sendWRData" class="bg-color-primary">Run Evaluation</button>
