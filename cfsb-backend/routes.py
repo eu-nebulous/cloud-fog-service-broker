@@ -47,16 +47,30 @@ def process_selected_criteria():
         print("user_id:", user_id)
         print("application_id:", application_id)
 
-        # Prepare message to be sent to SAL
-        message_for_SAL = [
-            {
-                "type": "NodeTypeRequirement",
-                "nodeTypes": ["IAAS", "PAAS", "FAAS", "BYON", "EDGE", "SIMULATION"],
-                #"nodeTypes": ["EDGE"],
-                "jobIdForEDGE": ""
-                #"jobIdForEDGE": "FCRnewLight0"
-            }
-        ]
+        if str(application_id) == "DYEMAC_Pilot":
+            print("app id for DYEMAC_Pilot")
+            # Prepare message to be sent to SAL
+            message_for_SAL = [
+                {
+                    "type": "AttributeRequirement",
+                    "requirementClass": "cloud",
+                    "requirementAttribute": "id",
+                    "requirementOperator": "EQ",
+                    "value": "uio-openstack-optimizer-n"
+                }
+            ]
+        else:
+            print("app id = "+str(application_id))
+            # Prepare message to be sent to SAL
+            message_for_SAL = [
+                {
+                    "type": "NodeTypeRequirement",
+                    "nodeTypes": ["IAAS", "PAAS", "FAAS", "BYON", "EDGE", "SIMULATION"],
+                    # "nodeTypes": ["EDGE"],
+                    "jobIdForEDGE": ""
+                    # "jobIdForEDGE": "FCRnewLight0"
+                }
+            ]
 
         # message_for_SAL =[{"type":"AttributeRequirement","requirementClass":"image","requirementAttribute":"operatingSystem.family","requirementOperator":"IN","value":"UBUNTU"},{"type":"AttributeRequirement","requirementClass":"image","requirementAttribute":"name","requirementOperator":"INC","value":"22"},{"type":"AttributeRequirement","requirementClass":"location","requirementAttribute":"name","requirementOperator":"EQ","value":"bgo"},{"type":"AttributeRequirement","requirementClass":"hardware","requirementAttribute":"ram","requirementOperator":"GEQ","value":"8192"},
         #  {"type":"AttributeRequirement","requirementClass":"hardware","requirementAttribute":"cores","requirementOperator":"GEQ","value":"4"}]

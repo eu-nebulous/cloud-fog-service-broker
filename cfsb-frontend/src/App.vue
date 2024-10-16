@@ -231,9 +231,9 @@ export default {
     }
   },
   mounted() {
+    this.setDefaultUser()
     this.getURLparams();
     // this.checkUserLogin();
-    this.setDefaultUser()
   }
 };
 </script>
