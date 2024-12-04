@@ -199,8 +199,8 @@ export default {
     getURLparams() {
       let app_in_url = false
       let user_in_url = false
-      let app_id_from_js = new URL(location.href).searchParams.get('app_id');
-      let user_id_from_js = new URL(location.href).searchParams.get('user_id');
+      let app_id_from_js = new URL(location.href).searchParams.get('appId');
+      let user_id_from_js = new URL(location.href).searchParams.get('nonce');
 
       if (app_id_from_js) {
         console.log('app_id from URL:', app_id_from_js);
