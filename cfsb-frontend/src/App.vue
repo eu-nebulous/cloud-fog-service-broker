@@ -215,11 +215,6 @@ export default {
         localStorage.setItem('fog_broker_user_uuid', this.uuid);
       }
       if (app_in_url && user_in_url){
-        // let user_data = {
-        //   'user_id': user_id_from_js,
-        //   'app_id': app_id_from_js,
-        // }
-        // this.fetchUser(user_data);
         return true
       } else {
         return false
@@ -236,7 +231,6 @@ export default {
     }
   },
   mounted() {
-    this.getURLparams();
     if (!this.getURLparams()) {
       this.setDefaultUser()
     }

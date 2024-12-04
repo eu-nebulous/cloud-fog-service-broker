@@ -275,9 +275,13 @@ def save_app_data(json_data):
     # Extract app data and app_id
     app_data = json_data[0][0]  # Assuming the first element contains the app_id
     app_id = app_data['app_id']
+    user_id = app_data['user_id']
 
     # Directory setup
-    app_dir = f"app_dirs/{app_id}"
+    user_dir = f"app_dirs/{user_id}"
+    if not os.path.exists(user_dir):
+        os.makedirs(user_dir)
+    app_dir = f"app_dirs/{user_id}/{app_id}"
     if not os.path.exists(app_dir):
         os.makedirs(app_dir)
 
