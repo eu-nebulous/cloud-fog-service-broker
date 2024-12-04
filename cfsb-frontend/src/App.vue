@@ -174,7 +174,7 @@ export default {
     // },
     async fetchUser(user_data) {
       try {
-        const response = await fetch(apiURL+'/login', {
+        const response = await fetch(apiURL+'/user/info', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify(user_data)
@@ -184,7 +184,7 @@ export default {
         if (data.length===1) {
           this.uuid = data[0][2];
           console.log(data[0][2]);
-          localStorage.setItem('fog_broker_user_uuid', data[0][2]);
+          localStorage.setItem('fog_broker_user_username', data[0][2]);
           localStorage.setItem('fog_broker_app_id', user_data.app_id);
           let elem = this.$refs.modalCloseBtn
           elem.click()
@@ -215,6 +215,11 @@ export default {
         localStorage.setItem('fog_broker_user_uuid', this.uuid);
       }
       if (app_in_url && user_in_url){
+        // let user_data = {
+        //   'user_id': user_id_from_js,
+        //   'app_id': app_id_from_js,
+        // }
+        // this.fetchUser(user_data);
         return true
       } else {
         return false
@@ -232,8 +237,9 @@ export default {
   },
   mounted() {
     this.getURLparams();
-    // this.checkUserLogin();
-    this.setDefaultUser()
+    if (!this.getURLparams()) {
+      this.setDefaultUser()
+    }
   }
 };
 </script>

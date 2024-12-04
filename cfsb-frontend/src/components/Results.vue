@@ -90,10 +90,14 @@
         if (confirm("Save Project?")) {
           console.log('Save Project Results button clicked');
           let array_data = []
-          // Application Id
+          // Application and User Id
+          let user_id = localStorage.getItem('fog_broker_user_uuid');
           let app_id = localStorage.getItem('fog_broker_app_id');
           let appData = [
-            {app_id: app_id}
+            {
+              app_id: app_id,
+              user_id: user_id,
+            }
           ];
           array_data.push(appData);
 
