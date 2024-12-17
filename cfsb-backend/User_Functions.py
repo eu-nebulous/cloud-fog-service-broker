@@ -12,47 +12,6 @@ Boolean_Variables = [
     "0cf00a53-fd33-4887-bb38-e0bbb04e3f3e", "d95c1dae-1e22-4fb4-9cdc-743e96d0dddc",
     "8cd09fe9-c119-4ccd-b651-0f18334dbbe4", "7147995c-8e68-4106-ab24-f0a7673eb5f5", "c1c5b3c9-6178-4d67-a7e3-0285c2bf98ef"]
 
-# Used to extract_SAL_node_candidate_data from Use Side for DataGrid
-# def extract_SAL_node_candidate_data_Front(json_data):
-#     default_criteria_list = ["cores", "ram", "disk", "memoryPrice", "price"]
-#
-#     if isinstance(json_data, dict):  # Single node dictionary
-#         json_data = [json_data]  # Wrap it in a list
-#
-#     extracted_data = []
-#     node_ids = []
-#     node_names = []
-#
-#     for item in json_data:
-#         hardware_info = item.get("hardware", {})
-#         # Extract default criteria values
-#         default_criteria_values = {criteria: hardware_info.get(criteria, 0.0) if criteria in hardware_info else item.get(criteria, 0.0) for criteria in default_criteria_list}
-#
-#         # Correctly extract the providerName from the cloud information
-#         cloud_info = item.get("cloud", {})   # get the cloud info or default to an empty dict
-#         api_info = cloud_info.get("api", {})
-#         provider_name = api_info.get("providerName", "Unknown Provider")
-#
-#         # each item is now a dictionary
-#         node_data = {
-#             "nodeId": item.get("nodeId", ''),
-#             "id": item.get('id', ''),
-#             "nodeCandidateType": item.get("nodeCandidateType", ''),
-#             **default_criteria_values,  # Unpack default criteria values into node_data
-#             "hardware": hardware_info,
-#             "location": item.get("location", {}),
-#             "image": item.get("image", {}),
-#             "providerName": provider_name
-#         }
-#         extracted_data.append(node_data)
-#         node_ids.append(node_data["id"])
-#
-#         # print("Before create_node_name")
-#         node_names.append(create_node_name(node_data))  # call create_node_name function
-#         # print("After create_node_name")
-#
-#     return extracted_data, node_ids, node_names
-
 def extract_SAL_node_candidate_data_Front(json_data):
     default_criteria_list = ["cores", "ram", "disk", "memoryPrice", "price"]
 
@@ -70,10 +29,17 @@ def extract_SAL_node_candidate_data_Front(json_data):
 
         cloud_info = item.get("cloud", {})   # get the cloud info or default to an empty dict
         node_type = item.get("nodeCandidateType", "")
+        
+        # Skip nodes with a non-empty jobId
+        if item.get("jobId"):
+            continue
 
         # extract the providerName from the cloud information
         if node_type == "EDGE":
-            provider_name = "-"  # For "EDGE" type, set provider_name as "-"
+            # provider_name = "-"  # For "EDGE" type, set provider_name as "-"
+            provider_name = hardware_info.get("providerId")  # For EDGE type retrieve the provider_name from providerId in hardware
+            if not provider_name:  # Check if provider_name is empty
+                provider_name = "Unknown"
         else:
             api_info = cloud_info.get("api", {})
             provider_name = api_info.get("providerName", "Unknown Provider")  # For other types, fetch from api_info

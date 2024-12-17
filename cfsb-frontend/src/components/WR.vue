@@ -64,7 +64,7 @@
     </div>
     <!-- Separator Line -->
     <div class="separator-line"></div>
-    <div class="pt-4"> More information can be found <a href="https://github.com/eu-nebulous/nebulous/wiki/3.1.2-Resource-selection-and-preferences">here</a>
+    <div class="pt-4"> More information can be found <a href="https://github.com/eu-nebulous/nebulous/wiki/3.1.2-Resource-selection-and-preferences"  target="_blank">here</a>
  </div>
     <div class="button-container">
         <button @click="goBackToCriteriaSelection" class="bg-color-primary">Back to Criteria Selection</button>
