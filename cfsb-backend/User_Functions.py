@@ -31,7 +31,7 @@ def extract_SAL_node_candidate_data_Front(json_data):
         node_type = item.get("nodeCandidateType", "")
         
         # Skip nodes with a non-empty jobId
-        if item.get("jobId"):
+        if item.get("jobIdForEdge") or item.get("jobIdForByon"):
             continue
 
         # extract the providerName from the cloud information
@@ -123,6 +123,8 @@ def extract_SAL_node_candidate_data(json_string):
     for item in json_data:
         # Ensure each item is a dictionary before accessing it
         if isinstance(item, dict):
+            if item.get("jobIdForEdge") or item.get("jobIdForByon"):
+                continue
             node_data = {
                 "nodeId": item.get("nodeId", ''),
                 "id": item.get('id', ''),
@@ -382,8 +384,12 @@ def read_application_data(app_id, sal_reply_body):
             for criterion in selected_criteria:
                 data_table[criterion] = []
 
-            matched_node_ids = [node['id'] for node in data.get('gridData', []) if node['id'] in [n['id'] for n in sal_reply_body]]
-            unmatched_node_ids = [n['id'] for n in sal_reply_body if n['id'] not in matched_node_ids]
+            # matched_node_ids = [node['id'] for node in data.get('gridData', []) if node['id'] in [n['id'] for n in sal_reply_body]]
+            matched_node_ids = [
+                node['id'] for node in data.get('gridData', [])
+                if node['id'] in [n['id'] for n in sal_reply_body if n.get("jobIdForEdge") or n.get("jobIdForByon")]
+            ]
+            unmatched_node_ids = [n['id'] for n in sal_reply_body if n['id'] not in matched_node_ids and (n.get("jobIdForEdge") or n.get("jobIdForByon"))]
 
             # Process MATCHED nodes
             for node in data.get('gridData', []):
