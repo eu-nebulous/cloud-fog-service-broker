@@ -31,7 +31,10 @@ def extract_SAL_node_candidate_data_Front(json_data):
         node_type = item.get("nodeCandidateType", "")
         
         # Skip nodes with a non-empty jobId
-        if item.get("jobIdForEdge") or item.get("jobIdForByon"):
+        if (item.get("jobIdForEdge") not in [None, "any"]) or (item.get("jobIdForByon") not in [None, "any"]):
+            # print("has job id")
+            # print("edge = " + str(item.get("jobIdForEdge")))
+            # print("byon = " + str(item.get("jobIdForByon")))
             continue
 
         # extract the providerName from the cloud information
@@ -123,7 +126,7 @@ def extract_SAL_node_candidate_data(json_string):
     for item in json_data:
         # Ensure each item is a dictionary before accessing it
         if isinstance(item, dict):
-            if item.get("jobIdForEdge") or item.get("jobIdForByon"):
+            if (item.get("jobIdForEdge") not in [None, "any"]) or (item.get("jobIdForByon") not in [None, "any"]):
                 continue
             node_data = {
                 "nodeId": item.get("nodeId", ''),
@@ -366,6 +369,14 @@ def read_application_data(app_id, sal_reply_body):
     if isinstance(sal_reply_body, str):
         sal_reply_body = json.loads(sal_reply_body)
 
+        #remove busy items
+        filtered_sal_reply_body = []
+        for n in sal_reply_body:
+            if not (n.get("jobIdForEdge") not in [None, "any"] or n.get("jobIdForByon") not in [None, "any"]):
+                filtered_sal_reply_body.append(n)
+
+        sal_reply_body = filtered_sal_reply_body
+
     if os.path.exists(file_path):
         print(f"JSON file found for application ID {app_id}.")
         with open(file_path, 'r', encoding='utf-8') as f:
@@ -384,12 +395,8 @@ def read_application_data(app_id, sal_reply_body):
             for criterion in selected_criteria:
                 data_table[criterion] = []
 
-            # matched_node_ids = [node['id'] for node in data.get('gridData', []) if node['id'] in [n['id'] for n in sal_reply_body]]
-            matched_node_ids = [
-                node['id'] for node in data.get('gridData', [])
-                if node['id'] in [n['id'] for n in sal_reply_body if n.get("jobIdForEdge") or n.get("jobIdForByon")]
-            ]
-            unmatched_node_ids = [n['id'] for n in sal_reply_body if n['id'] not in matched_node_ids and (n.get("jobIdForEdge") or n.get("jobIdForByon"))]
+            matched_node_ids = [node['id'] for node in data.get('gridData', []) if node['id'] in [n['id'] for n in sal_reply_body]]
+            unmatched_node_ids = [n['id'] for n in sal_reply_body if n['id'] not in matched_node_ids]
 
             # Process MATCHED nodes
             for node in data.get('gridData', []):
