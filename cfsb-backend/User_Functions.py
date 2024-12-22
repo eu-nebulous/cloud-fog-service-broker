@@ -23,6 +23,13 @@ def extract_SAL_node_candidate_data_Front(json_data):
     node_names = []
 
     for item in json_data:
+
+
+        # Remove nodes that have a value for jobIdForEdge
+        jobIdForEdge = item.get('jobIdForEdge', None)
+        if (jobIdForEdge not in [None, "any","all-applications"]):
+            print(f"Skipping used node {item.get('id', '')} on {jobIdForEdge}")
+            continue
         hardware_info = item.get("hardware", {})
         # Extract default criteria values
         default_criteria_values = {criteria: hardware_info.get(criteria, 0.0) if criteria in hardware_info else item.get(criteria, 0.0) for criteria in default_criteria_list}
@@ -30,12 +37,6 @@ def extract_SAL_node_candidate_data_Front(json_data):
         cloud_info = item.get("cloud", {})   # get the cloud info or default to an empty dict
         node_type = item.get("nodeCandidateType", "")
         
-        # Skip nodes with a non-empty jobId
-        if (item.get("jobIdForEdge") not in [None, "any"]) or (item.get("jobIdForByon") not in [None, "any"]):
-            # print("has job id")
-            # print("edge = " + str(item.get("jobIdForEdge")))
-            # print("byon = " + str(item.get("jobIdForByon")))
-            continue
 
         # extract the providerName from the cloud information
         if node_type == "EDGE":
@@ -126,8 +127,6 @@ def extract_SAL_node_candidate_data(json_string):
     for item in json_data:
         # Ensure each item is a dictionary before accessing it
         if isinstance(item, dict):
-            if (item.get("jobIdForEdge") not in [None, "any"]) or (item.get("jobIdForByon") not in [None, "any"]):
-                continue
             node_data = {
                 "nodeId": item.get("nodeId", ''),
                 "id": item.get('id', ''),
@@ -369,13 +368,6 @@ def read_application_data(app_id, sal_reply_body):
     if isinstance(sal_reply_body, str):
         sal_reply_body = json.loads(sal_reply_body)
 
-        #remove busy items
-        filtered_sal_reply_body = []
-        for n in sal_reply_body:
-            if not (n.get("jobIdForEdge") not in [None, "any"] or n.get("jobIdForByon") not in [None, "any"]):
-                filtered_sal_reply_body.append(n)
-
-        sal_reply_body = filtered_sal_reply_body
 
     if os.path.exists(file_path):
         print(f"JSON file found for application ID {app_id}.")
