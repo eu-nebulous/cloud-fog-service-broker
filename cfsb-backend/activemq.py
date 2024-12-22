@@ -108,6 +108,17 @@ class SyncedHandler(Handler):
                         print("Error found in SAL's message body:", nodes_data['message'])
                         sal_reply_body = []
                     else:  # No error found in SAL's reply body
+
+                        # Remove nodes that have a value for jobIdForEdge
+                        filtered_nodes_data = []
+                        for node in nodes_data:
+                            if ("jobIdForEdge" in node and node["jobIdForEdge"] not in [None, "any","all-applications"]):
+                                print(f"Skipping used node {node['id']} on {node['jobIdForEdge']}")
+                                continue
+                            else:
+                                filtered_nodes_data.append(node)
+                        nodes_data = filtered_nodes_data
+
                         total_nodes = len(nodes_data)  # Get the total number of nodes
                         print("Total Nodes in SAL's reply:", total_nodes)
 
@@ -301,6 +312,16 @@ class SyncedHandler(Handler):
                         nodes_per_list = len(nodes_by_requirement)
                         # print("Nuber of Nodes: ", nodes_per_list + "in List:", list_number)
                         print(f"Number of Nodes: {nodes_per_list} in List: {list_number}")
+
+                        # Remove nodes that have a value for jobIdForEdge
+                        filtered_nodes_by_requirement = []
+                        for node in nodes_by_requirement:
+                            if ("jobIdForEdge" in node and node["jobIdForEdge"] not in [None, "any", "all-applications"]):
+                                print(f"Skipping used node {node['id']} on {node['jobIdForEdge']}")
+                                continue
+                            else:
+                                filtered_nodes_by_requirement.append(node)
+                        nodes_by_requirement = filtered_nodes_by_requirement
 
                         for node in nodes_by_requirement:
                             unique_nodes_dict[node["id"]] = node
