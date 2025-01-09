@@ -1,3 +1,14 @@
 __pycache__/
 .nox/
 .idea/
+.idea/workspace.xml
+cfsb-backend/.venv
+cfsb-backend/venv/*
+cfsb-backend/__pycache__/
+cfsb-backend/notes.txt
+cfsb-backend/app_dirs/*/
+cfsb-backend/CFSBResponse.json
+cfsb-backend/CFSB_Response.json
+cfsb-backend/NodeCandidates.json
+
+cfsb-frontend/node_modules

@@ -264,4 +264,17 @@ ul {
   color: var(--main-color);
 }
 
+button {
+  //color: var(--main-color);
+  border: 2px solid;
+  border-color:  #1B253BFF;
+}
+
+button:hover {
+  background-color: #e9ebed;
+  color: var(--main-color);
+  border: 2px solid;
+  border-color: var(--main-color);
+}
+
 </style>

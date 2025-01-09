@@ -45,7 +45,7 @@
   </template>
 
   <script>
-  export const backendURL = process.env.VITE_BACKEND_URL;
+  export const backendURL = import.meta.env.VITE_BACKEND_URL;
   const apiURL = backendURL;
   import Chart from 'chart.js/auto';
 
@@ -90,12 +90,25 @@
         if (confirm("Save Project?")) {
           console.log('Save Project Results button clicked');
           let array_data = []
-          // Application Id
+          // Application Data
           let app_id = localStorage.getItem('fog_broker_app_id');
+          let user_id = localStorage.getItem('fog_broker_user_uuid');
+          let policy = localStorage.getItem('policyChoice');
+          let app_specific = localStorage.getItem('nodesModeChoice');
           let appData = [
-            {app_id: app_id}
+            {
+              app_id: app_id,
+              user_id: user_id,
+              policy: policy,
+              app_specific: app_specific
+            }
           ];
           array_data.push(appData);
+
+          // Provider  Criteria
+          let providerCriteriaFromStorage = localStorage.getItem('provider_selections');
+          let providerCriteria = JSON.parse(providerCriteriaFromStorage);
+          array_data.push(providerCriteria);
 
           // Node Names
           let NodeNamesFromStorage = localStorage.getItem('NodeNames');
@@ -134,6 +147,7 @@
           localStorage.removeItem('gridData');
           localStorage.removeItem('relativeWRData');
           localStorage.removeItem('immediateWRData');
+          localStorage.removeItem('provider_selections');
           // localStorage.removeItem('fog_broker_user_uuid'); May keep them so the user can evaluate again
           // localStorage.removeItem('fog_broker_app_id');
 

@@ -59,10 +59,10 @@ def perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_nam
     A_eq = []
     b_eq = []
 
-    # Create the Constraint of each unit
+    # Create the Constraint of each Resource
     for row_values in zip(*data_table.values()):
-        A.append(list(row_values))
-    b.extend([1] * len(A))
+        A.append(list(row_values))  # LHS
+    b.extend([1] * len(A))  #All Constraints RHS <= 1
 
     # Add weight restriction constraints to A or A_eq based on the operator
     for constraint in relative_wr_data:

@@ -64,8 +64,7 @@
     </div>
     <!-- Separator Line -->
     <div class="separator-line"></div>
-    <div class="pt-4"> More information can be found <a href="https://github.com/eu-nebulous/nebulous/wiki/3.1.2-Resource-selection-and-preferences"  target="_blank">here</a>
- </div>
+    <div class="pt-4"> More information can be found <a href="https://github.com/eu-nebulous/nebulous/wiki/3.1.2-Resource-selection-and-preferences">here</a></div>
     <div class="button-container">
         <button @click="goBackToCriteriaSelection" class="bg-color-primary">Back to Criteria Selection</button>
         <button @click="sendWRData" class="bg-color-primary">Run Evaluation</button>
@@ -82,7 +81,7 @@
 </template>
 
 <script>
-export const backendURL = process.env.VITE_BACKEND_URL;
+export const backendURL = import.meta.env.VITE_BACKEND_URL;
 const apiURL = backendURL;
 export default {
   data() {
@@ -328,7 +327,8 @@ export default {
         gridData: this.receivedGridData,
         relativeWRData: relativeWRData,
         immediateWRData: immediateWRData,
-        nodeNames: nodeNamesArray
+        nodeNames: nodeNamesArray,
+        evaluation_settings: [localStorage.getItem('policyChoice'), localStorage.getItem('nodesModeChoice')]
       };
       console.log('Payload being sent to backend from WR.vue:', payload);
       this.isLoading = true;
@@ -392,6 +392,11 @@ input{height: 40px;}
   display: flex;
   flex-direction: column;
   gap: 10px;
+  //background-color: #e7e7e7;
+}
+
+select {
+  background-color: #f5f3f3;
 }
 
 .condition-row {
@@ -405,16 +410,18 @@ button {
   background-color: var(--main-color); /* Blue color */
   color: #fff; /* White text color */
   padding: 10px 15px;
-  border: none;
+  border: 2px solid;
+  border-color:  #1B253BFF;
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
+
 button:hover {
-  background-color: var(--secondary-color); /* Lighter shade of purple on hover */
+  background-color: #e9ebed;
   color: var(--main-color);
-  border: 2px;
+  border: 2px solid;
   border-color: var(--main-color);
 }
 </style>

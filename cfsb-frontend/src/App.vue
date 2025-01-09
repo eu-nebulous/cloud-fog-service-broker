@@ -98,16 +98,17 @@
   background-color: var(--main-color); /* Blue color */
   color: #fff; /* White text color */
   padding: 10px 15px;
-  border: none;
+  border: 2px solid;
+  border-color: #e9ebed;
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
 .button-primary:hover {
-  background-color: var(--secondary-color); /* Lighter shade of purple on hover */
+  background-color: #e9ebed;
   color: var(--main-color);
-  border: 2px;
+  border: 2px solid;
   border-color: var(--main-color);
 }
 
@@ -127,6 +128,23 @@
   padding-top: 2rem;
 }
 
+.navbar-nav .nav-link {
+  position: relative;
+  display: inline-block;
+  padding: 8px 12px; /* Adjust padding for spacing */
+  border-radius: 8px; /* Creates the rounded rectangle effect */
+  border: 1px solid #1b253b;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.navbar-nav .nav-link:hover {
+  //background-color: #f0f0f0; /* Light grey background for the hover effect */
+  border: 1px solid #d3d3d3; /* Grey border */
+  color: #1b253b;
+  text-decoration: none; /* Remove underline on hover */
+}
+
+
 .footer {
   background-color: var(--main-color);
   margin-top: 15px;
@@ -134,7 +152,7 @@
 </style>
 
 <script>
-export const backendURL = process.env.VITE_BACKEND_URL;
+export const backendURL = import.meta.env.VITE_BACKEND_URL;
 const apiURL = backendURL;
 export default {
   name: 'App',
@@ -199,8 +217,8 @@ export default {
     getURLparams() {
       let app_in_url = false
       let user_in_url = false
-      let app_id_from_js = new URL(location.href).searchParams.get('app_id');
-      let user_id_from_js = new URL(location.href).searchParams.get('user_id');
+      let app_id_from_js = new URL(location.href).searchParams.get('appId');
+      let user_id_from_js = new URL(location.href).searchParams.get('nonce');
 
       if (app_id_from_js) {
         console.log('app_id from URL:', app_id_from_js);
@@ -222,7 +240,8 @@ export default {
     },
     setDefaultUser() {
       localStorage.setItem('fog_broker_user_uuid', 'e3ff4006-be5f-4e00-bbe1-e49a88b2541a');
-      localStorage.setItem('fog_broker_app_id', '2f7cc63df4b1da7532756f44345758da');
+      // localStorage.setItem('fog_broker_app_id', '2f7cc63df4b1da7532756f44345758da');
+      localStorage.setItem('fog_broker_app_id', '123456789');
     }
   },
   computed: {
@@ -231,9 +250,9 @@ export default {
     }
   },
   mounted() {
-    this.getURLparams();
-    // this.checkUserLogin();
-    this.setDefaultUser()
+    if (!this.getURLparams()) {
+      this.setDefaultUser()
+    }
   }
 };
 </script>

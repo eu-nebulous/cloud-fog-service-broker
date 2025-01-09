@@ -55,7 +55,7 @@
 </template>
 
 <script>
-export const backendURL = process.env.VITE_BACKEND_URL;
+export const backendURL = import.meta.env.VITE_BACKEND_URL;
 const apiURL = backendURL;
 import {useRouter} from 'vue-router';
 
