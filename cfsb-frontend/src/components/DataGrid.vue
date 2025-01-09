@@ -1,4 +1,10 @@
 <template>
+  <div v-show="hasDefinedCriteria">
+    <DefinedCriteria :criteria="definedCriteria" :providers="serverProviders" @criteriaUpdated="updateDataGridWithSelection" />
+    <div class="pt-4"></div>
+    <button @click="goBackToCriteriaSelection" class="bg-color-primary">Back to Criteria Selection</button>
+    <button @click="loadDataGrid" class="bg-color-primary">Set</button>
+  </div>
   <div v-show="isLoading">
     <div class="alert alert-info">
       Loading Nodes. Please wait...
@@ -11,47 +17,6 @@
     <div class="p-4">
       <h2>Nodes Data</h2>
     </div>
-<!--    <table v-if="gridData.length" class="grid-cell-class">-->
-<!--      <thead>-->
-<!--      <tr>-->
-<!--        <th>Node</th>-->
-<!--        &lt;!&ndash; Assuming all entries have the same criteria, using the first one to generate headers &ndash;&gt;-->
-<!--        <th v-for="(criterion, index) in gridData[0].criteria" :key="index">-->
-<!--          {{ criterion.title }}-->
-<!--        </th>-->
-<!--      </tr>-->
-<!--      </thead>-->
-<!--      <tbody>-->
-<!--      <tr v-for="(entry, entryIndex) in gridData" :key="entry.name">-->
-<!--        <td>{{ entry.name }}</td>-->
-<!--        <td v-for="(dataValue, dataIndex) in entry.data_values" :key="`${entry.name}-${dataIndex}`">-->
-<!--          &lt;!&ndash; Numeric data type &ndash;&gt;-->
-<!--          <template v-if="dataValue.data_type.type === 2">-->
-<!--            <input type="number" v-model="dataValue.value" @blur="validateNumeric(entry.data_values, dataIndex)" step="0.5"/>-->
-<!--          </template>-->
-
-<!--          &lt;!&ndash; Ordinal data type &ndash;&gt;-->
-<!--          <template v-else-if="dataValue.data_type.type === 1">-->
-<!--            <select v-model="dataValue.value">-->
-<!--              <option v-for="option in dataValue.data_type.values" :value="option" :key="option">{{ option }}</option>-->
-<!--            </select>-->
-<!--          </template>-->
-
-<!--          &lt;!&ndash; Boolean data type &ndash;&gt;-->
-<!--          <template v-else-if="dataValue.data_type.type === 5">-->
-<!--            <select v-model="dataValue.value">-->
-<!--              <option v-for="option in ['True', 'False']" :value="option" :key="option">{{ option }}</option>-->
-<!--            </select>-->
-<!--          </template>-->
-
-<!--          &lt;!&ndash; Fallback or other data types &ndash;&gt;-->
-<!--          <template v-else>-->
-<!--            <input type="text" v-model="dataValue.value" />-->
-<!--          </template>-->
-<!--        </td>-->
-<!--      </tr>-->
-<!--      </tbody>-->
-<!--    </table>-->
     <table v-if="gridData.length" class="grid-cell-class">
       <thead>
       <tr>
@@ -80,19 +45,28 @@
     </div>
     <div class="pt-4"></div>
     <button @click="goBackToCriteriaSelection" class="bg-color-primary">Back to Criteria Selection</button>
-    <button @click="SaveDataforWR" class="bg-color-primary">Save and Add Weight Restrictions</button>
+    <button @click="SaveDataforWR" v-bind:class="{ 'bg-color-primary': !hasNoData, 'disabled': hasNoData }" v-bind="{disabled: hasNoData}">Save and Add Weight Restrictions</button>
   </div>
+
+
 </template>
 
 <script>
-export const backendURL = process.env.VITE_BACKEND_URL;
+export const backendURL = import.meta.env.VITE_BACKEND_URL;
 const apiURL = backendURL;
+import DefinedCriteria from "@/components/DefinedCriteria.vue";
 export default {
+  components: {DefinedCriteria},
   data() {
     return {
       NodeNames: [],
       gridData: [], // Updated to be an array to match the structure provided by the backend
-      isLoading: null
+      isLoading: null,
+      hasNoData: false,
+      hasDefinedCriteria: false,
+      serverProviders: [],
+      definedCriteria: [],
+      selectedCriteria: {},
     };
   },
   mounted() {
@@ -101,7 +75,7 @@ export default {
       selectedItemsWithTypes = this.$route.params.selectedItems || [];
     }
     if (selectedItemsWithTypes.length > 0) {
-      this.fetchGridData(selectedItemsWithTypes.map(item => item.name));
+      this.fetchGridData(selectedItemsWithTypes.map(item => item.name), selectedItemsWithTypes);
     }
   },
   methods: {
@@ -109,26 +83,40 @@ export default {
       const storedItems = localStorage.getItem('selectedCriteria');
       return storedItems ? JSON.parse(storedItems) : [];
     },
-    async fetchGridData(selectedItems) {
+    async fetchGridData(selectedItems, selectedItemsWithTypes) {
       this.isLoading = true;
       try {
         // Retrieve app_id and user_id from local storage directly within this method
         const app_id = localStorage.getItem('fog_broker_app_id');
         const user_id = localStorage.getItem('fog_broker_user_uuid');
+        const settings = [localStorage.getItem('policyChoice'), localStorage.getItem('nodesModeChoice')];
         const response = await fetch(apiURL+'/process_selected_criteria', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           // body: JSON.stringify({selectedItems}),
           body: JSON.stringify({
             selectedItems,
+            selectedItemsWithTypes,
             app_id,  // Include app_id from local storage
-            user_id  // Include user_id from local storage
+            user_id,  // Include user_id from local storage
+            settings
           })
         });
 
         if (response.ok) {
           this.isLoading = false;
-          const { gridData, NodeNames } = await response.json();
+          const { gridData, NodeNames, definedCriteria, providers = [] } = await response.json();
+          if (definedCriteria.length > 0) {
+            // defined criteria
+            console.log("has defined criteria");
+            console.log(definedCriteria);
+            this.definedCriteria = definedCriteria;
+            this.hasDefinedCriteria = true;
+            this.serverProviders = providers;
+            // this.serverProviders.push('a', 'b', '1', '2', 'aws-europe-1');
+            this.serverProviders.reverse();
+            console.log("providers "+providers);
+          }
           // Initialize data_values for each entry in gridData
           this.gridData = gridData.map(entry => ({
             ...entry,
@@ -138,6 +126,9 @@ export default {
             }))
           }));
           this.NodeNames = NodeNames || [];
+          if (Object.keys(gridData).length === 0){
+            this.hasNoData = true;
+          }
         } else {
           throw new Error('Failed to fetch grid data');
         }
@@ -236,8 +227,39 @@ export default {
       } catch (error) {
         console.error('Error:', error);
       }
-    }
-
+    },
+    updateDataGridWithSelection(selections) {
+      this.selectedCriteria = selections; // Store selections from DefinedCriteria
+      // let provider_selections = JSON.stringify(selections);
+      // localStorage.setItem('provider_selections', provider_selections); // store the selections per provider
+    },
+    loadDataGrid() {
+      // Apply stored selections to gridData when the "Set" button is clicked
+      // Loop over each node entry in gridData
+      this.gridData.forEach((entry) => {
+        // Check if entry name contains any provider from the list
+        Object.keys(this.selectedCriteria).forEach((provider) => {
+          // Extract the provider name using a regular expression
+          let match = entry.name.match(/Provider:\s*([\w-]+)/);
+          let extractedProvider = match ? match[1] : null;
+          console.log(provider);
+          console.log(entry.name);
+          if (extractedProvider === provider) {
+            // Update each criterion in entry based on the selected criteria
+            entry.criteria.forEach((criterion) => {
+              console.log(criterion);
+              console.log(this.selectedCriteria[provider]);
+              const criterionTitle = criterion.title;
+              const selectedValue = this.selectedCriteria[provider][criterionTitle];
+              if (selectedValue) {
+                criterion.value = selectedValue;
+              }
+            });
+          }
+        });
+      });
+      console.log("Updated gridData:", this.gridData);
+    },
 
   }
 };
@@ -304,16 +326,28 @@ button {
 }
 
 button:hover {
-  background-color: var(--secondary-color); /* Lighter shade of purple on hover */
+  background-color: #e9ebed;
   color: var(--main-color);
-  border:2px;
-  border-color:var(--main-color);
+  border: 2px solid;
+  border-color: var(--main-color);
+}
+
+button.disabled {
+  background-color: #6c757d; /* Blue color */
+  color: #fff; /* White text color */
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-right: 30px;
 }
 
 select {
   width: 100%;
   padding: 8px;
   border: 1px solid #1b253b;
+  background-color: white;
 }
 
 .grid-cell-class {

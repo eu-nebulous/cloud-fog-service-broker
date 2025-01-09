@@ -39,6 +39,8 @@ def process_selected_criteria():
         # Get selected criteria app_id and user_id sent from Frontend
         data = request.json
         selected_criteria = data.get('selectedItems', [])
+        # skip criteria if any
+        selected_criteria = skip_criteria_front(selected_criteria)
         print("-------------------------------------------------")
 
         # Get app_id and user_id already obtained in the Frontend from URL
@@ -46,13 +48,25 @@ def process_selected_criteria():
         user_id = data.get('user_id')
         print("user_id:", user_id)
         print("application_id:", application_id)
+        evaluation_settings = data.get('settings') # in evaluation_settings we pass data like policy and nodes mode
+        policy = evaluation_settings[0]
+        nodes_mode = evaluation_settings[1]
+        print("policy: ", policy + ", nodes_mode: ", nodes_mode)
+
+        # check for user defined criteria
+        defined_criteria = []
+        defined_criteria = file.get_defined_criteria(data.get('selectedItemsWithTypes', []))
+        if defined_criteria:
+            print("User defined criteria are found")
+        else:
+            print("No user defined criteria")
 
         # Prepare message to be sent to SAL
         message_for_SAL = [
             {
                 "type": "NodeTypeRequirement",
                 "nodeTypes": ["IAAS", "PAAS", "FAAS", "BYON", "EDGE", "SIMULATION"],
-                #"nodeTypes": ["EDGE"],
+                # "nodeTypes": ["EDGE"],
                 "jobIdForEDGE": ""
                 #"jobIdForEDGE": "FCRnewLight0"
             }
@@ -68,12 +82,15 @@ def process_selected_criteria():
             "body": body_json_string_for_SAL
         }
         print("Request to Sal:", RequestToSal)
-
         sal_reply = activemq.call_publisher(RequestToSal)
+
         # Parse the JSON string to a Python object
         nodes_data = json.loads(sal_reply) if isinstance(sal_reply, str) else sal_reply
         # print("nodes_data", nodes_data)
-        print("Request from front-end")
+        formatted_json = json.dumps(nodes_data, indent=4)
+        with open('NodeCandidates.json', 'w') as file1:
+            file1.write(formatted_json)
+        print("Request from front-end (Printed from Routes)")
 
         # Check if there is any error in SAL's reply body
         if 'key' in nodes_data and any(keyword in nodes_data['key'].lower() for keyword in ['error', 'exception']):
@@ -81,13 +98,11 @@ def process_selected_criteria():
             print("Error found in SAL's message body:", messageToDataGrid)
             node_names = []
             grid_data_with_names = []
+            providers = []
         else:  # No error found in SAL's reply body
-
-            ###--- For Review, use ONLY ONE block, SAL's response or JSON file ----------------------###
-
             ###-------- Extract data from SAL's response --------###
             print("Use of SAL's response")
-            extracted_data, node_ids, node_names = extract_SAL_node_candidate_data_Front(nodes_data)
+            extracted_data, node_ids, node_names, providers = extract_SAL_node_candidate_data_Front(nodes_data,nodes_mode,application_id)
             # print("SAL's extracted_data: ", extracted_data)
             ###-------- Extract data from SAL's response --------###
 
@@ -97,11 +112,8 @@ def process_selected_criteria():
             # jsondata = read_json_file_as_string(json_file_path)
             # nodes_data = json.loads(jsondata)
             # if nodes_data:
-            #     extracted_data, node_ids, node_names = extract_SAL_node_candidate_data_Front(nodes_data)
+            #     extracted_data, node_ids, node_names, providers = extract_SAL_node_candidate_data_Front(nodes_data)
             ###-------- Extract data from dummy JSON file --------###
-
-            ###--- For Review, use ONLY ONE block, SAL's response or JSON file ----------------------###
-
 
             # print("extracted_data:", extracted_data)
             field_mapping = create_criteria_mapping()
@@ -146,16 +158,24 @@ def process_selected_criteria():
                     else:
                         # Handle other criteria (this part may need adjustment based on your actual data structure)
                         # value = "N/A"  # Placeholder for the logic to determine non-default criteria values
-                        # Generate random or default values for rest criteria
-                        type_value = criterion_data_type['type']
-                        # print("type_value:", type_value)
 
-                        if type_value == 1:
-                            value = random.choice(["High", "Medium", "Low"])
-                        elif type_value == 5:
-                            value = random.choice(["True", "False"])
+                        if criterion_key in file.get_defined_criteria_list():
+                            # for defined criteria do not generate values
+                            value = "N/A"
                         else:
-                            value = round(random.uniform(1, 100), 2)
+                            # Generate low or default values for rest criteria
+                            type_value = criterion_data_type['type']
+                            # print("type_value:", type_value)
+
+                            if type_value == 1:
+                                # value = random.choice(["High", "Medium", "Low"])
+                                value = "Low"
+                            elif type_value == 5:
+                                # value = random.choice(["True", "False"])
+                                value = "False"
+                            else:
+                                # value = round(random.uniform(1, 100), 2)
+                                value = 0.001
 
                     criterion_data = {
                         "title": criterion_title,
@@ -172,10 +192,22 @@ def process_selected_criteria():
             # print("grid_data_with_names:", grid_data_with_names)
             messageToDataGrid = "True"
 
+            # TODO: Read the providers to send to datagrid component
+            # check from sal response
+            # "cloud": {
+            #     "id": "nebulous-aws-sal-1",
+            #     "endpoint": null,
+            #     "cloudType": "PUBLIC",
+            #     "api": {
+            #         "providerName": "aws-ec2"
+            #     },
+
         return jsonify({
             'success': messageToDataGrid,
             'gridData': grid_data_with_names,
-            'NodeNames': node_names
+            'NodeNames': node_names,
+            'definedCriteria': defined_criteria,
+            'providers': providers
         })
 
     except Exception as e:
@@ -184,7 +216,7 @@ def process_selected_criteria():
 
 
 
-# Used for Evating the node candidates
+# Used for Evaluating the node candidates
 @main_routes.route('/process-evaluation-data', methods=['POST'])
 def process_evaluation_data():
     try:
@@ -203,10 +235,18 @@ def process_evaluation_data():
         # print("# node_ids:", len(node_ids))
 
         # Convert RAM and Cores
-        data_table = convert_data_table(data_table)  # Convert RAM and # of Cores, e.g. 1/X
+        # if policy min then do the convert. else no
+        evaluation_settings = data.get('evaluation_settings')  # in evaluation_settings we pass data like policy and nodes mode
+        policy = evaluation_settings[0]
+        nodes_mode = evaluation_settings[1]
+        if policy == '0':
+            print("Policy was min - Convert made")
+            data_table = convert_data_table(data_table)  # Convert RAM and # of Cores, e.g. 1/X
+        else:
+            print("Policy was max - No convert made")
         # Run Optimization - Perform evaluation
         results = perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_names, node_ids)
-        print("Results: ", results)
+        # print("Results: ", results)
         print("-------------------------------------------------")
         # Return the results
         return jsonify({'status': 'success', 'results': results})
@@ -248,7 +288,7 @@ def create_app():
     return jsonify(result)
 
 
-# Checks if app exists or inserts it in db
+# Checks if app exists or insert it in db
 @main_routes.route('/app', methods=['POST'])
 def check_for_app():
     data = request.json
@@ -281,6 +321,8 @@ def save_app():
 def send():
     data = request.get_json()
     body = data['body']
+    body = json.dumps(body)
+    print(type(body))
     application_id = data['application_id']
     correlation_id = data['correlation_id']
     key = data['key']

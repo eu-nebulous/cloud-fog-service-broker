@@ -161,3 +161,19 @@ def get_subject_data(item_subject):
                 attr_subject = attr_subject.replace(SMI_prefix, '')
                 subject_data["title"] = attr_subject
     return subject_data
+
+
+def get_defined_criteria_list():
+    defined_criteria = ["attr-accountability", "attr-reputation"]  # Define the list of criteria given by the user
+    return defined_criteria
+
+
+# This function is used to set the criteria for which the user gives values per provider
+def get_defined_criteria(selected_criteria):
+    defined_criteria = get_defined_criteria_list()
+    criteria_to_define = []
+    for criteria in selected_criteria:
+        if criteria['name'] in defined_criteria:
+            # print(criteria['name'])
+            criteria_to_define.append(criteria)
+    return criteria_to_define
