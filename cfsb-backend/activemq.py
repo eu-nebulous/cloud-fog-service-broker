@@ -261,7 +261,7 @@ class SyncedHandler(Handler):
                     # Convert the original data of RAM and # of Cores, e.g. 1/X, if they are selected
                     # print("Original created_data_table:", data_table)
                     # TODO: INCORPORATE THIS INTO create_data_table function
-                    if (app_data['policy'] == '0'):
+                    if (app_data['policy'] == 0):
                         data_table = convert_data_table(data_table)  # Convert RAM and # of Cores, e.g. 1/X
                         # print("Converted created_data_table:", data_table)
                     else:
@@ -479,7 +479,7 @@ class SyncedHandler(Handler):
                     # Convert the original data of RAM and # of Cores, e.g. 1/X, if they are selected
                     # print("Original created_data_table:", data_table)
                     # TODO: check policy to convert or not
-                    if (app_data['policy'] == '0'):
+                    if (app_data['policy'] == 0):
                         data_table = convert_data_table(data_table)  # Convert RAM and # of Cores, e.g. 1/X
                         # print("Converted created_data_table:", data_table)
                     else:
