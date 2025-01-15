@@ -28,7 +28,7 @@ def extract_SAL_node_candidate_data_Front(json_data_all, app_specific, app_id):
 
     # app_specific = 1
     # print(app_specific)
-    app_id = "123456789"
+    # app_id = "123456789"
 
     # Filter the json_data_all based on app_specific
     if app_specific == "0" or not app_specific: # When all nodes chosen, we give only the nodes for all applications.
