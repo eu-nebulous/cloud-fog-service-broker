@@ -403,7 +403,7 @@ def read_application_data(app_id):
         data = json.load(f)
         app_specific = data.get("appSpecific", False)
         policy = data.get("policy", 0) # read also app_specific and policy also
-        app_data['policy'] = policy
+        app_data['policy'] = int(policy)
         app_data['app_specific'] = app_specific # node mode
         # app_data['app_id'] = app_id
 
