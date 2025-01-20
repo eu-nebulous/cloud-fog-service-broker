@@ -102,6 +102,7 @@ export default {
     goBackToHome() {
       this.$router.push({ name: 'HomePage' });
     }
+
   },
 
 };

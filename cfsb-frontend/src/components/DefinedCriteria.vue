@@ -40,25 +40,26 @@ export default {
 </script>
 
 <template>
-<h3>Please provide your input for the following criteria:</h3>
+  <h3>Please provide your input for the following criteria:</h3>
 
 
   <table>
     <thead>
-      <tr>
-        <th>Provider</th>
-        <th v-for="criterion in criteria" :key="criterion.title">{{ criterion.title }}</th>
-      </tr>
+    <tr>
+      <th>Provider</th>
+      <th v-for="criterion in criteria" :key="criterion.title">{{ criterion.title }}</th>
+    </tr>
     </thead>
     <tbody>
-      <tr v-for="provider in providers" :key="provider">
-        <td>{{ provider }}</td>
-        <td v-for="criterion in criteria" :key="criterion">
-          <select @input="updateSelection(provider, criterion, $event.target.value)">
-            <option v-for="option in options" :key="option" :value="option">{{ option }}</option>
-          </select>
-        </td>
-      </tr>
+    <tr v-for="provider in providers" :key="provider">
+      <td>{{ provider }}</td>
+      <td v-for="criterion in criteria" :key="criterion">
+        <select @input="updateSelection(provider, criterion, $event.target.value)">
+          <option value="0" selected disabled>Select Value</option>
+          <option v-for="option in options" :key="option" :value="option">{{ option }}</option>
+        </select>
+      </td>
+    </tr>
     </tbody>
   </table>
 </template>

@@ -46,23 +46,12 @@ class SyncedHandler(Handler):
             if not application_id_optimizer:
                 application_id_optimizer = 'd535cf554ea66fbebfc415ac837a5828'  # dummy application_id_optimizer
             # print("Application Id: ", application_id_optimizer)
-            ###-------- Extract body from Optimizer's message --------###
             ## Read the Message Sent from Optimizer
             opt_message_data = body
             print("Whole Message Sent from Optimizer Single:", opt_message_data)
             ## Extract 'body' from opt_message_data
             body_sent_from_optimizer = opt_message_data.get('body', {})
-            # when on sender with multi body it works with the following commented. TODO: put the dumps for sender only inside single
-            # body_sent_from_optimizer = json.dumps(body_sent_from_optimizer) # When SENDER is used then Convert the body data to a JSON string
-            ###-------- Extract body from Optimizer's message --------###
 
-            ### The following are taken from the MULTI case - CHECK IF IT CAN BE IMPLEMENTED THE SAME WITH SINGLE. Is JSLOADS Needed???
-            # body_sent_from_optimizer = json.loads(opt_message_data['body'])  # Parse the JSON string in body into a Python object (a list of lists in this case)
-            # body_sent_from_optimizer = opt_message_data.get('body', {})  # Use ONLY for SENDER !!!
-            # body_sent_from_optimizer = json.dumps(body_sent_from_optimizer)  # When SENDER is used then Convert the body data to a JSON string
-            ###
-
-            ## New code here. We will delete the comments above when we are OK.
             # if the body is str --> json it will be converted as python. On SAL we have to pass json.
             if isinstance(body_sent_from_optimizer, str):
                 # print(type(body_sent_from_optimizer))
@@ -73,7 +62,7 @@ class SyncedHandler(Handler):
 
             print("-------------------------------------------------")
             print("Extracted body from Optimizer Message:", body_sent_from_optimizer)
-            print("check if request should be handled as multi or single")
+            print("Check if the request should be handled as Multi or Single")
             # Check if the request should be handled as multi or single
             if isinstance(body_sent_from_optimizer, (list, str)):
                 # print(type(body_sent_from_optimizer[0]))
@@ -95,7 +84,6 @@ class SyncedHandler(Handler):
             correlation_id_optimizer = message.correlation_id
             if not correlation_id_optimizer:
                 correlation_id_optimizer = '88334290cad34ad9b21eb468a9f8ff11'  # dummy correlation_id
-
             print("Optimizer Correlation Id: ", correlation_id_optimizer)
 
             application_id_optimizer = message.subject
@@ -110,7 +98,6 @@ class SyncedHandler(Handler):
             ## Extract 'body' from opt_message_data
             # body_sent_from_optimizer = json.loads(opt_message_data['body'])  # Comment this when on sender - Parse the JSON string in body into a Python object (a list of lists in this case)
             body_sent_from_optimizer = opt_message_data.get('body', {})  # Use ONLY for SENDER !!!
-            ## New code here. We will delete the comments above when we are OK.
             if isinstance(body_sent_from_optimizer, str):
                 # print(type(body_sent_from_optimizer))
                 try:
@@ -120,7 +107,7 @@ class SyncedHandler(Handler):
 
             print("Extracted body from Optimizer Message:", body_sent_from_optimizer)
             print("-------------------------------------------------")
-            print("check if request should be handled as multi or single")
+            print("Check if the request should be handled as Multi or Single")
             # check if request should be handled as multi or single
             if isinstance(body_sent_from_optimizer, (list, str)):
                 # print(type(body_sent_from_optimizer[0]))
@@ -139,7 +126,7 @@ class SyncedHandler(Handler):
             ## Prepare message to be send to SAL
             # locations = []
             print("--------Before Retrieving Locations --------")
-            print(body_json_string)
+            print("Message to SAL:", body_json_string)
             body_json_string, locations = remove_request_attribute('CFSB-datasource-geolocations', json.loads(body_json_string))
             print("--------After Retrieving Locations --------")
             # print(body_json_string)
@@ -168,29 +155,20 @@ class SyncedHandler(Handler):
                 if 'key' in nodes_data and any(
                         keyword in nodes_data['key'].lower() for keyword in ['error', 'exception']):
                     print("Error found in SAL's message body:", nodes_data['message'])
-                    sal_reply_body = []
+                    sal_reply_body = '' # Make it an Empty string in case of error
                 else:  # No error found in SAL's reply body
                     total_nodes = len(nodes_data)  # Get the total number of nodes
                     sal_reply_body = sal_body # Keep sal_reply_body as is since it's already a JSON string
                     print("Total Nodes in SAL's reply:", total_nodes)
 
-                    # if total_nodes > 300:  # Check if more than 300 nodes received
-                    #     print("More than 300 nodes returned from SAL.")
-                    #     # Filter to only include the first 300 nodes and convert back to JSON string
-                    #     sal_reply_body = json.dumps(nodes_data[:300])
-                    # elif total_nodes > 0 and total_nodes <= 300:
-                    #     # print(f"Total {total_nodes} nodes returned from SAL. Processing all nodes.")
-                    #     # Keep sal_reply_body as is since it's already a JSON string
-                    #     sal_reply_body = sal_body
-                    # else:
-                    #     sal_reply_body = []
-
             except json.JSONDecodeError as e:
                 print(f"Error parsing JSON reply from SAL: {e}")
-                sal_reply_body = []  # Default to an empty JSON array as a string in case of error
+                sal_reply_body = '' #  Make it an Empty string in case of error
 
-            if sal_reply_body:  # Check whether SAL's reply body is empty
+            if sal_reply_body.strip() not in ('', '[]'): # Check whether SAL's reply body is empty
                 # print("SAL reply Body:", sal_reply_body)
+                # print(type(sal_reply_body))  # Check the data type
+                # print(f"Raw content: {repr(sal_reply_body)}")
 
                 # Check the number of nodes before Evaluation
                 if total_nodes > 1:
@@ -198,26 +176,15 @@ class SyncedHandler(Handler):
                     if check_json_file_exists(application_id_optimizer):  # Application JSON exist in DB
                         print(f"JSON file for application ID {application_id_optimizer} exists.")
 
-                        # TODO: The read_application_data should return the policy from the saved file, in order to check it to do the convert or not.
-                        # Check if there are differences in available nodes between saved data in JSON file and SAL's reply
-                        # data_table, relative_wr_data, immediate_wr_data, node_names, node_ids, app_data = read_application_data(
-                        # application_id_optimizer, sal_reply_body, locations)
+                        # The read_application_data returns int the app_data the policy from the saved file, in order to check it to do the convert or not.
                         app_data, selected_criteria, provider_criteria, relative_wr_data, immediate_wr_data = read_application_data(application_id_optimizer)
                         extracted_data_SAL, node_ids, node_names, providers = extract_SAL_node_candidate_data_NEW(sal_reply_body, app_data, application_id_optimizer,selected_criteria)
                         data_table = create_data_table(extracted_data_SAL, selected_criteria, provider_criteria, locations)
-
                         # print("relative_wr_data:", relative_wr_data)
                         # print("immediate_wr_data:", immediate_wr_data)
                     else:  # Application does not exist in directory
-                        # print(f"JSON file for application ID {application_id_optimizer} does not exist.")
-                        # Extract data from SAL's response
-                        # need to use the NEW function
-                        # extracted_data_SAL, node_ids, node_names = extract_SAL_node_candidate_data(sal_reply_body)
-                        # print("extracted_data_SAL:", extracted_data_SAL)
-                        # print("node_ids:", node_ids)
-
+                        print(f"JSON file for application ID {application_id_optimizer} does not exist.")
                         # Use the create_criteria_mapping() to get the criteria mappings
-                        # selected_criteria = ["Operating cost", "Memory Price", "Number of CPU Cores", "Memory Size", "Storage Capacity"]
                         # selected criteria must be a list of dictionaries like when reading it from file
                         json_selected_criteria = {
                             "selectedCriteria": [
@@ -249,23 +216,23 @@ class SyncedHandler(Handler):
                         # Create data_table:
                         # provider_criteria do not exist when the application file does not exist. None is treated like false
                         data_table = create_data_table(extracted_data_SAL, selected_criteria, None, locations)
+                        print(data_table)
                         relative_wr_data = []
                         immediate_wr_data = []
                         # create default app_data dictionary for policy and app_specific when file not exists for the application
-                        app_data = {'policy': 0, 'app_specific': False}
+                        app_data = {'policy': '0', 'app_specific': False}
 
                     # Check the number of nodes before Evaluation
                     print("There are " + str(len(node_ids)) + " nodes for Evaluation")
-                    print(data_table)
 
                     # Convert the original data of RAM and # of Cores, e.g. 1/X, if they are selected
-                    # print("Original created_data_table:", data_table)
+                    print("Original data_table:", data_table)
                     # TODO: INCORPORATE THIS INTO create_data_table function
-                    if (app_data['policy'] == 0):
+                    if (app_data['policy'] == '0'):
                         data_table = convert_data_table(data_table)  # Convert RAM and # of Cores, e.g. 1/X
-                        # print("Converted created_data_table:", data_table)
+                        print("Converted data_table:", data_table)
                     else:
-                        print("Policy was max for this application")
+                        print("Policy is MAX for this application")
 
                     ## Run evaluation
                     evaluation_results = perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_names,
@@ -344,10 +311,10 @@ class SyncedHandler(Handler):
                 list_number += 1
                 print("Process List: ", list_number)
                 # print("Within requirements loop:", requirement)
-                print("--------before remove--------")
+                print("--------Before Removal--------")
                 print(requirement)
                 requirement, locations = remove_request_attribute('CFSB-datasource-geolocations', requirement)
-                print("--------after remove--------")
+                print("--------After Removal--------")
                 print(requirement)
                 if locations:
                     print(locations)
@@ -368,12 +335,11 @@ class SyncedHandler(Handler):
                 ## Process SAL's Reply
                 sal_body = sal_reply.get('body')  # Get the 'body' as a JSON string
                 if sal_body:
-                    print("SAL's Reply is OK: ", list_number)
+                    print("SAL Replied Successfully: ", list_number)
                     # iterate over all nodes to keep unique nodes
                     nodes_by_requirement = json.loads(sal_body)
                     # print("nodes_by_requirement from OPT-Triggering-Multi: ", nodes_by_requirement)
                     nodes_per_list = len(nodes_by_requirement)
-                    # print("Nuber of Nodes: ", nodes_per_list + "in List:", list_number)
                     print(f"Number of Nodes: {nodes_per_list} in List: {list_number}")
 
                     for node in nodes_by_requirement:
@@ -410,14 +376,7 @@ class SyncedHandler(Handler):
                     if check_json_file_exists(application_id_optimizer):  # Application JSON exist in DB
                         print(f"JSON file for application ID {application_id_optimizer} exists.")
 
-                        ###-------- Extract data from dummy JSON file --------###
-                        # json_file_path = 'dummySALresponse.json'
-                        # sal_reply_body = read_json_file_as_string(json_file_path)
-                        ###-------- Extract data from dummy JSON file --------###
-                        # TODO: The read_application_data should return the policy from the saved file, in order to check it to do the convert or not.
-                        # Check if there are differences in available nodes between saved data in JSON file and SAL's reply
-                        # data_table, relative_wr_data, immediate_wr_data, node_names, node_ids, app_data = read_application_data(
-                        #     application_id_optimizer, sal_reply_body, locations)
+                        # The read_application_data returns in app_data the policy from the saved file to check it and convert or not
                         app_data, selected_criteria, provider_criteria, relative_wr_data, immediate_wr_data = read_application_data(
                             application_id_optimizer)
                         extracted_data_SAL, node_ids, node_names, providers = extract_SAL_node_candidate_data_NEW(
@@ -427,16 +386,7 @@ class SyncedHandler(Handler):
                         # print("relative_wr_data:", relative_wr_data)
                         # print("immediate_wr_data:", immediate_wr_data)
                     else:  # Application does not exist in directory
-                        # print(f"JSON file for application ID {application_id_optimizer} does not exist.")
-                        ###-------- Extract data from SAL's response --------###
-                        # Extract data from SAL's response
-                        # need to use the NEW function
-                        extracted_data_SAL, node_ids, node_names = extract_SAL_node_candidate_data(sal_reply_body)
-                        # print("extracted_data_SAL:", extracted_data_SAL)
-                        # print("node_ids:", node_ids)
-                        ###-------- Extract data from SAL's response --------###
-
-                        # Use the create_criteria_mapping() to get the criteria mappings
+                        print(f"JSON file for application ID {application_id_optimizer} does not exist.")
                         # selected_criteria = ["Operating cost", "Memory Price", "Number of CPU Cores", "Memory Size", "Storage Capacity"]
                         json_selected_criteria = {
                             "selectedCriteria": [
@@ -452,7 +402,7 @@ class SyncedHandler(Handler):
                                 }
                             ]
                         }
-                        # check if distance was asked by optimizer
+                        # Check if distance was asked by optimizer
                         if locations:
                             distance_item = {
                                 "name": "9f5706e3-08bd-412d-8d59-04f464e867a8",
@@ -468,28 +418,36 @@ class SyncedHandler(Handler):
                         # Create data_table:
                         # provider_criteria do not exist when the application file does not exist. None is treated like false
                         data_table = create_data_table(extracted_data_SAL, selected_criteria, None, locations)
+
                         relative_wr_data = []
                         immediate_wr_data = []
                         # create default app_data dictionary for policy and app_specific when file not exists for the application
-                        app_data = {'policy': 0, 'app_specific': False} # Use the default policy (minimal)
+                        app_data = {'policy': '0', 'app_specific': False} # Use the default policy (minimal)
+                        # print("app_data:", app_data['policy'])
 
                     # Check the number of nodes before Evaluation
                     print("There are " + str(len(node_ids)) + " nodes for Evaluation")
-
+                    print("Original Data", data_table)
                     # Convert the original data of RAM and # of Cores, e.g. 1/X, if they are selected
-                    # print("Original created_data_table:", data_table)
-                    # TODO: check policy to convert or not
-                    if (app_data['policy'] == 0):
+                    if (app_data['policy'] == '0'):
                         data_table = convert_data_table(data_table)  # Convert RAM and # of Cores, e.g. 1/X
-                        # print("Converted created_data_table:", data_table)
+                        print("Converted data_table:", data_table)
                     else:
-                        print("Policy was max for this application")
+                        print("Policy is MAX for this application")
 
-                    ## Run evaluation for all eligible nodes
+                    # Calculate the simple average score for each node
+                    # columns = list(data_table.keys())
+                    # averages = []
+                    # for i in range(len(data_table[columns[0]])):
+                    #     row_sum = sum(data_table[col][i] for col in columns)
+                    #     averages.append(row_sum / len(columns))
+                    # # print("Average Scores: ", averages)
+
+                    # Run evaluation for all eligible nodes
                     evaluation_results = perform_evaluation(data_table, relative_wr_data, immediate_wr_data,
                                                             node_names, node_ids)
                     # print("Evaluation Results:", evaluation_results)
-                    print("lp status = " + str(evaluation_results.get('LPstatus')))
+                    print("LP Status = " + str(evaluation_results.get('LPstatus')))
 
                     if evaluation_results.get('LPstatus') == 'feasible':
                         feasibility = True
@@ -624,7 +582,6 @@ def call_otp_publisher(body):
 
 
 # Used to read dummy response and send to Optimizer using JSON
-# I have already sent to Optimizer using this function
 def read_dummy_response_data_toOpt(file_path):
     with open(file_path, 'r') as file:
         data = json.load(file)
@@ -645,7 +602,6 @@ def is_json(myjson):
         return False
     return True
 
-
 def print_start_message():
     ascii_art = """
   CCCC   FFFFF  SSSSS  BBBBB  
@@ -664,6 +620,6 @@ def print_start_message():
 def print_end_message():
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # Use datetime.now() directly
     print("\n" + "="*50)
-    print(f"{'CFSB Evaluation has Ended':^50}")
+    print(f"{'CFSB Evaluation has been Completed':^50}")
     print(f"Timestamp: {timestamp:^50}")
     print("="*50 + "\n")

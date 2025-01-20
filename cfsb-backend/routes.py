@@ -15,10 +15,10 @@ logging.disable(logging.CRITICAL)
 main_routes = Blueprint('main', __name__)
 
 # List of items with Ordinal Data
-Ordinal_Variables = ['attr-reputation', 'attr-assurance']
-NoData_Variables = ['attr-security', 'attr-performance-capacity', 'attr-performance-suitability']
-Cont_Variables = ['attr-performance', 'attr-financial', 'attr-performance-capacity-memory',
-                  'attr-performance-capacity-memory-speed']
+# Ordinal_Variables = ['attr-reputation', 'attr-assurance']
+# NoData_Variables = ['attr-security', 'attr-performance-capacity', 'attr-performance-suitability']
+# Cont_Variables = ['attr-performance', 'attr-financial', 'attr-performance-capacity-memory',
+#                   'attr-performance-capacity-memory-speed']
 
 
 #Used in CriteriaSelection.vue
@@ -50,8 +50,8 @@ def process_selected_criteria():
         print("application_id:", application_id)
         evaluation_settings = data.get('settings') # in evaluation_settings we pass data like policy and nodes mode
         policy = evaluation_settings[0]
-        nodes_mode = evaluation_settings[1]
-        print("policy: ", policy + ", nodes_mode: ", nodes_mode)
+        app_specific = evaluation_settings[1] # nodes_mode
+        print("policy: ", policy + ", app_specific: ", app_specific) # nodes_mode
 
         # check for user defined criteria
         defined_criteria = []
@@ -102,18 +102,9 @@ def process_selected_criteria():
         else:  # No error found in SAL's reply body
             ###-------- Extract data from SAL's response --------###
             print("Use of SAL's response")
-            extracted_data, node_ids, node_names, providers = extract_SAL_node_candidate_data_Front(nodes_data,nodes_mode,application_id)
+            extracted_data, node_ids, node_names, providers = extract_SAL_node_candidate_data_Front(nodes_data,app_specific,application_id)
             # print("SAL's extracted_data: ", extracted_data)
             ###-------- Extract data from SAL's response --------###
-
-            ###-------- Extract data from dummy JSON file --------###
-            # print("Use of dummy JSON file")
-            # json_file_path = 'dummySALresponse.json'
-            # jsondata = read_json_file_as_string(json_file_path)
-            # nodes_data = json.loads(jsondata)
-            # if nodes_data:
-            #     extracted_data, node_ids, node_names, providers = extract_SAL_node_candidate_data_Front(nodes_data)
-            ###-------- Extract data from dummy JSON file --------###
 
             # print("extracted_data:", extracted_data)
             field_mapping = create_criteria_mapping()
@@ -154,11 +145,13 @@ def process_selected_criteria():
                     # Fetch the values of the selected default criteria
                     if criterion_title in default_list_criteria_mapping:
                         SAL_criterion_name = field_mapping.get(criterion_title)  # Map the criterion title with the criterion name in SAL's reply
-                        value = hardware_info.get(SAL_criterion_name, "N/A")     # Get the criterion values
+                        if criterion_title == 'Operating cost':
+                            value = node_data.get('price', 0) or 100 # If 'price' is not present, it defaults to 100 (a large cost)
+                        else:
+                            value = hardware_info.get(SAL_criterion_name, "N/A") # For the rest criteria the values are in hardware
                     else:
-                        # Handle other criteria (this part may need adjustment based on your actual data structure)
+                        # Handle other criteria
                         # value = "N/A"  # Placeholder for the logic to determine non-default criteria values
-
                         if criterion_key in file.get_defined_criteria_list():
                             # for defined criteria do not generate values
                             value = "N/A"
@@ -191,16 +184,6 @@ def process_selected_criteria():
             } for node_id, data in grid_data.items()]
             # print("grid_data_with_names:", grid_data_with_names)
             messageToDataGrid = "True"
-
-            # TODO: Read the providers to send to datagrid component
-            # check from sal response
-            # "cloud": {
-            #     "id": "nebulous-aws-sal-1",
-            #     "endpoint": null,
-            #     "cloudType": "PUBLIC",
-            #     "api": {
-            #         "providerName": "aws-ec2"
-            #     },
 
         return jsonify({
             'success': messageToDataGrid,
@@ -238,12 +221,13 @@ def process_evaluation_data():
         # if policy min then do the convert. else no
         evaluation_settings = data.get('evaluation_settings')  # in evaluation_settings we pass data like policy and nodes mode
         policy = evaluation_settings[0]
-        nodes_mode = evaluation_settings[1]
+        # app_specific = evaluation_settings[1] #nodes_mode
         if policy == '0':
-            print("Policy was min - Convert made")
+            print("Policy was min - Conversion was made")
             data_table = convert_data_table(data_table)  # Convert RAM and # of Cores, e.g. 1/X
+            print("Converted Data Table", data_table)
         else:
-            print("Policy was max - No convert made")
+            print("Policy was max - No Conversion was made")
         # Run Optimization - Perform evaluation
         results = perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_names, node_ids)
         # print("Results: ", results)

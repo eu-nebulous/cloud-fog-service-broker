@@ -55,10 +55,6 @@ export default {
 
 <template>
   <div class="container">
-    <!-- User ID Display -->
-    <div class="user-id-display" style="position: absolute; top: 20px; right: 20px; font-size: 18px;">
-      <span>Welcome, User ID: {{ userId }}</span>
-    </div>
     <div class="row p-4 text-center">
       <div class="col col-12">
         <h1 class="display-2">Welcome to <span style="color: var(--main-color);">Cloud Fog Service Broker</span></h1>

@@ -142,7 +142,9 @@ def perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_nam
         # res = linprog(c, A_ub=A, b_ub=b, A_eq=A_eq, b_eq=b_eq, bounds=bounds, method='simplex', callback=None, options={'presolve': True, 'autoscale': True, 'bland': True})
 
         DEA_Scores.append(-res.fun if res.success else None)
-
+        # print(res.fun)
+        print(res.x) # Optimal Solution
+        # print(res.message)
         # Check if the optimization problem is infeasible
         if not res.success:
             # Return an appropriate JSON response indicating infeasibility
@@ -160,10 +162,10 @@ def perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_nam
     DEA_Scores_Ranked = len(DEA_Scores_Rounded) - rankdata(DEA_Scores_Rounded, method='max') + 1
 
     # Print the rounded scores and their corresponding ranks
-    # print("Rounded DEA Scores:", DEA_Scores_Rounded)
+    print("Rounded DEA Scores:", DEA_Scores_Rounded)
     # print("Corresponding Ranks:", DEA_Scores_Ranked)
 
-    # Create a JSON object with titles, DEA scores, and ranks
+    # Create a JSON object with title, id, DEA scores, and ranks
     results_json = [
         {
             "Title": node_names[i],
@@ -180,11 +182,11 @@ def perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_nam
 
 
 # # Provided data
-# data_table = {'2ad4bd97-d932-42a5-860e-e607a50f161d': [3, 1], 'e917581d-1a62-496b-9d2e-05972fe309e9': [2, 1], '78aca9a8-8c14-4c7d-af34-72cef0da992d': [3, 1], 'd2bddce9-4118-41a9-b528-3bac32b13312': [3, 2]}
+# data_table = {'A': [3, 1], 'B': [2, 1], 'C': [3, 1], 'D': [3, 2]}
 # relative_wr_data: [{'LHSCriterion': 'Accountability', 'Operator': 1, 'Intense': 2, 'RHSCriterion': 'Compliance'}]
 # immediate_wr_data: [{'Criterion': 'Compliance', 'Operator': 1, 'Value': 0.5}]
 #
-# node_ids = ['2ad4bd97-d932-42a5-860e-e607a50f161d', 'e917581d-1a62-496b-9d2e-05972fe309e9', '78aca9a8-8c14-4c7d-af34-72cef0da992d', 'd2bddce9-4118-41a9-b528-3bac32b13312']
+# node_ids = ['A', 'B', 'C', 'D']
 #
 # Evaluation_JSON = perform_evaluation(data_table, [], [], node_ids)
 # pretty_json = json.dumps(Evaluation_JSON)

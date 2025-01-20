@@ -343,7 +343,7 @@ export default {
 
         if (!response.ok) {
           // If the HTTP response is not OK, throw an error
-          throw new Error('Network response was not ok');
+          throw new Error('Error in process_evaluation_data() response');
         }
 
         const data = await response.json();

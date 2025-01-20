@@ -62,7 +62,7 @@ def extract_SAL_node_candidate_data_Front(json_data_all, app_specific, app_id):
         default_criteria_values = {criteria: hardware_info.get(criteria, 0.0) if criteria in hardware_info else item.get(criteria, 0.0) for criteria in default_criteria_list}
         node_type = item.get("nodeCandidateType", "")
 
-        # skip busy nodes
+        # Skip busy nodes
         if (item.get("jobIdForEdge") not in [None, "any", "", "all-applications"]) or (item.get("jobIdForByon") not in [None, "any", "", "all-applications"]):
             continue
 
@@ -282,7 +282,7 @@ def save_app_data(json_data):
 
 #################  BLOCK FOR GENERAL PURPOSE #################
 # Used to map the criteria from SAL's response with the selected criteria (from frontend)
-# If additions here, then add it in node_dict_map() also
+# If additions here, then add it in node_dict_map() also!!!
 def create_criteria_mapping():
     field_mapping = {
         # "Cost": "price",
@@ -299,15 +299,20 @@ def create_criteria_mapping():
 # This function maps the default criteria with the flattened keys from the node data (e.g. ram inside hardware will become hardware_ram)
 def node_dict_map():
     field_mapping = {
-        "price": "price",
+        "price": "price", # Operating cost
         "memoryPrice": "memoryPrice",
         "cores": "hardware_cores",
-        "ram": "hardware_ram",
-        "disk": "hardware_disk",
+        "ram": "hardware_ram", # memory size
+        "disk": "hardware_disk", # storage capacity
         "distance_lat": "location_geoLocation_latitude",
         "distance_long": "location_geoLocation_longitude",
     }
     return field_mapping
+
+# Function to normalize a list of values by the maximum value
+def normalize_with_max(values):
+    max_value = max(values)
+    return [value / max_value for value in values]
 
 
 # USED TO BRING TO SAME LEVEL SAL DATA OF EACH NODE - Inner fields are prefixed with the parent
@@ -350,7 +355,16 @@ def convert_data_table(created_data_table):
     if 'Memory Size' in created_data_table:
         created_data_table['Memory Size'] = [1/x for x in created_data_table['Memory Size']]
 
-    # TODO: DO THE SAME FOR Price, Memory Price and distance
+    # Check if 'Proximity to Data Source' exists in the dictionary and convert its values
+    if 'Proximity to Data Source' in created_data_table:
+        created_data_table['Proximity to Data Source'] = [1/x for x in created_data_table['Proximity to Data Source']]
+
+    # Check if 'Operating cost' (Price) exists in the dictionary and convert its values
+    if 'Operating cost' in created_data_table:
+        created_data_table['Operating cost'] = [1/x for x in created_data_table['Operating cost']]
+
+    # Normalize the Data with column MAX
+    created_data_table = {key: normalize_with_max(values) for key, values in created_data_table.items()}
 
     return created_data_table
 
@@ -371,7 +385,6 @@ def read_json_file_as_string(file_path):
 
 
 #################  BLOCK WHEN OPTIMIZER TRIGGERS CFSB #################
-
 # Used to check if a JSON file for a given application ID exists
 def check_json_file_exists(app_id):
     app_dir = f"app_dirs/{app_id}" # The directory where the JSON files are stored
@@ -403,7 +416,7 @@ def read_application_data(app_id):
         data = json.load(f)
         app_specific = data.get("appSpecific", False)
         policy = data.get("policy", 0) # read also app_specific and policy also
-        app_data['policy'] = int(policy)
+        app_data['policy'] = policy
         app_data['app_specific'] = app_specific # node mode
         # app_data['app_id'] = app_id
 
@@ -412,10 +425,7 @@ def read_application_data(app_id):
 
     # Get all the criteria selected from the User
     selected_criteria = {criterion['title']: criterion for criterion in data.get('selectedCriteria', [])}
-    print("sel crit data in read_application_data")
-    print(selected_criteria)
-    # Pass the whole dictionary of selected criteria with type etc
-    # selected_criteria = data.get('selectedCriteria', [])
+    print("selected criteria data in read_application_data:", selected_criteria)
 
     # Get the Info about Criteria given based on Provider, In the File, we store [providerData] { provider --> criterio --> value }
     provider_criteria = data.get("providerCriteria", {})
@@ -427,94 +437,6 @@ def read_application_data(app_id):
             for criterion, value in criteria.items():
                 print("Criterion: " + criterion + " is " + str(value))
 
-    # sal_reply_body = json.loads(sal_reply_body) # not needed
-    # not needed it is already checked before calling the function in ActiveMQ
-    # if os.path.exists(file_path): # File with saved information about the given App exists
-    #     print(f"JSON file found for application ID {app_id}.")
-    #     with open(file_path, 'r', encoding='utf-8') as f:
-    #         data = json.load(f)
-    #         app_specific = data.get("appSpecific", False)
-    #         policy = data.get("policy", 0)
-    #         app_data['policy'] = policy
-    #         app_data['app_specific'] = app_specific # node mode
-    #         # app_data['app_id'] = app_id
-    #
-    #         # Get the saved Weight Restrictions
-    #         relative_wr_data, immediate_wr_data = data.get('relativeWRData', []), data.get('immediateWRData', [])
-    #
-    #         # Get all the criteria selected from the User
-    #         selected_criteria = {criterion['title']: criterion for criterion in data.get('selectedCriteria', [])}
-    #
-    #         # Get the Info about Criteria given based on Provider, In the File, we store [providerData] { provider --> criterio --> value }
-    #         provider_criteria = data.get("providerCriteria", {})
-    #         print("provider_criteria:",provider_criteria)
-    #         for provider, criteria in provider_criteria.items():
-    #             print("Provider: " + provider)
-    #             for criterion, value in criteria.items():
-    #                 print("Criterion: " + criterion + " is " + str(value))
-    #
-    #         # TODO:
-    #         # Step 1: get nodes based on app_specific, use extract_SAL_node_candidate_data_NEW function for this
-    #         # NEW: Put the logic around Criteria in the extract_SAL_node_candidate_data_NEW
-    #         # extracted_data_SAL, node_ids_SAL, node_names_SAL = extract_SAL_node_candidate_data_NEW(sal_reply_body,app_specific, app_id)
-    #         # Step 2: Check which criteria were selected by the user
-    #         # Step 3: Separate criteria values retrieved from SAL or from File
-    #         # For criteria values from SAL use the extracted node data. function: extract_SAL_node_candidate_data
-    #         # Step 4: In the File, we store [providerData] { provider --> criterio --> value }
-    #
-    #         # Step 4.1: Get distinct providers from SAL nodes data
-    #         # TODO get the distinct providers from SAL
-    #         # Step 4.2: foreach 4.1provider found in 4providers assign the corresponding criteria value. If 4.1provider not exist, then assign low value
-    #         # Get the default criteria using the function
-    #         # default_list_criteria_mapping = create_criteria_mapping()
-    #         # for criterion in selected_criteria:
-    #         #     data_table[criterion] = []
-    #         #
-    #         # for node_data in sal_reply_body:
-    #         #     node_ids.append(node_data['id'])
-    #         #     print("Node Data")
-    #         #     print(node_data)
-    #         #     print("END Printing Node Data")
-    #         #     node_provider = extract_node_provider(node_data)
-    #         #     print("Node Provider:", node_provider)
-    #         #     for criterion, crit_info in selected_criteria.items():
-    #         #         print(criterion) # Accountability
-    #         #         print(crit_info) # {'name': 'attr-accountability', 'type': 1, 'title': 'Accountability'}
-    #         #         mapped_field = default_list_criteria_mapping.get(criterion, '')
-    #         #         # try to get the criteria here I guess
-    #         #         if node_provider in provider_criteria:
-    #         #             # first check if this provider is in the providerCriteria in file
-    #         #             print("Check for this provider's criteria")
-    #         #             if crit_info["name"] in provider_criteria[node_provider]:
-    #         #                 # then check if for this provider, this criterio exists in the dictionary
-    #         #                 # check if the criteria matched with providers exist (e.g. reputation)
-    #         #                 print(crit_info["name"] + " exists for " + node_provider)
-    #         #                 # get the criterion's value
-    #         #                 stored_criteria_value = provider_criteria[node_provider][crit_info["name"]]
-    #         #                 print(stored_criteria_value)
-    #         #                 value = stored_criteria_value
-    #         #                 # converted_value = convert_value(stored_criteria_value, crit_info)
-    #         #             else:
-    #         #                 # if criterion is mapped get data from nebulous (SAL)
-    #         #                 if mapped_field != '':
-    #         #                     print("mapped field = " + mapped_field)
-    #         #                     sal_node = extract_node_from_node_data(node_data)
-    #         #                     node_field_dict = node_dict_map()
-    #         #                     value = sal_node[node_field_dict[mapped_field]] # TODO map the flattened dictionary keys with the mapped criteria
-    #         #                     # converted_value = convert_value(value, crit_info)
-    #         #                 else:
-    #         #                     # converted_value = converted_value(None, crit_info)
-    #         #                     value = None
-    #         #         else:
-    #         #             # Provider does not exist for matched criteria
-    #         #             value = None
-    #         #         converted_value = convert_value(value, crit_info)
-    #         #         print("Converted value for criterion " + criterion + " is " + str(converted_value))
-    #         #         data_table[criterion].append(converted_value)
-    #         #
-    #         # node_names = node_ids
-
-    # return data_table, relative_wr_data, immediate_wr_data, node_names, node_ids, app_data
     return app_data, selected_criteria, provider_criteria, relative_wr_data, immediate_wr_data
 
 # USED TO EXTRACT SAL DATA WHEN TRIGGERED FROM OPTIMIZER
@@ -558,20 +480,19 @@ def extract_SAL_node_candidate_data_NEW(json_data_all, app_data, app_id, selecte
         print("USE ONLY app_specific NODES")
 
     # Print or use the filtered data
-    print("Data for eligible nodes in NEW:", json_data)
+    # print("Data for eligible nodes in NEW:", json_data)
 
     extracted_data = []
     node_ids = []
     node_names = []
     providers = []  # Store the distinct providers for defined criteria
 
-    # TODO: Check if the default are in the selected_criteria, and then calculate default_criteria_values
-    # default_criteria_list = ["cores", "ram", "disk", "memoryPrice", "cpuFrequency"]
+    # default_criteria_list : ["cores", "ram", "disk", "memoryPrice", "cpuFrequency"]
     default_criteria_list = create_criteria_mapping()
 
     for item in json_data:  # Loop only in data of nodes that can be used based on app_specific
         node_flat_dict = extract_node_from_node_data(item)
-        # skip busy nodes
+        # Skip busy nodes
         if (node_flat_dict["jobIdForEdge"] not in [None, "any", "", "all-applications"]) or (node_flat_dict["jobIdForByon"] not in [None, "any", "", "all-applications"]):
             continue
         if node_flat_dict["nodeCandidateType"] == "EDGE":
@@ -582,12 +503,11 @@ def extract_SAL_node_candidate_data_NEW(json_data_all, app_data, app_id, selecte
             node_flat_dict["nodeProviderId"] = "Unknown"
         if node_flat_dict["nodeProviderId"] == "":
             node_flat_dict["nodeProviderId"] = "Unknown"
-        print("Node flat dict")
-        print(node_flat_dict)
+        # print("Node flat dict")
+        # print(node_flat_dict)
         hardware_info = item.get("hardware", {})
         # Extract default criteria values else put ZERO value
         default_criteria_values = {criteria: hardware_info.get(criteria, 0.0) if criteria in hardware_info else item.get(criteria, 0.0) for criteria in default_criteria_list}
-        # TODO: Check if the default are in the selected_criteria, and then calculate default_criteria_values
 
         node_type = item.get("nodeCandidateType", "")
         if node_type == "EDGE":
@@ -607,7 +527,7 @@ def extract_SAL_node_candidate_data_NEW(json_data_all, app_data, app_id, selecte
         # providers = find_distinct_providers(providers, provider_name)
         # print("Providers:", providers)
 
-        # TODO:  We may THINK AGAIN WHAT WE SAVE INTO node_data POSSIBLE DOUBLE SAVINGS
+        # TODO:  We may THINK AGAIN WHAT WE SAVE INTO node_data POSSIBLE SAVING TWICE
         node_data = { # each item is now a dictionary
             # "nodeId": item.get("nodeId", ''),
             "id": item.get('id', ''),
@@ -629,10 +549,10 @@ def extract_SAL_node_candidate_data_NEW(json_data_all, app_data, app_id, selecte
     # Extract node_ids and node_names
     # node_ids = [node['id'] for node in extracted_data]
     # node_names = [node.get('name', '') for node in json_data if isinstance(node, dict)]
-    print("Extracted from NEW:",extracted_data)
+    # print("Extracted from NEW:", extracted_data)
     return extracted_data, node_ids, node_names, providers
 
-# Used to extract_SAL_node_candidate_data from App Side working with Optimizer
+# Used to extract_SAL_node_candidate_data when Optimizer asks
 def extract_SAL_node_candidate_data(json_string):
     # print("Entered in extract_SAL_node_candidate_data")
     json_data = json.loads(json_string)
@@ -641,7 +561,7 @@ def extract_SAL_node_candidate_data(json_string):
     for item in json_data:
         # Ensure each item is a dictionary before accessing it
         if isinstance(item, dict):
-            # skip busy nodes
+            # Skip busy nodes
             if (item.get("jobIdForEdge") not in [None, "any", "", "all-applications"]) or (item.get("jobIdForByon") not in [None, "any", "", "all-applications"]):
                 continue
             node_data = {
@@ -716,34 +636,28 @@ def create_data_table(extracted_data, selected_criteria, provider_criteria, loca
     node_dict_mapping = node_dict_map()
     # Initialize the data table with lists for each criterion
     data_table = {criterion: [] for criterion in selected_criteria}
-    # TODO: 3 Types of criteria (Default and Distance), Providers, and Rest
-    # extracted_data['providerName'] with this way we can access the Provider of each node
+    # 3 Types of criteria (Default and Distance), Providers, and Rest
 
     # Loop over each node in the extracted data
     for node in extracted_data:
-        # print("Node Data")
-        # print(node)
+        # print("Node Data:", node)
         # print("END Printing Node Data")
         # For each selected criterion, retrieve the corresponding value from the node's data
         for criterion, criterion_info in selected_criteria.items():
-            print("crit data")
-            print("Name = " +criterion_info["name"] + " and type = " + str(criterion_info["type"]))
+            # print("Criterion data")
+            # print("Name = " +criterion_info["name"] + " and type = " + str(criterion_info["type"]))
             # Determine the field name using the mapping, defaulting to the criterion name itself
             field_name = field_mapping.get(criterion, criterion)
-            print("field_name = " + field_name)
-            value = None  # Default value if field is not found
-            # TODO:
-            # if default
-            if criterion in field_mapping:
-                print(criterion + " exists in field mapping")
-                # populate with value from the node data
-                if field_name in node_dict_mapping:
-                    print(field_name + " exists in node dict mapping and value = " + str(node[node_dict_mapping[field_name]]))
+            # print("field_name = " + field_name)
+
+            # value = 100  # Default value if field will not be found
+            if criterion in field_mapping: # if criterion belong to the default ones
+                # print(criterion + " exists in field mapping")
+                if field_name in node_dict_mapping: # take its value from the node data
+                    # print(field_name + " exists in node dict mapping and value = " + str(node[node_dict_mapping[field_name]]))
                     value = node[node_dict_mapping[field_name]]
-                elif field_name == "distance":
-                    # calculate values for location
-                    if locations:
-                        # if locations asked by optimizer
+                elif field_name == "distance": # calculate values for location
+                    if locations: # if locations asked by optimizer
                         print("Check for locations")
                         if (node[node_dict_mapping["distance_lat"]] not in [None, ""]) and (
                                 node[node_dict_mapping["distance_long"]] not in [None, ""]):
@@ -752,14 +666,10 @@ def create_data_table(extracted_data, selected_criteria, provider_criteria, loca
                             reference_point = [latitude, longitude]
                             value = calculate_distance(reference_point, locations,
                                                                  default_reference_point=[0.0, 0.0])
-                        else:
-                            # when node does not provide location data
-                            value = 0.3 # Any antipodal distance on earth is approximately 20,037 kilometers, thus we considered 30k,  that is 1/30 due to the conversion
+                        else: # when node does not provide location data
+                            value = 0.3 # Any antipodal distance on earth is approximately 20,037 kilometers, thus we considered 30k, that is 1/30 due to the conversion
                 else:
-                    print("error in node dict mapping. create_criteria_mapping() and node_dict_map do not match")
-            #     if location
-            #           calculate distance
-            # elif provider_criteria
+                    print("Error in node dict mapping. create_criteria_mapping() and node_dict_map do not match")
             elif provider_criteria and (node["nodeProviderId"] in provider_criteria):
                 # first check if this provider is in the providerCriteria in file
                 node_provider = node["nodeProviderId"]
@@ -772,17 +682,30 @@ def create_data_table(extracted_data, selected_criteria, provider_criteria, loca
                     print(stored_criteria_value)
                     value = stored_criteria_value
                 else:
-                    # Criterio does not exist in matched provider's criteria
+                    # Criterion does not exist in matched provider's criteria
                     print("Error else in provider criteria" + criterion_info["name"] + " does not exist for " + node_provider)
-            # else # rest criteria that we do not HAVE DATA, so give the default values (eg 0.001)
-            else:
+            else: # rest criteria that we do not HAVE DATA
                 value = None
 
-            # call convert_value because it has already implemented the required logic
+            # call convert_value
             converted_value = convert_value(value, criterion_info)
             data_table[criterion].append(converted_value)
 
     return data_table
+
+
+# Used to Give Numerical values to Ordinal and Boolean for Evaluation
+def convert_value(value: None, criterion_info):
+    if criterion_info['type'] == 5:  # Boolean type
+        return 1 if value else 0
+    elif criterion_info['type'] == 1:  # Ordinal type
+        if value:  # If value found
+            ordinal_value_mapping = {"High": 3, "Medium": 2, "Low": 1}
+            return ordinal_value_mapping.get(value) or 1  # Use the value from mapping, or assign default value
+    elif criterion_info['type'] == 2:  # Numeric
+        return value if value else 100 # A big value because then will be converted
+    return value
+
 
 # Used to Append "Score" and "Rank" for each node in SAL's response JSON
 def append_evaluation_results(sal_reply_body, scores_and_ranks):
@@ -813,10 +736,9 @@ def append_evaluation_results(sal_reply_body, scores_and_ranks):
     return sal_reply_body
 
 
-#################  BLOCK UNKNOWN USE #################
 
-
-# USED TO RETRIEVE THE PROVIDER NAME OF EACH NODE
+#################  BLOCK NOT USED  #################
+# Used to RETRIEVE THE PROVIDER NAME OF EACH NODE
 def extract_node_provider(node):
     hardware_info = node.get("hardware", {})
     node_type = node.get("nodeCandidateType", "")
@@ -836,22 +758,6 @@ def extract_node_provider(node):
         provider_name = "Unknown"
     return provider_name
 
-# Used to Give Numerical values to Ordinal and Boolean for Evaluation
-def convert_value(value: None, criterion_info):
-    if criterion_info['type'] == 5:  # Boolean type
-        return 1 if value else 0
-    elif criterion_info['type'] == 1:  # Ordinal type
-        if value:  # If we want the value
-            ordinal_value_mapping = {"High": 3, "Medium": 2, "Low": 1}
-            return ordinal_value_mapping.get(value, value)  # Use the value from mapping, or keep it as is if not found
-        else:  # If we do not want to keep the value, assign default value
-            return 1
-    elif criterion_info['type'] == 2:  # Numeric
-        return value if value else 0.001
-    return value
-
-
-#################  BLOCK NOT USED  #################
 # Used to generate random values for DataGrid
 def random_value_based_on_type(data_type, criterion_info=None):
     if data_type == 1:  # Ordinal
@@ -876,7 +782,6 @@ def extract_node_candidate_data(json_file_path):
     for item in json_data:
         hardware_info = item.get("nodeCandidate", {}).get("hardware", {})
         node_data = {
-            # TODO: extract geolocation
             "name": item['name'],
             "id": item['id'],
             "nodeId": item.get("nodeCandidate", {}).get("nodeId"),

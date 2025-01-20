@@ -2,8 +2,12 @@
   <div v-show="hasDefinedCriteria">
     <DefinedCriteria :criteria="definedCriteria" :providers="serverProviders" @criteriaUpdated="updateDataGridWithSelection" />
     <div class="pt-4"></div>
+    <div class="button-container">
     <button @click="goBackToCriteriaSelection" class="bg-color-primary">Back to Criteria Selection</button>
-    <button @click="loadDataGrid" class="bg-color-primary">Set</button>
+    <button @click="loadDataGrid" class="save-button">Set Values for Criteria</button>
+<!--    <button @click="SaveDataforWR" class="save-button" v-bind:class="{'bg-color-primary': !hasNoData, 'disabled': hasNoData }" v-bind="{disabled: hasNoData}">Save and Add Weight Restrictions</button>-->
+    <button @click="scrollToBottom" class="bg-color-primary">Scroll to Bottom</button>
+    </div>
   </div>
   <div v-show="isLoading">
     <div class="alert alert-info">
@@ -44,8 +48,11 @@
       No data to display.
     </div>
     <div class="pt-4"></div>
+    <div class="button-container">
     <button @click="goBackToCriteriaSelection" class="bg-color-primary">Back to Criteria Selection</button>
-    <button @click="SaveDataforWR" v-bind:class="{ 'bg-color-primary': !hasNoData, 'disabled': hasNoData }" v-bind="{disabled: hasNoData}">Save and Add Weight Restrictions</button>
+    <button @click="SaveDataforWR" class="save-button" v-bind:class="{ 'bg-color-primary': !hasNoData, 'disabled': hasNoData }" v-bind="{disabled: hasNoData}">Save and Add Weight Restrictions</button>
+    <button @click="scrollToTop" class="bg-color-primary">Scroll to Top</button>
+    </div>
   </div>
 
 
@@ -79,6 +86,16 @@ export default {
     }
   },
   methods: {
+    scrollToTop() {
+      document.documentElement.scrollTop = 0; // For most browsers
+      document.body.scrollTop = 0; // For Safari and older browsers
+    },
+    scrollToBottom() {
+      window.scrollTo({
+        top: document.body.scrollHeight || document.documentElement.scrollHeight,
+        behavior: "smooth", // Smooth scrolling effect
+      });
+    },
     getSelectedItemsFromStorage() {
       const storedItems = localStorage.getItem('selectedCriteria');
       return storedItems ? JSON.parse(storedItems) : [];
@@ -343,6 +360,17 @@ button.disabled {
   margin-right: 30px;
 }
 
+.button-container {
+  display: flex;
+  justify-content: space-between; /* Spread buttons across the container */
+  align-items: center; /* Align buttons vertically */
+  margin-top: 20px;
+}
+
+.save-button {
+  margin-left: auto; /* Push this button to the far right */
+}
+
 select {
   width: 100%;
   padding: 8px;
@@ -362,11 +390,11 @@ select {
   color: #269af2;
   --c: radial-gradient(farthest-side,currentColor 96%,#0000);
   background:
-    var(--c) 100% 100% /30% 60%,
-    var(--c) 70%  0    /50% 100%,
-    var(--c) 0    100% /36% 68%,
-    var(--c) 27%  18%  /26% 40%,
-    linear-gradient(to bottom, currentColor 0%, transparent 100%) bottom/67% 58%;
+      var(--c) 100% 100% /30% 60%,
+      var(--c) 70%  0    /50% 100%,
+      var(--c) 0    100% /36% 68%,
+      var(--c) 27%  18%  /26% 40%,
+      linear-gradient(to bottom, currentColor 0%, transparent 100%) bottom/67% 58%;
   background-repeat: no-repeat;
   position: relative;
 }

@@ -164,7 +164,7 @@ def get_subject_data(item_subject):
 
 
 def get_defined_criteria_list():
-    defined_criteria = ["attr-accountability", "attr-reputation"]  # Define the list of criteria given by the user
+    defined_criteria = ["attr-accountability", "attr-reputation", "attr-agility"]  # List of criteria given by the user based on Provider
     return defined_criteria
 
 
