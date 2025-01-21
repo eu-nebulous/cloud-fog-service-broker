@@ -21,6 +21,7 @@
             </li>
           </ul>
         </div>
+        <div class="d-flex text-white">Welcome, User ID: <span style="padding-left: 10px;"><strong>{{ user_data["user_id"] }}</strong></span> </div>
       </div>
     </nav>
         <router-view></router-view>
@@ -162,7 +163,8 @@ export default {
       password: "",
       uuid: "",
       app_id: "",
-      login: true
+      login: true,
+      user_data: {},
     }
   },
   methods: {
@@ -239,9 +241,18 @@ export default {
       }
     },
     setDefaultUser() {
-      localStorage.setItem('fog_broker_user_uuid', 'e3ff4006-be5f-4e00-bbe1-e49a88b2541a');
+      localStorage.setItem('fog_broker_user_uuid', 'CFSB User');
       // localStorage.setItem('fog_broker_app_id', '2f7cc63df4b1da7532756f44345758da');
       localStorage.setItem('fog_broker_app_id', '123456789');
+    },
+    getUserLocalData() {
+      let user_data = {};
+      let user_id = localStorage.getItem('fog_broker_user_uuid');
+      if (!user_id) {
+        user_id = "CFSB User";
+      }
+      user_data['user_id'] = user_id;
+      return user_data;
     }
   },
   computed: {
@@ -251,8 +262,9 @@ export default {
   },
   mounted() {
     if (!this.getURLparams()) {
-      this.setDefaultUser()
+      this.setDefaultUser();
     }
+    this.user_data = this.getUserLocalData();
   }
 };
 </script>

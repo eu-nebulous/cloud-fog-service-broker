@@ -1,9 +1,17 @@
+import "@fortawesome/fontawesome-free/css/all.min.css";
 <template>
   <div class="results-container">
     <h2>Evaluation Results</h2>
     <p class="description">
       The scores have been rounded to the nearest two decimal places.
     </p>
+    <div class="button-container">
+      <button @click="goBackToWR">Add/Modify Weight Restrictions</button>
+      <button @click="saveProjectResults" class="save-button">Save Project</button>
+      <button @click="scrollToBottom" class="bg-color-primary">Scroll to Bottom</button>
+
+    </div>
+    <div class="separator-line"></div>
     <div v-if="loading" class="loading">Loading...</div>
     <div v-else>
       <!-- Table for displaying the results -->
@@ -18,7 +26,7 @@
         <tbody>
         <tr v-for="(result, index) in results" :key="index">
           <td>{{ result.Title }}</td>
-          <td>{{ formatPercentage(result['DEA Score']) }}</td>
+          <td>{{ formatPercentage(result['Score']) }}</td> <!-- Be aware of 'Score' in results_json of Evaluation.py -->
           <td>{{ result.Rank }}</td>
         </tr>
         </tbody>
@@ -39,7 +47,13 @@
       <div class="separator-line"></div>
       <div class="button-container">
         <button @click="goBackToWR">Add/Modify Weight Restrictions</button>
-        <button @click="saveProjectResults">Save Project</button>
+        <button @click="saveProjectResults" class="save-button">Save Project</button>
+        <button @click="scrollToTop" class="bg-color-primary">Scroll to Top</button>
+<!--        <div class="arrows-container mt-3">-->
+<!--        <span @click="scrollToTop" class="arrow-button">-->
+<!--                <i class="fa-solid fa-arrow-up"></i>-->
+<!--              </span>-->
+<!--        </div>-->
       </div>
     </div>
   </template>
@@ -82,6 +96,16 @@
       }
     },
     methods: {
+      scrollToTop() {
+        document.documentElement.scrollTop = 0; // For most browsers
+        document.body.scrollTop = 0; // For Safari and older browsers
+      },
+      scrollToBottom() {
+        window.scrollTo({
+          top: document.body.scrollHeight || document.documentElement.scrollHeight,
+          behavior: "smooth", // Smooth scrolling effect
+        });
+      },
       goBackToWR() {
         // Make sure 'WR' matches the name of the route in your router configuration
         this.$router.push({ name: 'WR' });
@@ -180,7 +204,7 @@
         console.log(this.results);
 
         const titles = this.results.map(result => result.Title);
-        const deaScores = this.results.map(result => result['DEA Score']);
+        const deaScores = this.results.map(result => result['Score']); // Be aware of 'Score' in results_json of Evaluation.py
         const ranks = this.results.map(result => result.Rank);
 
         this.$nextTick(() => {
@@ -283,6 +307,16 @@
   </script>
 
   <style>
+  .button-container {
+    display: flex;
+    justify-content: space-between; /* Spread buttons across the container */
+    align-items: center; /* Align buttons vertically */
+    margin-top: 20px;
+  }
+
+  .save-button {
+    margin-left: auto; /* Push this button to the far right */
+  }
   .results-container {
     padding: 20px;
   }
@@ -313,5 +347,23 @@
     background-color: #172135; /* Deep purple color */
     margin: 10px 0; /* Spacing above and below the line */
   }
+  .arrow-button {
+    cursor: pointer;
+    font-size: 1.5rem; /* Adjust the size of the arrow */
+    margin: 0 1rem; /* Add space between arrows */
+    color: var(--main-color); /* Use your theme color */
+    transition: color 0.2s ease;
+  }
 
+  .arrow-button:hover {
+    color: #1b253b; /* Darker color on hover */
+  }
+
+  .arrows-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 20px;
+  }
   </style>

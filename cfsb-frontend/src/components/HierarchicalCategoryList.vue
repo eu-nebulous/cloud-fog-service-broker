@@ -18,9 +18,11 @@
           </ul>
         </li>
       </ul>
+      <div class="button-container">
       <button @click="goBackToHome" class="bg-color-primary">Back</button>
       <!-- Submit button outside the recursive structure -->
-      <button type="submit" class="bg-color-primary">Next</button>
+      <button type="submit" class="save-button">Next</button>
+      </div>
     </form>
     <div v-else>
       <li v-for="item in items" :key="item.name" class="list-group-item criteria-card">
@@ -277,4 +279,14 @@ button:hover {
   border-color: var(--main-color);
 }
 
+.button-container {
+  display: flex;
+  justify-content: space-between; /* Spread buttons across the container */
+  align-items: center; /* Align buttons vertically */
+  margin-top: 20px;
+}
+
+.save-button {
+  margin-left: auto; /* Push this button to the far right */
+}
 </style>
