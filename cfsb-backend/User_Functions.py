@@ -350,21 +350,24 @@ def convert_data_table(created_data_table):
     # Check if 'Number of CPU Cores' exists in the dictionary and convert its values
     if 'Number of CPU Cores' in created_data_table:
         created_data_table['Number of CPU Cores'] = [1/x for x in created_data_table['Number of CPU Cores']]
+        created_data_table['Number of CPU Cores'] = normalize_with_max(created_data_table['Number of CPU Cores'])
 
     # Check if 'Memory Size' exists in the dictionary and convert its values
     if 'Memory Size' in created_data_table:
         created_data_table['Memory Size'] = [1/x for x in created_data_table['Memory Size']]
+        created_data_table['Memory Size'] = normalize_with_max(created_data_table['Memory Size'])
 
     # Check if 'Proximity to Data Source' exists in the dictionary and convert its values
     if 'Proximity to Data Source' in created_data_table:
         created_data_table['Proximity to Data Source'] = [1/x for x in created_data_table['Proximity to Data Source']]
+        created_data_table['Proximity to Data Source'] = normalize_with_max(created_data_table['Proximity to Data Source'])
 
     # Check if 'Operating cost' (Price) exists in the dictionary and convert its values
     if 'Operating cost' in created_data_table:
         created_data_table['Operating cost'] = [1/x for x in created_data_table['Operating cost']]
-
+        created_data_table['Operating cost'] = normalize_with_max(created_data_table['Operating cost'])
     # Normalize the Data with column MAX
-    created_data_table = {key: normalize_with_max(values) for key, values in created_data_table.items()}
+    # created_data_table = {key: normalize_with_max(values) for key, values in created_data_table.items()}
 
     return created_data_table
 

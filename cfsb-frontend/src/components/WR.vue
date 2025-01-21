@@ -343,32 +343,50 @@ export default {
 
         if (!response.ok) {
           // If the HTTP response is not OK, throw an error
-          throw new Error('Error in process_evaluation_data() response');
+          // throw new Error('Error in process_evaluation_data() response');
+          throw new Error(`HTTP error: ${response.status}`);
         }
 
         const data = await response.json();
+        console.log('Backend Response:', data);
+        // Access LPstatus
+        const LPstatus = data.results.LPstatus;
+
         console.log('Response from backend process-evaluation-data():', data);
         console.log('Response data.results.LPstatus:', data.results.LPstatus);
 
         //Loading message should stop here
-        this.isLoading = false;
+        // this.isLoading = false;
 
         // First, check the general status of the response to confirm the request was processed successfully
         // Check the LP problem's feasibility status
-        if (data.status === 'success') {
-          if (data.results.LPstatus === 'feasible') {
+        if (data.status === 'success')
+        {
+          if (LPstatus === 'feasible') {
             localStorage.setItem('evaluationResults', JSON.stringify(data.results));
             localStorage.setItem('relativeWRData', JSON.stringify(relativeWRData));
             localStorage.setItem('immediateWRData', JSON.stringify(immediateWRData));
 
             // Navigate to Results.vue
             this.$router.push({ name: 'Results', params: { evaluationResults: data.results.results } });
-          } else if (data.results.LPstatus === 'infeasible') {
-            // Set the error message for infeasible LP solution
-            this.errorMessage = data.results.message; // Accessing the message directly
-            alert(this.errorMessage); // Show the message to the user via alert
           }
-        } else {
+          else if (LPstatus === 'infeasible') {
+            // Set the error message for infeasible LP solution
+            // this.errorMessage = data.results.message; // Accessing the message directly
+            console.error('Optimization problem infeasible:', data.results);
+
+            const errorMessage = data.results?.results?.message ||
+                "The optimization problem is infeasible. Please check your input.";
+
+            alert(errorMessage);
+            this.isLoading = false;
+          }
+          else {
+            throw new Error(`Unexpected LPstatus: ${LPstatus}`);
+          }
+        }
+        else
+        {
           // Handle other unexpected 'status'
           this.errorMessage = 'An unexpected error occurred.';
         }
