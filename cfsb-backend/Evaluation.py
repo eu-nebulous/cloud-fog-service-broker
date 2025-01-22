@@ -74,8 +74,8 @@ def perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_nam
                     # print("constraint:", constraint)
                     A_boolean.append(constraint)
                     b_boolean.append(-gamma) # difference between the scores of nodes belonging to different category must be greater than gamma
-        print("A_boolean:", A_boolean)
-        print("b_boolean:", b_boolean)
+        # print("A_boolean:", A_boolean)
+        # print("b_boolean:", b_boolean)
         # print("node_categories:", node_categories)
         # print("sorted_categories:", sorted_categories)
 
@@ -171,7 +171,7 @@ def perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_nam
     # num_of_dmus = len(next(iter(data_table.values())))
     # Cols_No = len(criteria_list)
     epsilon = 1e-3  # Lower bound of the variables
-    min_epsilon = 1e-9  # Minimum epsilon threshold
+    min_epsilon = 1e-5  # Minimum epsilon threshold
 
     # Objective Function, first num_of_criteria variables have coefficients 0, then num_of_dmus variables have -1
     c = np.array([0] * num_of_criteria + [1] * num_of_dmus, dtype=float)
@@ -211,7 +211,7 @@ def perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_nam
             score = sum(optimal_solution[j] * dmu_values[j] for j in range(num_of_criteria))
             # Append the adjusted score to DEA_Scores
             MOP_Scores.append(score)
-        # print("MOP_Scores: ", MOP_Scores)
+        print("MOP_Scores: ", MOP_Scores)
         # Round the DEA scores to 2 decimal places
         MOP_Scores_Rounded = np.round(MOP_Scores, 2)
         #In case of Success then Rank the DEA scores using 'max' method for ties
@@ -236,28 +236,40 @@ def perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_nam
         return {'LPstatus': 'feasible', 'results': results_json}
 
     else: # If no solution is found after all attempts, report failure
-        MOP_Scores = [None] * num_of_dmus # Set scores to None for all nodes
         print("The problem remains infeasible even with epsilon: ", epsilon)
         print(res.message)
+        if A_boolean and (relative_wr_data or immediate_wr_data): # Rel. and/or Immed., and Boolean Constraints
+            infeasibility_message = ("The optimization problem is infeasible with the given constraints.\n"
+            "Please review the Relative and/or Immediate constraints.\n"
+            "Otherwise, this should be attributed to the extra contraints derived from the Boolean criteria.\n"
+            "In such a case, please make changes on the selected criteria or on their data.")
+        elif not A_boolean and (relative_wr_data or immediate_wr_data): # Not Boolean, Rel. and/or Immed.
+            infeasibility_message = ("The optimization problem is infeasible with the given constraints.\n"
+            "Please review the Relative and/or Immediate constraints.")
+        elif not relative_wr_data and not immediate_wr_data and A_boolean: # No Rel. and Immed., only Boolean Constraints
+            infeasibility_message = ("The optimization problem is infeasible.\n"
+                                    "This is caused by the extra contraints derived from the Boolean criteria.\n"
+                                    "Please make changes on the selected criteria or on their data.")
+        else: # For any other case of Infeasibility
+            infeasibility_message = "The optimization problem is infeasible with the given constraints and data."
+
         # Return an appropriate JSON response indicating infeasibility
         infeasibility_response = {
-            "message": "The optimization problem is infeasible with the given weight restrictions. Please review them."
-            # "message": res.message
-            # In case no weight restrictions are used, then the infeasibility is caused due to the data of the criteria. Please make changes on the data.
+            "message": infeasibility_message
         }
         print(infeasibility_response)
         return {'LPstatus': 'infeasible', 'results': infeasibility_response}
 
 
 
-# # Provided data
+## Provided data
 # data_table = {
 #     'Provider Track record': [44.3, 37.53, 51.91, 86.56, 28.43],
 #     'Agility': [41.8, 53.69, 91.3, 84.72, 58.37],
 #     'Reputation': [2, 1, 3, 1, 3],
 #     'Brand Name': [71.39, 83.11, 20.72, 91.07, 89.49],
-#     'Free Support': [1, 1, 0, 1, 0],
-    # 'Boolean2': [0, 1, 0, 1, 0]
+#     'Free Support': [1, 0, 0, 1, 0],
+#     # 'Boolean2': [0, 1, 0, 1, 0]
 # }
 #
 # relative_wr_data = [
@@ -268,16 +280,17 @@ def perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_nam
 # immediate_wr_data = [
 #     {'Criterion': 'Brand Name', 'Operator': 1, 'Value': 1e-3}
 # ]
-# immediate_wr_data = [
-#     {'Criterion': 'Reputation', 'Operator': 1, 'Value': 0.2},
-#     {'Criterion': 'Reputation', 'Operator': -1, 'Value': 0.5},
-#     {'Criterion': 'Agility', 'Operator': -1, 'Value': 0.75},
-#     {'Criterion': 'Brand Name', 'Operator': 0, 'Value': 0.3}
-# ]
 #
-# # "immediate_wr_data":[{"Criterion":"Accountability","Operator":1,"Value":0.2}]}
-# # w1>=0.2 and w1<=0.5
-
+# # immediate_wr_data = [
+# #     {'Criterion': 'Reputation', 'Operator': 1, 'Value': 0.2},
+# #     {'Criterion': 'Reputation', 'Operator': -1, 'Value': 0.5},
+# #     {'Criterion': 'Agility', 'Operator': -1, 'Value': 0.75},
+# #     {'Criterion': 'Brand Name', 'Operator': 0, 'Value': 0.3}
+# # ]
+# #
+# # # "immediate_wr_data":[{"Criterion":"Accountability","Operator":1,"Value":0.2}]}
+# # # w1>=0.2 and w1<=0.5
+#
 # node_ids = ['Node 1', 'Node 2', 'Node 3', 'Node 4', 'Node 5']
 # node_names = ['Node 1', 'Node 2', 'Node 3', 'Node 4', 'Node 5']
 # Evaluation_JSON = perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_names, node_ids)
