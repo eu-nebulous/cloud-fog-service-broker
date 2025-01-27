@@ -17,8 +17,8 @@ def perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_nam
     # # Normalize keys to handle potential mismatches (case sensitivity, whitespace)
     normalized_data_table_keys = [key.strip().lower() for key in data_table.keys()]
     normalized_boolean_variables = [var.strip().lower() for var in Boolean_Variables]
-    print("Normalized Data Table Keys:", normalized_data_table_keys)
-    print("Normalized Boolean Variables:", normalized_boolean_variables)
+    # print("Normalized Data Table Keys:", normalized_data_table_keys)
+    # print("Normalized Boolean Variables:", normalized_boolean_variables)
 
     # Identify boolean criteria
     boolean_criteria = [
@@ -207,26 +207,25 @@ def perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_nam
             # Gather the values for the current DMU
             dmu_values = [values[dmu_index] for values in data_table.values()]
             # print(f"Node {dmu_index} Values:", [values[dmu_index] for values in data_table.values()])
-            # Calculate the score for the current DMU
+            # Calculate the Score for the current DMU
             score = sum(optimal_solution[j] * dmu_values[j] for j in range(num_of_criteria))
-            # Append the adjusted score to DEA_Scores
+            # Append the adjusted score to Scores
             MOP_Scores.append(score)
         print("MOP_Scores: ", MOP_Scores)
-        # Round the DEA scores to 2 decimal places
+        # Round the Scores to 2 decimal places
         MOP_Scores_Rounded = np.round(MOP_Scores, 2)
-        #In case of Success then Rank the DEA scores using 'max' method for ties
+        #In case of Success then Rank the Scores using 'max' method for ties
         MOP_Scores_Ranked = len(MOP_Scores_Rounded) - rankdata(MOP_Scores_Rounded, method='max') + 1
 
         # Print the rounded scores and their corresponding ranks
         print("Rounded Node Scores:", MOP_Scores_Rounded)
-        # print("Corresponding Ranks:", DEA_Scores_Ranked)
 
-        # Create a JSON object with title, id, DEA scores, and ranks
+        # Create a JSON object with title, id, Scores, and ranks
         results_json = [
             {
                 "Title": node_names[i],
                 "Id": node_ids[i],
-                "Score": MOP_Scores[i], # Provide the full Scores to be depicted in the Graph
+                "Score": float(MOP_Scores[i]), # Provide the full Scores to be depicted in the Graph
                 "Rank": int(MOP_Scores_Ranked[i])
             }
             for i in range(len(node_ids))
@@ -309,5 +308,5 @@ def perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_nam
 # pretty_json = json.dumps(Evaluation_JSON)
 # print(pretty_json)
 # print("Evaluation_JSON:", Evaluation_JSON)
-# # print("DEA Scores:", DEA_Scores)
-# # print("Ranked DEA Scores:", DEA_Scores_Ranked)
+# # print("Scores:", Scores)
+# # print("Ranked Scores:", Scores_Ranked)
