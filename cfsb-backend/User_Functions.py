@@ -725,7 +725,7 @@ def append_evaluation_results(sal_reply_body, scores_and_ranks):
 
     # Proceed if there are multiple nodes or scores_and_ranks is not empty
     # Create a dictionary mapping Ids to scores and ranks
-    eval_results_dict = {result['Id']: (result['DEA Score'], result['Rank'])
+    eval_results_dict = {result['Id']: (result['Score'], result['Rank'])
                          for result in scores_and_ranks if scores_and_ranks}
 
     # Iterate over each node in sal_reply_body and append Score and Rank
