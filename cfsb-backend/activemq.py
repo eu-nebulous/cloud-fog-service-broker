@@ -366,9 +366,9 @@ class SyncedHandler(Handler):
 
             except json.JSONDecodeError as e:
                 print(f"Error parsing JSON reply from SAL: {e}")
-                sal_reply_body = []  # Default to an empty JSON array as a string in case of error
+                sal_reply_body = ''  # Make it an Empty string in case of error
 
-            if sal_reply_body:  # Check whether SAL's reply body is empty
+            if sal_reply_body.strip() not in ('', '[]'): # Check whether SAL's reply body is empty
                 # print("SAL reply Body:", sal_reply_body)
                 # Check the number of nodes before Evaluation
                 if total_nodes > 1:
