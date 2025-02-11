@@ -399,15 +399,18 @@ def check_json_file_exists(app_id):
 def remove_request_attribute(attribute_to_remove, data):
     print("try to remove " + attribute_to_remove)
     locations = []
-    for dictionary in data:
-        for key, value in dictionary.items():
-            # print("key = " + str(key))
-            # print("value = " + str(value))
-            if key == "requirementAttribute":
-                if value == attribute_to_remove:
-                    locations = dictionary["value"]
-                    data.remove(dictionary)
-                    print("removed " + str(dictionary))
+    try:
+        for dictionary in data:
+            for key, value in dictionary.items():
+                # print("key = " + str(key))
+                # print("value = " + str(value))
+                if key == "requirementAttribute":
+                    if value == attribute_to_remove:
+                        locations = dictionary["value"]
+                        data.remove(dictionary)
+                        print("removed " + str(dictionary))
+    except Exception as e:
+        print(f"Error removing {attribute_to_remove}: {e}")
     return data, locations
 
 # Used to read the saved application data CFSB when triggered by Optimizer

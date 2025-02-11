@@ -146,7 +146,10 @@ class SyncedHandler(Handler):
             sal_reply = context.publishers['SAL-GET'].send_sync(RequestToSal)
 
             ## Process SAL's Reply
-            sal_body = sal_reply.get('body')  # Get the 'body' as a JSON string Replace sal_body with sal_reply_body
+            if sal_reply is not None and sal_reply != '':
+                sal_body = sal_reply.get('body')  # Get the 'body' as a JSON string Replace sal_body with sal_reply_body
+            else:
+                sal_body = '{"key": "error", "message": "SAL did not reply or returned empty response"}'
 
             try:
                 # Parse the JSON string to a Python object
@@ -332,7 +335,11 @@ class SyncedHandler(Handler):
                 ## Request the node candidates from SAL
                 sal_reply = context.publishers['SAL-GET'].send_sync(RequestToSal)
 
-                ## Process SAL's Reply
+                ## Process SAL's Reply if sal_reply is not None and sal_reply != '' and isinstance(sal_reply, dict):
+                if sal_reply is None or sal_reply == '':
+                    print("SAL did not reply or returned empty response")
+                    continue
+
                 sal_body = sal_reply.get('body')  # Get the 'body' as a JSON string
                 if sal_body:
                     print("SAL Replied Successfully: ", list_number)
