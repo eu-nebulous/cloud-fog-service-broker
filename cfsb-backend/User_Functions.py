@@ -4,6 +4,7 @@ import random
 import json
 from datetime import datetime
 import math
+import logging
 
 # Boolean_Variables = ['Extend offered network capacity', 'Extend offered processing capacity', 'Extend offered memory capacity',
 #                      'Fog resources addition', 'Edge resources addition', 'Solid State Drive']
@@ -397,7 +398,7 @@ def check_json_file_exists(app_id):
 
 # Used to remove the additional fields in the request (sent by Optimizer) about the Locations
 def remove_request_attribute(attribute_to_remove, data):
-    print("try to remove " + attribute_to_remove)
+    print("Removing the additional field in Optimizer request " + attribute_to_remove)
     locations = []
     try:
         for dictionary in data:
@@ -446,7 +447,11 @@ def read_application_data(app_id):
     return app_data, selected_criteria, provider_criteria, relative_wr_data, immediate_wr_data
 
 # USED TO EXTRACT SAL DATA WHEN TRIGGERED FROM OPTIMIZER
-def extract_SAL_node_candidate_data_NEW(json_data_all, app_data, app_id, selected_criteria):
+def extract_SAL_node_candidate_data_NEW(json_data_all, app_data, app_id, selected_criteria, correlation_id_optimizer):
+
+    print(f"\n[DEBUG] Request ID: {correlation_id_optimizer} - Start Processing extract_SAL_node_candidate_data_NEW()")
+    print(f"[DEBUG] Request ID: {correlation_id_optimizer} - App ID: {app_id}, App Specific: {app_data['app_specific']}")
+
     """
     Extract node candidate data based on whether the node is specific to an app or usable by all apps.
     :param app_specific: 1 if filtering for app-specific nodes, 0 for all-app nodes.
@@ -457,6 +462,7 @@ def extract_SAL_node_candidate_data_NEW(json_data_all, app_data, app_id, selecte
         try:
             json_data_all = json.loads(json_data_all)
         except json.JSONDecodeError as e:
+            print(f"[ERROR] Request ID: {correlation_id_optimizer} - Failed to decode JSON: {e}")
             raise ValueError(f"Failed to decode JSON: {e}")
 
     if isinstance(json_data_all, dict):  # Single node dictionary
@@ -469,7 +475,8 @@ def extract_SAL_node_candidate_data_NEW(json_data_all, app_data, app_id, selecte
     # app_specific = 1
     # print(app_specific)
     if app_specific == "0" or not app_specific: # All Applications
-        print("ENTERED app_specific == 0")
+        # print("ENTERED app_specific == 0")
+        print(f"[DEBUG] Request ID: {correlation_id_optimizer} - Filtering for all applications")
         # Keep only nodes for all applications  # json_data = [node for node in json_data_all if is_for_all_applications(node)]
         # Keep only nodes for all applications and IAAS (CLOUDS) nodes
         json_data = [
@@ -478,15 +485,17 @@ def extract_SAL_node_candidate_data_NEW(json_data_all, app_data, app_id, selecte
         ]
     else:
         # Keep only nodes for specific applications that match application_id
+        print(f"[DEBUG] Request ID: {correlation_id_optimizer} - Filtering for specific application: {app_id}")
         json_data = [
             # node for node in json_data_all if matches_application_id(node, app_id)
             # if matches_application_id(node, app_id) or node.get("nodeCandidateType", "") == "IAAS"
             node for node in json_data_all if isinstance(node, dict) and matches_application_id(node, app_id)
         ]
-        print("USE ONLY app_specific NODES")
+        # print("USE ONLY app_specific NODES")
 
     # Print or use the filtered data
     # print("Data for eligible nodes in NEW:", json_data)
+    print(f"[DEBUG] Request ID: {correlation_id_optimizer} - Nodes after filtering: {len(json_data)}")
 
     extracted_data = []
     node_ids = []
@@ -500,6 +509,7 @@ def extract_SAL_node_candidate_data_NEW(json_data_all, app_data, app_id, selecte
         node_flat_dict = extract_node_from_node_data(item)
         # Skip busy nodes
         if (node_flat_dict["jobIdForEdge"] not in [None, "any", "", "all-applications"]) or (node_flat_dict["jobIdForByon"] not in [None, "any", "", "all-applications"]):
+            print(f"[DEBUG] Request ID: {correlation_id_optimizer} - Skipping busy node: {node_flat_dict['id']}")
             continue
         if node_flat_dict["nodeCandidateType"] == "EDGE":
             node_flat_dict["nodeProviderId"] = node_flat_dict["hardware_providerId"]
@@ -552,6 +562,8 @@ def extract_SAL_node_candidate_data_NEW(json_data_all, app_data, app_id, selecte
         # print("Before create_node_name")
         node_names.append(create_node_name(node_data))  # call create_node_name function
 
+    print(f"[DEBUG] Request ID: {correlation_id_optimizer} - Extracted {len(extracted_data)} valid nodes")
+    print(f"[DEBUG] Request ID: {correlation_id_optimizer} - Processing Complete\n")
     # Extract node_ids and node_names
     # node_ids = [node['id'] for node in extracted_data]
     # node_names = [node.get('name', '') for node in json_data if isinstance(node, dict)]
@@ -664,7 +676,7 @@ def create_data_table(extracted_data, selected_criteria, provider_criteria, loca
                     value = node[node_dict_mapping[field_name]]
                 elif field_name == "distance": # calculate values for location
                     if locations: # if locations asked by optimizer
-                        print("Check for locations")
+                        # print("Check for locations")
                         if (node[node_dict_mapping["distance_lat"]] not in [None, ""]) and (
                                 node[node_dict_mapping["distance_long"]] not in [None, ""]):
                             latitude = node[node_dict_mapping["distance_lat"]]
@@ -679,13 +691,13 @@ def create_data_table(extracted_data, selected_criteria, provider_criteria, loca
             elif provider_criteria and (node["nodeProviderId"] in provider_criteria):
                 # first check if this provider is in the providerCriteria in file
                 node_provider = node["nodeProviderId"]
-                print("Check for provider's "+ node_provider +" criteria")
+                # print("Check for provider's "+ node_provider +" criteria")
                 if criterion_info["name"] in provider_criteria[node_provider]:
                     # then check if for this provider, this criterio exists in the criteria matched with providers (e.g. reputation)
-                    print(criterion_info["name"] + " exists for " + node_provider)
+                    # print(criterion_info["name"] + " exists for " + node_provider)
                     # get the criterion's value
                     stored_criteria_value = provider_criteria[node_provider][criterion_info["name"]]
-                    print(stored_criteria_value)
+                    # print(stored_criteria_value)
                     value = stored_criteria_value
                 else:
                     # Criterion does not exist in matched provider's criteria
@@ -708,6 +720,8 @@ def convert_value(value: None, criterion_info):
         if value:  # If value found
             ordinal_value_mapping = {"High": 3, "Medium": 2, "Low": 1}
             return ordinal_value_mapping.get(value) or 1  # Use the value from mapping, or assign default value
+        else:
+            return 1
     elif criterion_info['type'] == 2:  # Numeric
         return value if value else 100 # A big value because then will be converted
     return value
@@ -730,21 +744,222 @@ def append_evaluation_results(sal_reply_body, scores_and_ranks):
     # Create a dictionary mapping Ids to scores and ranks
     eval_results_dict = {result['Id']: (result['Score'], result['Rank'])
                          for result in scores_and_ranks if scores_and_ranks}
+    # print("Now: ", len(eval_results_dict))
 
     # Iterate over each node in sal_reply_body and append Score and Rank
-    for node in sal_reply_body:
+    countRemoved = 0
+    countKept = 0
+    count_nodes = 0
+    count_nodes_keep = 0
+    # debug_sal_reply_body = sal_reply_body
+    nodes_to_remove = [] # will store the list elements from sal_reply_body
+    for list_index, node in enumerate(sal_reply_body):  # TODO check what sal_reply_body has
+        count_nodes = count_nodes + 1
         node_id = node.get('id')  # Assuming the ID is directly under the node
         if node_id in eval_results_dict:
+            countKept = countKept + 1
             score, rank = eval_results_dict[node_id]
             node["score"] = score
             node["rank"] = rank
+        else:
+            countRemoved = countRemoved + 1
+            # sal_reply_body.remove(node)  # Remove node from the list
+            nodes_to_remove.append(list_index)
+    print("Total Nodes: " + str(count_nodes))
+    print("Nodes Removed: " + str(countRemoved))
+    print("Nodes Kept: " + str(countKept))
 
-    return sal_reply_body
+    # print("list indexes to remove: " + str(nodes_to_remove))
+    filtered_sal_reply_body = []
+    for list_index, node in enumerate(sal_reply_body):
+        if list_index not in nodes_to_remove:
+            count_nodes_keep = count_nodes_keep + 1
+            filtered_sal_reply_body.append(node)
+    print("Nodes Data Appended: " + str(count_nodes_keep))
+    return filtered_sal_reply_body
 
+def ensure_dict(node):
+    """
+    Ensures `node` is always a dictionary.
+
+    - If `node` is already a dictionary, return it as is.
+    - If `node` is a JSON string, convert it to a dictionary.
+    - If `node` is a list containing dictionaries, return the first dictionary.
+    - If `node` is None, a list, or invalid, return an empty dictionary.
+
+    Args:
+        node (any): The object to check and convert.
+
+    Returns:
+        dict: A dictionary version of `node` or an empty dictionary if invalid.
+    """
+    if isinstance(node, dict):
+        return node  # ✅ Already a dictionary
+    elif isinstance(node, str):
+        try:
+            parsed_node = json.loads(node)  # ✅ Convert JSON string to dictionary
+            if isinstance(parsed_node, dict):
+                return parsed_node
+            elif isinstance(parsed_node, list) and parsed_node and isinstance(parsed_node[0], dict):
+                return parsed_node[0]  # ✅ Extract first dictionary from list
+        except json.JSONDecodeError:
+            logging.error("[ERROR] Invalid JSON format in ensure_dict()")
+            return {}  # ❌ Return empty dict for invalid JSON
+    elif isinstance(node, list) and node and isinstance(node[0], dict):
+        return node[0]  # ✅ Extract first dictionary from list
+    else:
+        logging.error("[ERROR] Unexpected data type in ensure_dict(): %s", type(node))
+        return {}  # ❌ Return empty dict for unexpected type
+
+
+def process_sal_reply(context, RequestToSal, list_number, unique_nodes_dict):
+    """
+    Sends a request to SAL, processes the response, and extracts unique nodes.
+
+    Args:
+        context (Context): The EXN messaging context.
+        RequestToSal (dict): The request payload for SAL.
+        list_number (int): The current request iteration number.
+        unique_nodes_dict (dict): Dictionary to store unique nodes.
+
+    Returns:
+        dict: A processed response dictionary containing nodes or an error message.
+    """
+    # Send request to SAL
+    sal_reply = context.publishers['SAL-GET'].send_sync(RequestToSal)
+    logging.info(f"[SAL] Response received for List {list_number}: {sal_reply}")
+
+    # Extract 'body' safely
+    sal_body = sal_reply.get('body') if isinstance(sal_reply, dict) and 'body' in sal_reply else \
+        '{"key": "error", "message": "SAL did not reply or returned an empty response"}'
+
+    # ✅ Ensure `sal_body_json` is a dictionary, NEVER None
+    sal_body_json = ensure_dict(sal_body) or {}  # 🔥 FORCE {} if None
+
+    # ✅ Explicitly check that it's a dictionary before using `.get()`
+    if not isinstance(sal_body_json, dict):
+        logging.error(f"[ERROR] sal_body_json is not a dictionary in List {list_number}: {type(sal_body_json)}")
+        sal_body_json = {}  # Force it to be a dictionary
+
+    # ✅ Check for errors SAFELY
+    if sal_body_json.get("key", "") == "error":  # 🔥 Using .get() safely
+        logging.error(f"[ERROR] SAL Error in List {list_number}: {sal_body_json}")
+        return sal_body_json  # Return error response
+
+    # ✅ Process valid responses
+    logging.info(f"[OK] SAL Replied Successfully for List {list_number}")
+
+    # Extract nodes from response
+    nodes_by_requirement = sal_body_json if isinstance(sal_body_json, list) else [sal_body_json]
+    nodes_per_list = len(nodes_by_requirement)
+    logging.info(f"Number of Nodes: {nodes_per_list} in List {list_number}")
+
+    # Store unique nodes
+    for node in nodes_by_requirement:
+        node = ensure_dict(node)  # Ensure each node is a dictionary
+        if "id" in node:
+            unique_nodes_dict[node["id"]] = node
+
+    logging.info("------------------------------------------------------------")
+    return unique_nodes_dict  # Return updated dictionary with nodes
+
+# def process_optimizer_message(self, key, body, message, context):
+#     """
+#     Processes an incoming message from the optimizer, extracts body data, and determines
+#     whether to handle it as a single or multi request.
+#     """
+#
+#     # Extract Correlation ID (Set dummy if missing)
+#     correlation_id_optimizer = message.correlation_id or 'dummy-correlation-id-1234'
+#     if correlation_id_optimizer == 'dummy-correlation-id-1234':
+#         logging.warning("Correlation ID missing, using dummy value.")
+#
+#     # Extract Application ID (Set dummy if missing)
+#     application_id_optimizer = message.subject or 'dummy-application-id-5678'
+#     if application_id_optimizer == 'dummy-application-id-5678':
+#         logging.warning("Application ID missing, using dummy value.")
+#
+#     # Extract and process body
+#     opt_message_data = body
+#     print(f"Whole Message Sent from Optimizer [{key}]:", opt_message_data)
+#
+#     body_sent_from_optimizer = opt_message_data.get('body', [])
+#     if isinstance(body_sent_from_optimizer, str):
+#         try:
+#             body_sent_from_optimizer = json.loads(body_sent_from_optimizer)
+#         except json.JSONDecodeError:
+#             print("ERROR: body_sent_from_optimizer is not valid JSON!")
+#             body_sent_from_optimizer = []
+#
+#     print("Extracted Body from Optimizer Message:", body_sent_from_optimizer)
+#     print("-------------------------------------------------")
+#
+#     # Handle Multi or Single requests
+#     if isinstance(body_sent_from_optimizer, (list, str)):
+#         if isinstance(body_sent_from_optimizer, list) and body_sent_from_optimizer and isinstance(body_sent_from_optimizer[0], list):
+#             print("The Request contains Multi Lists")
+#             self.handle_multi(application_id_optimizer, correlation_id_optimizer, body_sent_from_optimizer, context)
+#         else:
+#             print("The Request contains a Single List or an Empty List")
+#             body_sent_from_optimizer = json.dumps(body_sent_from_optimizer)  # Convert to JSON string
+#             self.handle_single(application_id_optimizer, correlation_id_optimizer, body_sent_from_optimizer, context)
+
+# def process_optimizer_message(self, key, body, message, context):
+#     """
+#     Processes an incoming message from the optimizer, extracts body data, and determines
+#     whether to handle it as a single or multi request.
+#     """
+#
+#     # Extract Correlation ID (Set dummy if missing)
+#     correlation_id_optimizer = message.correlation_id or 'dummy-correlation-id-1234'
+#     if correlation_id_optimizer == 'dummy-correlation-id-1234':
+#         logging.warning("Correlation ID missing, using dummy value.")
+#
+#     # Extract Application ID (Set dummy if missing)
+#     application_id_optimizer = message.subject or 'dummy-application-id-5678'
+#     if application_id_optimizer == 'dummy-application-id-5678':
+#         logging.warning("Application ID missing, using dummy value.")
+#
+#     # Extract and process body
+#     opt_message_data = body
+#     print(f"Whole Message Sent from Optimizer [{key}]:", opt_message_data)
+#
+#     body_sent_from_optimizer = opt_message_data.get('body', [])
+#     if isinstance(body_sent_from_optimizer, str):
+#         try:
+#             body_sent_from_optimizer = json.loads(body_sent_from_optimizer)
+#         except json.JSONDecodeError:
+#             print("ERROR: body_sent_from_optimizer is not valid JSON!")
+#             body_sent_from_optimizer = []
+#
+#     print("Extracted Body from Optimizer Message:", body_sent_from_optimizer)
+#     print("-------------------------------------------------")
+#
+#     # **Ensure only one request is processed at a time**
+#     with self.lock:
+#         print(f"[Processing] Correlation ID: {correlation_id_optimizer}, App ID: {application_id_optimizer}")
+#
+#         # Handle Multi or Single requests
+#         if isinstance(body_sent_from_optimizer, (list, str)):
+#             if isinstance(body_sent_from_optimizer, list) and body_sent_from_optimizer and isinstance(body_sent_from_optimizer[0], list):
+#                 print("The Request contains Multi Lists")
+#                 try:
+#                     self.handle_multi(application_id_optimizer, correlation_id_optimizer, body_sent_from_optimizer, context)
+#                 except Exception as e:
+#                     print(f"Exception in handle_multi: {e}")
+#             else:
+#                 print("The Request contains a Single List or an Empty List")
+#                 body_sent_from_optimizer = json.dumps(body_sent_from_optimizer)  # Convert to JSON string
+#                 try:
+#                     self.handle_single(application_id_optimizer, correlation_id_optimizer, body_sent_from_optimizer, context)
+#                 except Exception as e:
+#                     print(f"Exception in handle_single: {e}")
 
 
 #################  BLOCK NOT USED  #################
 # Used to RETRIEVE THE PROVIDER NAME OF EACH NODE
+
+
 def extract_node_provider(node):
     hardware_info = node.get("hardware", {})
     node_type = node.get("nodeCandidateType", "")

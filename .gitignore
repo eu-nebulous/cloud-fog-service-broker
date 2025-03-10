@@ -10,5 +10,5 @@ cfsb-backend/app_dirs/*/
 cfsb-backend/CFSBResponse.json
 cfsb-backend/CFSB_Response.json
 cfsb-backend/NodeCandidates.json
-
+cfsb-backend/EDGE_EXAMPLE1.json
 cfsb-frontend/node_modules
