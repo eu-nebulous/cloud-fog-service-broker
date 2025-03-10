@@ -67,45 +67,6 @@ class CFSBTestHandler(ConnectorHandler):
         logging.info("✅ Handler is now ready and context is initialized.")
 
 
-    # def on_message(self, key, address, body, message: Message, context=None):
-    #     """ Handles incoming responses. """
-    #     correlation_id = message.correlation_id
-    #     logging.info(f"[RECEIVED] Message from {address}: {body} (Correlation ID: {correlation_id})")
-    #     # logging.debug(f"Message details: {message}")
-    #
-    #     if correlation_id is None:
-    #         logging.error("❌ Received message without correlation ID!")
-    #         return
-    #
-    #     with self.lock:
-    #         self.responses[correlation_id] = body
-    #         logging.info(f"✅ Response stored for {correlation_id}: {body}")
-    #
-    #     try:
-    #         message.ack()
-    #         logging.info(f"✅ Acknowledged message with Correlation ID: {correlation_id}")
-    #     except AttributeError:
-    #         logging.warning(f"⚠️ Cannot acknowledge message: {correlation_id}")
-    # def on_message(self, key, address, body, message: Message, context=None):
-        # correlation_id = message.correlation_id
-        # logging.info(f"[RECEIVED] Message from {address}: {body} (Correlation ID: {correlation_id})")
-        # logging.debug(f"[DEBUG] Full message: {message}")
-        #
-        # if correlation_id is None:
-        #     logging.error("❌ Received message without correlation ID!")
-        #     return
-        #
-        # with self.lock:
-        #     # Log before storing, to see what the dictionary contains
-        #     logging.debug(f"Before storing, responses dict: {self.responses}")
-        #     self.responses[correlation_id] = body
-        #     logging.info(f"✅ Response stored for {correlation_id}: {body}")
-        #
-        # try:
-        #     message.ack()
-        #     logging.info(f"✅ Acknowledged message with Correlation ID: {correlation_id}")
-        # except Exception as e:
-        #     logging.error(f"⚠️ Error acknowledging message for {correlation_id}: {e}")
     def on_message(self, key, address, body, message: Message, context=None):
         correlation_id = message.correlation_id
         # logging.info(f"[RECEIVED] Message from {address}: {body} (Correlation ID: {correlation_id})")
