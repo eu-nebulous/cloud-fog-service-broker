@@ -4,7 +4,7 @@ from scipy.optimize import linprog
 from scipy.stats import rankdata
 
 def perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_names, node_ids):
-    print("--------Evaluation-------------------")
+    print("--------------  Evaluation Process -------------------")
     # print("Evaluation begun with perform_evaluation():")
     # print("Data Table:", data_table)
 
@@ -184,13 +184,13 @@ def perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_nam
         res = linprog(c, A_ub=A, b_ub=b, A_eq=A_eq, b_eq=b_eq, bounds=bounds, method='highs')
         # Check if the optimization was successful
         if res.success:
-            print("---------------------------")
+            print("-------------------------------------------------------")
             print(f"Optimization successful with epsilon = {epsilon}")
             break  # Exit the loop if a solution is found
         else:
             print(res.message)
             print(f"Infeasible with epsilon = {epsilon}, reducing epsilon...")
-            print("---------------------------")
+            print("-------------------------------------------------------")
             # Reduce epsilon
             epsilon /= 10
 
@@ -207,25 +207,26 @@ def perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_nam
             # Gather the values for the current DMU
             dmu_values = [values[dmu_index] for values in data_table.values()]
             # print(f"Node {dmu_index} Values:", [values[dmu_index] for values in data_table.values()])
-            # Calculate the Score for the current DMU
+            # Calculate the score for the current DMU
             score = sum(optimal_solution[j] * dmu_values[j] for j in range(num_of_criteria))
             # Append the adjusted score to Scores
             MOP_Scores.append(score)
-        print("MOP_Scores: ", MOP_Scores)
+        # print("MOP_Scores: ", MOP_Scores)
         # Round the Scores to 2 decimal places
-        MOP_Scores_Rounded = np.round(MOP_Scores, 2)
-        #In case of Success then Rank the Scores using 'max' method for ties
+        MOP_Scores_Rounded = np.round(MOP_Scores, 4)
+        # In case of Success then Rank the Scores using 'max' method for ties
         MOP_Scores_Ranked = len(MOP_Scores_Rounded) - rankdata(MOP_Scores_Rounded, method='max') + 1
 
         # Print the rounded scores and their corresponding ranks
-        print("Rounded Node Scores:", MOP_Scores_Rounded)
+        # print("Rounded Node Scores:", MOP_Scores_Rounded)
+        # print("Corresponding Ranks:", Scores_Ranked)
 
         # Create a JSON object with title, id, Scores, and ranks
         results_json = [
             {
                 "Title": node_names[i],
                 "Id": node_ids[i],
-                "Score": float(MOP_Scores[i]), # Provide the full Scores to be depicted in the Graph
+                "Score": float(MOP_Scores_Rounded[i]), # Provide the Scores to be depicted in the Graph
                 "Rank": int(MOP_Scores_Ranked[i])
             }
             for i in range(len(node_ids))
