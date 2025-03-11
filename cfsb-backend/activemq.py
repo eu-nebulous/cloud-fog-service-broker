@@ -503,6 +503,20 @@ class SyncedHandler(Handler):
         except json.JSONDecodeError as e:
               logging.error(f"Failed to parse message body from Optimizer as JSON: {e}")
 
+    def requestSAL(self, RequestToSal):
+        try:
+            sal_reply = Context.publishers['SAL-GET'].send_sync(RequestToSal)
+            # Process SAL's Reply
+            sal_body = sal_reply.get('body')  # Get the 'body' as a JSON string
+            # print("sal_body requestSAL function:", sal_body)
+            return sal_body
+        except Exception as e:
+            logging.error(f"Error while requesting SAL: {e}")
+            return None
+
+    def requestEmulate(self, RequestBody):
+        reply = Context.publishers[RequestBody['key']].send_sync(RequestBody)
+        return reply
 
 
 class Bootstrap(ConnectorHandler):
