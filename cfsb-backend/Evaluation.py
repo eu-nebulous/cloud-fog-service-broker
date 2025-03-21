@@ -1,7 +1,30 @@
 import numpy as np
 import json
+import time
 from scipy.optimize import linprog
 from scipy.stats import rankdata
+import concurrent.futures
+
+def solve_lp_with_timeout_ex(c, A, b, A_eq, b_eq, bounds, timeout_seconds):
+    """
+    Uses a ProcessPoolExecutor to run linprog with a timeout.
+
+    Args:
+        c, A, b, A_eq, b_eq, bounds: LP parameters.
+        timeout_seconds: Maximum time to wait for the solver.
+
+    Returns:
+        (res, timed_out): res is the linprog result (or None), and timed_out is a boolean.
+    """
+    with concurrent.futures.ProcessPoolExecutor(max_workers=1) as executor:
+        future = executor.submit(linprog, c, A_ub=A, b_ub=b, A_eq=A_eq, b_eq=b_eq, bounds=bounds, method='highs')
+        try:
+            res = future.result(timeout=timeout_seconds)
+            return res, False
+        except concurrent.futures.TimeoutError:
+            # The solver did not complete in time
+            return None, True
+
 
 def perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_names, node_ids):
     print("--------------  Evaluation Process -------------------")
@@ -30,7 +53,7 @@ def perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_nam
 
     # boolean_criteria = [criterion for criterion in data_table if 'boolean' in criterion.lower()]
     # lower() Converts each column name to lowercase, and Checks if the substring 'boolean' exists in the lowercase version of the name
-    num_of_dmus = len(next(iter(data_table.values())))  # Number of Nodes
+    num_of_nodes = len(next(iter(data_table.values())))  # Number of Nodes
 
     # Check if any boolean variables exist
     A_boolean= [] # Initialize the LHS Boolean Constraints
@@ -68,7 +91,7 @@ def perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_nam
                     high_scores = [-data_table[criterion][node_ids.index(node_high)] for criterion in data_table]
                     low_scores = [-data_table[criterion][node_ids.index(node_low)] for criterion in data_table]
                     # constraint = [h - l for h, l in zip(high_scores, low_scores)]
-                    constraint = [h - l for h, l in zip(high_scores, low_scores)] + [0] * num_of_dmus
+                    constraint = [h - l for h, l in zip(high_scores, low_scores)] + [0] * num_of_nodes
                     # print("high_scores:", high_scores)
                     # print("low_scores:", low_scores)
                     # print("constraint:", constraint)
@@ -83,7 +106,7 @@ def perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_nam
     criteria_list = list(data_table.keys())  # print(criteria_list)
     criterion_index = {criterion: idx for idx, criterion in enumerate(criteria_list)}  # print(criterion_index)
     num_of_criteria = len(criteria_list) # Number of Criteria
-    # Cols_No = num_of_criteria+num_of_dmus # Number of Criteria + No of Nodes (for deviations vars)
+    # Cols_No = num_of_criteria+num_of_nodes # Number of Criteria + No of Nodes (for deviations vars)
 
     # Initialize A and b matrices for inequality constraints, and A_eq and b_eq for equality constraints
     A = []
@@ -92,7 +115,7 @@ def perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_nam
     b_eq = []
 
     # Create the diagonal submatrix for deviation variables
-    diagonal_submatrix = [[1 if i == j else 0 for j in range(num_of_dmus)] for i in range(num_of_dmus)]
+    diagonal_submatrix = [[1 if i == j else 0 for j in range(num_of_nodes)] for i in range(num_of_nodes)]
 
     # Create the Constraints for each Node Score, combine data table values and the diagonal submatrix
     for i, row_values in enumerate(zip(*data_table.values())):
@@ -108,7 +131,7 @@ def perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_nam
         rhs_index = criterion_index[constraint['RHSCriterion']] # Criterion at the right
         intensity = constraint['Intense'] # value
 
-        constraint_row = [0] * (num_of_criteria + num_of_dmus) # Initialize all positions with zeros
+        constraint_row = [0] * (num_of_criteria + num_of_nodes) # Initialize all positions with zeros
         if constraint['Operator'] == 1:  # case >=
             constraint_row[lhs_index] = -1   # Because the Default Constraint Type of Solver is <=
             constraint_row[rhs_index] = intensity # value
@@ -133,7 +156,7 @@ def perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_nam
         criterion_idx = criterion_index[constraint['Criterion']]
         intensity = constraint['Value']
 
-        constraint_row = [0] * (num_of_criteria + num_of_dmus) # Initialize all positions with zeros
+        constraint_row = [0] * (num_of_criteria + num_of_nodes) # Initialize all positions with zeros
         if constraint['Operator'] == 1:  # case >=
             constraint_row[criterion_idx] = -1
             A.append(constraint_row)
@@ -156,43 +179,91 @@ def perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_nam
         A.extend(A_boolean)
         b.extend(b_boolean)
 
+    # For LP formulation:
+    criteria_list = list(data_table.keys())
+    num_of_criteria = len(criteria_list)         # Number of criteria variables
+    num_of_nodes = len(next(iter(data_table.values())))  # Number of nodes (decision-making units)
+    num_vars = num_of_criteria + num_of_nodes        # Total number of decision variables
+    # Cols_No = len(criteria_list)
+
     # Convert lists to numpy arrays
     A = np.array(A, dtype=float) if A else None
     b = np.array(b, dtype=float) if b else None
     A_eq = np.array(A_eq, dtype=float) if A_eq else None
     b_eq = np.array(b_eq, dtype=float) if b_eq else None
+    # print("A:", A)    # print("b:", b)     # print("A_eq:", A_eq)      # print("b_eq:", b_eq)
 
-    # print("A:", A)
-    # print("b:", b)
-    # print("A_eq:", A_eq)
-    # print("b_eq:", b_eq)
-    # print("---------------------------")
+    # Count the number of constraints
+    num_ineq = A.shape[0] if A is not None else 0
+    num_eq = A_eq.shape[0] if A_eq is not None else 0
 
-    # num_of_dmus = len(next(iter(data_table.values())))
-    # Cols_No = len(criteria_list)
-    epsilon = 1e-3  # Lower bound of the variables
-    min_epsilon = 1e-5  # Minimum epsilon threshold
+    # Print the LP size information
+    print("------------- LP Size information ---------------")
+    print(f"  Number of Nodes: {num_of_nodes}")
+    print(f"  Number of Criteria: {num_of_criteria}")
+    print(f"  Number of decision variables: {num_vars}")
+    print(f"  Number of inequality constraints: {num_ineq}")
+    print(f"  Number of equality constraints: {num_eq}")
+    print("-------------------------------------------------")
 
-    # Objective Function, first num_of_criteria variables have coefficients 0, then num_of_dmus variables have -1
-    c = np.array([0] * num_of_criteria + [1] * num_of_dmus, dtype=float)
-    # Iteratively solve the LP problem
-    while epsilon >= min_epsilon:
-        # Update the bounds with the current epsilon
-        bounds = [(epsilon, None) for _ in range(num_of_criteria)] + [(0, None) for _ in range(num_of_dmus)]
 
-        # Solve the LP problem
-        res = linprog(c, A_ub=A, b_ub=b, A_eq=A_eq, b_eq=b_eq, bounds=bounds, method='highs')
+    # Adjust the code since Large LPs  will take longer
+    large_problem = (num_vars > 1500 or (num_ineq + num_eq) > 1500)
+    if large_problem:
+        print("Large LP detected. Using non-iterative solving with epsilon = 1e-6")
+        epsilon = 1e-6
+    else:
+        epsilon = 1e-3 # Lower bound of the variables
+        min_epsilon = 1e-6  # Minimum epsilon threshold
+
+    # Objective Function, first num_of_criteria variables have coefficients 0, then num_of_nodes variables have -1
+    c = np.array([0] * num_of_criteria + [1] * num_of_nodes, dtype=float)
+
+    timeout_seconds = 15 # Set the timeout (in seconds) for the LP solver
+    solve_start_time = time.time() # Start timing the LP solve process
+
+    if large_problem:
+        bounds = [(epsilon, None) for _ in range(num_of_criteria)] + [(0, None) for _ in range(num_of_nodes)]
+        # res = linprog(c, A_ub=A, b_ub=b, A_eq=A_eq, b_eq=b_eq, bounds=bounds, method='highs')
+        res, timed_out = solve_lp_with_timeout_ex(c, A, b, A_eq, b_eq, bounds, timeout_seconds)
+        if timed_out:
+            print(f"LP optimization timed out after {timeout_seconds} seconds.")
+            return {'LPstatus': 'infeasible', 'results': 'The LP optimization process timed out.'}
+
         # Check if the optimization was successful
         if res.success:
-            print("-------------------------------------------------------")
             print(f"Optimization successful with epsilon = {epsilon}")
-            break  # Exit the loop if a solution is found
         else:
             print(res.message)
             print(f"Infeasible with epsilon = {epsilon}, reducing epsilon...")
-            print("-------------------------------------------------------")
-            # Reduce epsilon
-            epsilon /= 10
+            print("-------------------------------------------------")
+    else:
+        # Iteratively solve the LP problem
+        while epsilon >= min_epsilon:
+            # Update the bounds with the current epsilon
+            bounds = [(epsilon, None) for _ in range(num_of_criteria)] + [(0, None) for _ in range(num_of_nodes)]
+
+            # Solve the LP problem
+            # res = linprog(c, A_ub=A, b_ub=b, A_eq=A_eq, b_eq=b_eq, bounds=bounds, method='highs')
+            res, timed_out = solve_lp_with_timeout_ex(c, A, b, A_eq, b_eq, bounds, timeout_seconds)
+            if timed_out:
+                print(f"LP optimization timed out after {timeout_seconds} seconds.")
+                return {'LPstatus': 'infeasible', 'results': 'The LP optimization process timed out.'}
+
+            # Check if the optimization was successful
+            if res.success:
+                print(f"Optimization successful with epsilon = {epsilon}")
+                break  # Exit the loop if a solution is found
+            else:
+                print(res.message)
+                print(f"Infeasible with epsilon = {epsilon}, reducing epsilon...")
+                print("-------------------------------------------------")
+                # Reduce epsilon
+                epsilon /= 10
+
+    solve_end_time = time.time()
+    elapsed_time = solve_end_time - solve_start_time
+    print(f"LP solution time: {elapsed_time:.2f} seconds")
 
     MOP_Scores = []
     # Check if the optimization was successful after the loop
@@ -203,12 +274,12 @@ def perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_nam
         # print("---------------------------")
 
         # Calculate the Score for each node
-        for dmu_index in range(num_of_dmus):
-            # Gather the values for the current DMU
-            dmu_values = [values[dmu_index] for values in data_table.values()]
-            # print(f"Node {dmu_index} Values:", [values[dmu_index] for values in data_table.values()])
-            # Calculate the score for the current DMU
-            score = sum(optimal_solution[j] * dmu_values[j] for j in range(num_of_criteria))
+        for Node_Index in range(num_of_nodes):
+            # Gather the values for the current Node
+            Node_Values = [values[Node_Index] for values in data_table.values()]
+            # print(f"Node {Node_Index} Values:", [values[Node_Index] for values in data_table.values()])
+            # Calculate the score for the current Node
+            score = sum(optimal_solution[j] * Node_Values[j] for j in range(num_of_criteria))
             # Append the adjusted score to Scores
             MOP_Scores.append(score)
         # print("MOP_Scores: ", MOP_Scores)
@@ -231,7 +302,17 @@ def perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_nam
             }
             for i in range(len(node_ids))
         ]
-        # print(results_json)
+        # Calculate and print the size of results_json
+        try:
+            results_str = json.dumps(results_json)
+            results_bytes = results_str.encode('utf-8')
+            results_size_bytes = len(results_bytes)
+            results_size_mb = results_size_bytes / (1024 * 1024)
+            print(f"Results JSON Size: {results_size_bytes} bytes ({results_size_mb:.2f} MB)")
+            print("-------------------------------------------------")
+        except Exception as e:
+            print("Error measuring results_json size:", e)
+
         # Return successful results
         return {'LPstatus': 'feasible', 'results': results_json}
 
