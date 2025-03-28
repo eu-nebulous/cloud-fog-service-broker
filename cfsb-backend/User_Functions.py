@@ -447,10 +447,10 @@ def read_application_data(app_id):
     return app_data, selected_criteria, provider_criteria, relative_wr_data, immediate_wr_data
 
 # USED TO EXTRACT SAL DATA WHEN TRIGGERED FROM OPTIMIZER
-def extract_SAL_node_candidate_data_NEW(json_data_all, app_data, app_id, selected_criteria, correlation_id_optimizer):
+def extract_SAL_node_candidate_data(json_data_all, app_data, app_id, selected_criteria, correlation_id_optimizer):
 
-    print(f"\n[DEBUG] Request ID: {correlation_id_optimizer} - Start Processing extract_SAL_node_candidate_data_NEW()")
-    print(f"[DEBUG] Request ID: {correlation_id_optimizer} - App ID: {app_id}, App Specific: {app_data['app_specific']}")
+    print(f"\n[Request {correlation_id_optimizer} - Start Processing extract_SAL_node_candidate_data()")
+    print(f"[Request {correlation_id_optimizer} - App ID: {app_id}, App Specific: {app_data['app_specific']}")
 
     """
     Extract node candidate data based on whether the node is specific to an app or usable by all apps.
@@ -475,8 +475,7 @@ def extract_SAL_node_candidate_data_NEW(json_data_all, app_data, app_id, selecte
     # app_specific = 1
     # print(app_specific)
     if app_specific == "0" or not app_specific: # All Applications
-        # print("ENTERED app_specific == 0")
-        print(f"[DEBUG] Request ID: {correlation_id_optimizer} - Filtering for all applications")
+        print(f"[Request {correlation_id_optimizer} - Filtering for all applications")
         # Keep only nodes for all applications  # json_data = [node for node in json_data_all if is_for_all_applications(node)]
         # Keep only nodes for all applications and IAAS (CLOUDS) nodes
         json_data = [
@@ -485,7 +484,7 @@ def extract_SAL_node_candidate_data_NEW(json_data_all, app_data, app_id, selecte
         ]
     else:
         # Keep only nodes for specific applications that match application_id
-        print(f"[DEBUG] Request ID: {correlation_id_optimizer} - Filtering for specific application: {app_id}")
+        print(f"[Request {correlation_id_optimizer} - Filtering for specific application: {app_id}")
         json_data = [
             # node for node in json_data_all if matches_application_id(node, app_id)
             # if matches_application_id(node, app_id) or node.get("nodeCandidateType", "") == "IAAS"
@@ -495,7 +494,7 @@ def extract_SAL_node_candidate_data_NEW(json_data_all, app_data, app_id, selecte
 
     # Print or use the filtered data
     # print("Data for eligible nodes in NEW:", json_data)
-    print(f"[DEBUG] Request ID: {correlation_id_optimizer} - Nodes after filtering: {len(json_data)}")
+    print(f"[Request {correlation_id_optimizer} - Nodes after filtering: {len(json_data)}")
 
     extracted_data = []
     node_ids = []
@@ -509,7 +508,7 @@ def extract_SAL_node_candidate_data_NEW(json_data_all, app_data, app_id, selecte
         node_flat_dict = extract_node_from_node_data(item)
         # Skip busy nodes
         if (node_flat_dict["jobIdForEdge"] not in [None, "any", "", "all-applications"]) or (node_flat_dict["jobIdForByon"] not in [None, "any", "", "all-applications"]):
-            print(f"[DEBUG] Request ID: {correlation_id_optimizer} - Skipping busy node: {node_flat_dict['id']}")
+            print(f"[Request {correlation_id_optimizer} - Skipping busy node: {node_flat_dict['id']}")
             continue
         if node_flat_dict["nodeCandidateType"] == "EDGE":
             node_flat_dict["nodeProviderId"] = node_flat_dict["hardware_providerId"]
@@ -562,16 +561,16 @@ def extract_SAL_node_candidate_data_NEW(json_data_all, app_data, app_id, selecte
         # print("Before create_node_name")
         node_names.append(create_node_name(node_data))  # call create_node_name function
 
-    print(f"[DEBUG] Request ID: {correlation_id_optimizer} - Extracted {len(extracted_data)} valid nodes")
-    print(f"[DEBUG] Request ID: {correlation_id_optimizer} - Processing Complete\n")
+    print(f"[Request {correlation_id_optimizer} - Extracted {len(extracted_data)} valid nodes")
+    print(f"[Request {correlation_id_optimizer} - Processing Complete\n")
     # Extract node_ids and node_names
     # node_ids = [node['id'] for node in extracted_data]
     # node_names = [node.get('name', '') for node in json_data if isinstance(node, dict)]
     # print("Extracted from NEW:", extracted_data)
     return extracted_data, node_ids, node_names, providers
 
-# Used to extract_SAL_node_candidate_data when Optimizer asks
-def extract_SAL_node_candidate_data(json_string):
+# Used BEFORE to extract_SAL_node_candidate_data when Optimizer asks
+def extract_SAL_node_candidate_data_OLD(json_string):
     # print("Entered in extract_SAL_node_candidate_data")
     json_data = json.loads(json_string)
     extracted_data = []
