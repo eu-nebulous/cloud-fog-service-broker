@@ -6,7 +6,7 @@ CFSB provides a GUI for the application owner to select the criteria an express 
 
 ## Usage
 
-CFSB can accessed using application id and user id as parameters in the URL, e.g.,
+CFSB can be accessed using application id and user id as parameters in the URL, e.g.,
 
 https://cfsb.dev.nebulouscloud.eu/?appId=123a&nonce=gregk .
 
