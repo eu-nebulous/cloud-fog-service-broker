@@ -106,10 +106,10 @@ class SyncedHandler(Handler):
                 body_json_string = json.dumps(body_json_string)  # Convert the body data to a JSON string
 
             # Check ActiveMQ connection for 'SAL-GET' before sending.
-            if not is_activemq_connected(context, 'SAL-GET'):
-                error_msg = {"ActiveMQ connection is down. Unable to send message to SAL."}
-                print("ActiveMQ connection is down for 'SAL-GET'. Sent error message to next component.")
-                return error_msg
+            # if not is_activemq_connected(context, 'SAL-GET'):
+            #     error_msg = {"ActiveMQ connection is down. Unable to send message to SAL."}
+            #     print("ActiveMQ connection is down for 'SAL-GET'. Sent error message to next component.")
+            #     return error_msg
 
             RequestToSal = {  # Dictionary
                 "metaData": {"user": "admin"},  # key [String "metaData"] value [dictionary]
@@ -286,10 +286,10 @@ class SyncedHandler(Handler):
                 # TODO Handle this case (Send a suitable message to OPTIMIZER?)
             else:
                 # Check connection for 'SendToOPTMulti'
-                if not is_activemq_connected(context, 'SendToOPT'):
-                    error_msg = {"ActiveMQ connection is down. Unable to send message to Optimizer."}
-                    print("ActiveMQ connection is down for 'SendToOPTMulti'. Not sending the message.")
-                    return error_msg
+                # if not is_activemq_connected(context, 'SendToOPT'):
+                #     error_msg = {"ActiveMQ connection is down. Unable to send message to Optimizer."}
+                #     print("ActiveMQ connection is down for 'SendToOPTMulti'. Not sending the message.")
+                #     return error_msg
                 context.get_publisher('SendToOPT').send(CFSBResponse, application_id_optimizer,
                                                         properties={'correlation_id': correlation_id_optimizer}, raw=True)
                 print("-------------------------------------------------")
@@ -521,10 +521,10 @@ class SyncedHandler(Handler):
                 # TODO Handle this case (Send a suitable message to OPTIMIZER?)
             else:
                 # Check connection for 'SendToOPTMulti'
-                if not is_activemq_connected(context, 'SendToOPTMulti'):
-                    error_msg = {"ActiveMQ connection is down. Unable to send message to Optimizer."}
-                    print("ActiveMQ connection is down for 'SendToOPTMulti'. Not sending the message.")
-                    return error_msg
+                # if not is_activemq_connected(context, 'SendToOPTMulti'):
+                #     error_msg = {"ActiveMQ connection is down. Unable to send message to Optimizer."}
+                #     print("ActiveMQ connection is down for 'SendToOPTMulti'. Not sending the message.")
+                #     return error_msg
 
                 context.get_publisher('SendToOPTMulti').send(CFSBResponse, application_id_optimizer, properties={'correlation_id': correlation_id_optimizer}, raw=True)
                 logging.info(f"Message to Optimizer has been sent from OPT-Triggering-Multi " f"Correlation Id sent: {correlation_id_optimizer}")
