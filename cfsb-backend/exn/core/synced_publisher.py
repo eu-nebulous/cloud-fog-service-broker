@@ -36,7 +36,7 @@ class SyncedPublisher(Publisher):
         def _wait_for_reply():
             super(SyncedPublisher, self).send(body=body, application=application, properties= {'correlation_id':self.correlation_id}, raw=raw)
             timeout = self._timeout
-            while not self._replied:
+            while self._replied is None:
                 time.sleep(0.05)
                 timeout = timeout - 0.05
 
