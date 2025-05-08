@@ -38,7 +38,7 @@ def extract_SAL_node_candidate_data_Front(json_data_all, app_specific, app_id):
         # Keep only nodes for all applications and IAAS (CLOUDS) nodes
         json_data = [
             node for node in json_data_all
-            if is_for_all_applications(node) or node.get("nodeCandidateType", "") == "IAAS"
+            if is_for_all_applications(node) or matches_application_id(node, app_id) or node.get("nodeCandidateType", "") == "IAAS"
         ]
     else:
         # Keep only nodes for specific applications that match application_id, and IAAS nodes
@@ -480,7 +480,7 @@ def extract_SAL_node_candidate_data(json_data_all, app_data, app_id, selected_cr
         # Keep only nodes for all applications and IAAS (CLOUDS) nodes
         json_data = [
             node for node in json_data_all
-            if is_for_all_applications(node) or node.get("nodeCandidateType", "") == "IAAS"
+            if is_for_all_applications(node) or matches_application_id(node, app_id) or node.get("nodeCandidateType", "") == "IAAS"
         ]
     else:
         # Keep only nodes for specific applications that match application_id
