@@ -9,9 +9,6 @@ from .core.manager import Manager
 from .settings import base
 from .handler import connector_handler
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-_logger = logging.getLogger(__name__)
-
 
 class EXN:
 
@@ -77,7 +74,7 @@ class EXN:
             self.context.register_publisher(p)
 
     def start(self):
-        self.context.start(Manager(f"{self.url}:{self.port}"),self.handler)
+        self.context.start(Manager(f"{self.url}:{self.port}", self.username,self.password),self.handler)
 
 
     def stop(self):

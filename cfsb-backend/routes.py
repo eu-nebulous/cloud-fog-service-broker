@@ -9,8 +9,6 @@ import time
 import get_data as file
 import activemq
 import traceback
-import logging
-logging.disable(logging.CRITICAL)
 
 main_routes = Blueprint('main', __name__)
 
