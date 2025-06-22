@@ -15,8 +15,8 @@ from exn.core.synced_publisher import SyncedPublisher
 from exn.core.context import Context
 from exn.core.handler import Handler
 from exn.handler.connector_handler import ConnectorHandler
-from User_Functions import *
-from Evaluation import perform_evaluation
+from node_functions import *
+from node_evaluation import perform_evaluation
 import os
 
 import time

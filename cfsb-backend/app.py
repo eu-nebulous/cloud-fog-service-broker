@@ -9,7 +9,7 @@ logging.getLogger().addHandler(default_handler)
 logging.getLogger().setLevel(logging.INFO)
 
 from app_factory import create_app
-from activemq import start_exn_connector_in_background
+from message_handler import start_exn_connector_in_background
 
 
 app = create_app()

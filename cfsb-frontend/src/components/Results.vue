@@ -26,7 +26,7 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
         <tbody>
         <tr v-for="(result, index) in results" :key="index">
           <td>{{ result.Title }}</td>
-          <td>{{ formatPercentage(result['Score']) }}</td> <!-- Be aware of 'Score' in results_json of Evaluation.py -->
+          <td>{{ formatPercentage(result['Score']) }}</td> <!-- Be aware of 'Score' in results_json of node_evaluation.py -->
           <td>{{ result.Rank }}</td>
         </tr>
         </tbody>
@@ -204,7 +204,7 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
         console.log(this.results);
 
         const titles = this.results.map(result => result.Title);
-        const deaScores = this.results.map(result => result['Score']); // Be aware of 'Score' in results_json of Evaluation.py
+        const deaScores = this.results.map(result => result['Score']); // Be aware of 'Score' in results_json of node_evaluation.py
         const ranks = this.results.map(result => result.Rank);
 
         this.$nextTick(() => {
