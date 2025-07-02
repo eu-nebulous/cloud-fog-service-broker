@@ -86,7 +86,7 @@ def process_selected_criteria():
             "body": body_json_string_for_SAL
         }
         print("Request to Sal:", RequestToSal)
-        sal_reply = activemq.call_publisher(RequestToSal)
+        sal_reply = message_handler.call_publisher(RequestToSal)
 
         # Parse the JSON string to a Python object
         nodes_data = json.loads(sal_reply) if isinstance(sal_reply, str) else sal_reply
@@ -314,5 +314,5 @@ def send():
     application_id = data['application_id']
     correlation_id = data['correlation_id']
     key = data['key']
-    sender = activemq.call_otp_publisher(data)
+    sender = message_handler.call_otp_publisher(data)
     return data
