@@ -392,6 +392,29 @@ class SyncedHandler(Handler):
                                 print(f"Exception filtering {node}: {e}")
                         nodes_by_requirement = filtered_nodes_by_requirement
 
+                        """
+                        Hardcoded filter for UiO openstack nodes. Discard any node from Oslo and keep only nodes from Bergen that are running Ubuntu 22.04
+                        This is a temporary workaround to be removed when proper node candidate filtering is in place.
+                        """
+                        filtered_nodes_by_requirement = []
+                        for node in nodes_by_requirement:
+                            try:
+                                if (node.get("cloud", {}).get("id") != "edge" and 
+                                    node.get("location", {}).get("geoLocation",{}).get("city") == "Oslo"):
+                                    print(f"Skipping invalid instance type {node}")
+                                    continue
+                                if (node.get("cloud", {}).get("id") != "edge" and 
+                                    node.get("location", {}).get("geoLocation",{}).get("city") == "Bergen" and
+                                    "Ubuntu 22.04" not in node.get("image", {}).get("name", "")):
+                                    print(f"Skipping invalid instance type {node}")
+                                    continue                                
+                                
+                                filtered_nodes_by_requirement.append(node)
+                            except Exception as e:
+                                print(f"Exception filtering {node}: {e}")
+                        nodes_by_requirement = filtered_nodes_by_requirement
+
+
                         for node in nodes_by_requirement:
                             unique_nodes_dict[node["id"]] = node
 
