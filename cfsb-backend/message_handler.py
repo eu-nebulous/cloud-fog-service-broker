@@ -193,7 +193,7 @@ class SyncedHandler(Handler):
                                 }
                                 json_selected_criteria["selectedCriteria"].append(distance_item)
                             selected_criteria = {criterion['title']: criterion for criterion in json_selected_criteria.get('selectedCriteria', [])}
-                            app_data = {"app_specific": 0}
+                            app_data = {"app_specific": 1}
                             extracted_data_SAL, node_ids, node_names, providers = extract_SAL_node_candidate_data(
                                 sal_reply_body, app_data, application_id_optimizer, selected_criteria, correlation_id_optimizer)
 
@@ -204,7 +204,7 @@ class SyncedHandler(Handler):
                             relative_wr_data = []
                             immediate_wr_data = []
                             # create default app_data dictionary for policy and app_specific when file not exists for the application
-                            app_data = {'policy': '0', 'app_specific': False}
+                            app_data = {'policy': '0', 'app_specific': True}
 
                         # Check the number of nodes before Evaluation
                         print("There are " + str(len(node_ids)) + " nodes for Evaluation")
@@ -457,7 +457,7 @@ class SyncedHandler(Handler):
                             json_selected_criteria["selectedCriteria"].append(distance_item)
                         selected_criteria = {criterion['title']: criterion for criterion in
                                              json_selected_criteria.get('selectedCriteria', [])}
-                        app_data = {"app_specific": 0}
+                        app_data = {"app_specific": 1}
                         extracted_data_SAL, node_ids, node_names, providers = extract_SAL_node_candidate_data(
                             sal_reply_body, app_data, application_id_optimizer, selected_criteria, correlation_id_optimizer)
                         # Create data_table:
@@ -467,7 +467,7 @@ class SyncedHandler(Handler):
                         relative_wr_data = []
                         immediate_wr_data = []
                         # create default app_data dictionary for policy and app_specific when file not exists for the application
-                        app_data = {'policy': '0', 'app_specific': False} # Use the default policy (minimal)
+                        app_data = {'policy': '0', 'app_specific': True} # Use the default policy (minimal)
                         # print("app_data:", app_data['policy'])
 
                     # Check the number of nodes before Evaluation

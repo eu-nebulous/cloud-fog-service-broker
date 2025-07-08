@@ -32,7 +32,7 @@ def extract_SAL_node_candidate_data_Front(json_data_all, app_specific, app_id):
     # app_id = "123456789"
 
     # Filter the json_data_all based on app_specific
-    if app_specific == "0" or not app_specific: # When all nodes chosen, we give only the nodes for all applications.
+    if app_specific == "0": # When all nodes chosen, we give only the nodes for all applications.
         print("ENTERED app_specific == 0")
         # Keep only nodes for all applications  # json_data = [node for node in json_data_all if is_for_all_applications(node)]
         # Keep only nodes for all applications and IAAS (CLOUDS) nodes
@@ -421,7 +421,7 @@ def read_application_data(app_id):
     file_path = os.path.join(app_dir, f"{app_id}_data.json")
     with open(file_path, 'r', encoding='utf-8') as f:
         data = json.load(f)
-        app_specific = data.get("appSpecific", False)
+        app_specific = data.get("appSpecific", True)
         policy = data.get("policy", 0) # read also app_specific and policy also
         app_data['policy'] = policy
         app_data['app_specific'] = app_specific # node mode
@@ -474,7 +474,7 @@ def extract_SAL_node_candidate_data(json_data_all, app_data, app_id, selected_cr
     app_specific = app_data['app_specific']
     # app_specific = 1
     # print(app_specific)
-    if app_specific == "0" or not app_specific: # All Applications
+    if app_specific == "0": # All Applications
         print(f"[Request {correlation_id_optimizer} - Filtering for all applications")
         # Keep only nodes for all applications  # json_data = [node for node in json_data_all if is_for_all_applications(node)]
         # Keep only nodes for all applications and IAAS (CLOUDS) nodes
