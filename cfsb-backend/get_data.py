@@ -177,3 +177,73 @@ def get_defined_criteria(selected_criteria):
             # print(criteria['name'])
             criteria_to_define.append(criteria)
     return criteria_to_define
+
+# This functions stores a list with the criteria used in the CFSB criteria selection
+def get_active_criteria_list():
+    active_citeria = [
+        "attr-reputation",
+        "attr-agility",
+        # "attr-performance",
+        # "attr-performance-capacity",
+        "attr-performance-capacity-num-of-cores",
+        "attr-performance-capacity-memory",
+    ]
+    return active_citeria
+
+# This function goes to children only if the parent is active. If parent inactive, then all children are inactive
+def get_active_criteria_parent(items_list):
+    active_items_list = []
+    active_criteria = get_active_criteria_list()
+    for item in items_list:
+        # print(item)
+        if item["name"] in active_criteria:
+            print("active criterion parent")
+            active_items_list.append(item)
+            if item["children"] is not None:
+                children1 = []
+                for child in item["children"]:
+                    if child["name"] in active_criteria:
+                        # print("active criterion child 1")
+                        children1.append(child)
+                        if child["children"] is not None:
+                            children2 = []
+                            for child2 in child["children"]:
+                                if child2["name"] in active_criteria:
+                                    # print("active criterion child 2")
+                                    children2.append(child2)
+                            child["children"] = children2
+                item["children"] = children1
+    return active_items_list
+
+# This function handles active criteria individually. If a parent has active children it is considered active to keep the usual hierarchy
+def get_active_criteria_specific(items_list):
+    active_items_list = []
+    active_criteria = get_active_criteria_list()
+    for item in items_list:
+        # if item["name"] in active_criteria:
+        #     active_items_list.append(item) # if level 1 in active we put it in active_items_list
+        if item["children"] is not None:
+            children1 = []
+            for child in item["children"]:
+                # if child["name"] in active_criteria:
+                #     children1.append(child) # if level 2 in active we put it in active_items_list
+                if child["children"] is not None:
+                    children2 = []
+                    for child2 in child["children"]:
+                        if child2["name"] in active_criteria:
+                            children2.append(child2) # In children2 we put the active level 3 items
+                    child["children"] = children2 # In item from level 2 we put its active children --> level 3
+
+                    if child["name"] in active_criteria: # if child in active
+                        children1.append(child)  # In children1 we put the active level 2 items
+                    elif children2: # else if this child has active children
+                        children1.append(child) # in Children1 we put the child because it has at least one active child(from level 3)
+
+            item["children"] = children1 # in item from level 1 we put its active children --> level 2
+
+            if item["name"] in active_criteria:
+                active_items_list.append(item)  # if level 1 in active we put it in active_items_list
+            elif children1: # else if this parent has children(directly active or with active children) we put it in active items list
+                active_items_list.append(item)
+
+    return active_items_list

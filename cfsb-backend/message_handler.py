@@ -15,8 +15,8 @@ from exn.core.synced_publisher import SyncedPublisher
 from exn.core.context import Context
 from exn.core.handler import Handler
 from exn.handler.connector_handler import ConnectorHandler
-from User_Functions import *
-from Evaluation import perform_evaluation
+from node_functions import *
+from node_evaluation import perform_evaluation
 import os
 
 import time
@@ -99,17 +99,13 @@ class SyncedHandler(Handler):
     def handle_single(self, application_id_optimizer, correlation_id_optimizer, body_json_string, context):
         request_id = correlation_id_optimizer
         print(f"Entered handle_single - Request ID: {request_id}, App ID: {application_id_optimizer}")
+        feasibility = False
+
         try:
             ## Prepare message to be send to SAL - remove locations if needed
             body_json_string, locations = remove_request_attribute('CFSB-datasource-geolocations', json.loads(body_json_string))
             if locations:
                 body_json_string = json.dumps(body_json_string)  # Convert the body data to a JSON string
-
-            # Check ActiveMQ connection for 'SAL-GET' before sending.
-            # if not is_activemq_connected(context, 'SAL-GET'):
-            #     error_msg = {"ActiveMQ connection is down. Unable to send message to SAL."}
-            #     print("ActiveMQ connection is down for 'SAL-GET'. Sent error message to next component.")
-            #     return error_msg
 
             RequestToSal = {  # Dictionary
                 "metaData": {"user": "admin"},  # key [String "metaData"] value [dictionary]
@@ -120,194 +116,205 @@ class SyncedHandler(Handler):
             print(f"[Request {request_id}] Waiting for response from SAL...")
             print(f"[Request {request_id}] Received response from SAL")
 
-            ## Process SAL's Reply
-            if sal_reply is not None and sal_reply != '':
-                sal_body = sal_reply.get('body')  # Get the 'body' as a JSON string Replace sal_body with sal_reply_body
-            else:
-                sal_body = '{"key": "error", "message": "SAL did not reply or an empty response is returned"}'
+            # Test possible problematic response from SAL or Server
+            # sal_reply = {
+            #     'when': '2025-05-29T14:53:50.398298Z',
+            #     'body': '{"key":"gateway-server-exception-error","message":" Request processing failed; nested exception is java.lang.NullPointerException</p><p><b>Description</b> The server encountered an unexpected condition that prevented it from fulfilling the request."}',
+            #     'metaData': {
+            #         'user': 'admin',
+            #         'status': 500,  # Note: just use int directly
+            #         'protocol': 'HTTP'
+            #     }
+            # }
 
-            try:
-                # Parse the JSON string to a Python object
-                nodes_data = json.loads(sal_body)
-                # Check if there is any error in SAL's reply body
-                if 'key' in nodes_data and any(
-                        keyword in nodes_data['key'].lower() for keyword in ['error', 'exception']):
-                    print("Error found in SAL's message body:", nodes_data['message'])
-                    sal_reply_body = '' # Make it an Empty string in case of error
-                else:  # No error found in SAL's reply body
-                    total_nodes = len(nodes_data)  # Get the total number of nodes
-                    sal_reply_body = sal_body # Keep sal_reply_body as is since it's already a JSON string
-                    # print("Total Nodes in SAL's reply:", total_nodes)
+            status = sal_reply.get('metaData', {}).get('status', None)
 
-            except json.JSONDecodeError as e:
-                print(f"Error parsing JSON reply from SAL: {e}")
-                sal_reply_body = '' #  Make it an Empty string in case of error
+            if sal_reply and status == 200:
+                sal_body = sal_reply.get('body')
+                try:
+                    # Parse the JSON string to a Python object
+                    nodes_data = json.loads(sal_body)
+                    # print(nodes_data)
+                    # Check if there is any error in SAL's reply body
+                    if 'key' in nodes_data and any(
+                            keyword in nodes_data['key'].lower() for keyword in ['error', 'exception']):
+                        print("Error found in SAL's message body:", nodes_data['message'])
+                        sal_reply_body = '' # Make it an Empty string in case of error
+                    else:  # No error found in SAL's reply body
+                        total_nodes = len(nodes_data)  # Get the total number of nodes
+                        sal_reply_body = sal_body # Keep sal_reply_body as is since it's already a JSON string
+                        # print("Total Nodes in SAL's reply:", total_nodes)
+                except json.JSONDecodeError as e:
+                    print(f"Error parsing JSON reply from SAL: {e}")
 
-            if sal_reply_body.strip() not in ('', '[]'): # Check whether SAL's reply body is empty
-                # print("SAL reply Body:", sal_reply_body)
-                # print(type(sal_reply_body))  # Check the data type
-                # print(f"Raw content: {repr(sal_reply_body)}")
-
-                # Check the number of nodes before Evaluation
-                if total_nodes > 1:
-                    # Search for application_id, Read JSON and create data to pass to Evaluation
-                    if check_json_file_exists(application_id_optimizer):  # Application JSON exists
-                        print("-------------------------------------------------")
-                        print(f"JSON file for application ID {application_id_optimizer} exists.")
-
-                        # The read_application_data returns int the app_data the policy from the saved file, in order to check it to do the convert or not.
-                        app_data, selected_criteria, provider_criteria, relative_wr_data, immediate_wr_data = read_application_data(application_id_optimizer)
-                        extracted_data_SAL, node_ids, node_names, providers = extract_SAL_node_candidate_data(sal_reply_body, app_data, application_id_optimizer, selected_criteria, correlation_id_optimizer)
-                        data_table = create_data_table(extracted_data_SAL, selected_criteria, provider_criteria, locations)
-                        # print("relative_wr_data:", relative_wr_data)
-                        # print("immediate_wr_data:", immediate_wr_data)
-                    else:  # Application does not exist in directory
-                        print("-------------------------------------------------")
-                        print(f"JSON file for application ID {application_id_optimizer} does not exist.")
-                        # Use the create_criteria_mapping() to get the criteria mappings
-                        # selected criteria must be a list of dictionaries like when reading it from file
-                        json_selected_criteria = {
-                            "selectedCriteria": [
-                                {
-                                    "name": "attr-performance-capacity-num-of-cores",
-                                    "type": 2,
-                                    "title": "Number of CPU Cores"
-                                },
-                                {
-                                    "name": "attr-performance-capacity-memory",
-                                    "type": 2,
-                                    "title": "Memory Size"
-                                }
-                            ]
-                        }
-                        # check if distance was asked by optimizer
-                        if locations:
-                            distance_item = {
-                                "name": "9f5706e3-08bd-412d-8d59-04f464e867a8",
-                                "type": 2,
-                                "title": "Proximity to Data Source"
-                            }
-                            json_selected_criteria["selectedCriteria"].append(distance_item)
-                        selected_criteria = {criterion['title']: criterion for criterion in json_selected_criteria.get('selectedCriteria', [])}
-                        app_data = {"app_specific": 0}
-                        extracted_data_SAL, node_ids, node_names, providers = extract_SAL_node_candidate_data(
-                            sal_reply_body, app_data, application_id_optimizer, selected_criteria, correlation_id_optimizer)
-
-                        # Create data_table:
-                        # provider_criteria do not exist when the application file does not exist. None is treated like false
-                        data_table = create_data_table(extracted_data_SAL, selected_criteria, None, locations)
-                        # print(data_table)
-                        relative_wr_data = []
-                        immediate_wr_data = []
-                        # create default app_data dictionary for policy and app_specific when file not exists for the application
-                        app_data = {'policy': '0', 'app_specific': False}
+                if sal_reply_body.strip() not in ('', '[]'): # Check whether SAL's reply body is empty
+                    # print("SAL reply Body:", sal_reply_body)
+                    # print(type(sal_reply_body))  # Check the data type
+                    # print(f"Raw content: {repr(sal_reply_body)}")
 
                     # Check the number of nodes before Evaluation
-                    print("There are " + str(len(node_ids)) + " nodes for Evaluation")
-                    if len(node_ids) == 0:
-                        feasibility = False
-                        Message_Results = {
-                             "message": "No resources returned from SAL"
-                        }
-                        
-                    else:
-                        # Convert the original data of RAM and # of Cores, e.g. 1/X, if they are selected
-                        # print("Original data_table:", data_table)
-                        # TODO: INCORPORATE THIS INTO create_data_table function
-                        if (app_data['policy'] == '0'):
-                            data_table = convert_data_table(data_table)  # Convert RAM and # of Cores, e.g. 1/X
-                            # print("Converted data_table:", data_table)
-                        else:
-                            print("Policy is MAX for this application")
+                    if total_nodes > 1:
+                        # Search for application_id, Read JSON and create data to pass to Evaluation
+                        if check_json_file_exists(application_id_optimizer):  # Application JSON exists
+                            print("-------------------------------------------------")
+                            print(f"JSON file for application ID {application_id_optimizer} exists.")
 
-                        ## Run evaluation
-                        evaluation_results = perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_names,
-                                                                node_ids)
-                        # print("Evaluation Results:", evaluation_results)
+                            # The read_application_data returns int the app_data the policy from the saved file, in order to check it to do the convert or not.
+                            app_data, selected_criteria, provider_criteria, relative_wr_data, immediate_wr_data = read_application_data(application_id_optimizer)
+                            extracted_data_SAL, node_ids, node_names, providers = extract_SAL_node_candidate_data(sal_reply_body, app_data, application_id_optimizer, selected_criteria, correlation_id_optimizer)
+                            data_table = create_data_table(extracted_data_SAL, selected_criteria, provider_criteria, locations)
+                            # print("relative_wr_data:", relative_wr_data)
+                            # print("immediate_wr_data:", immediate_wr_data)
+                        else:  # Application does not exist in directory
+                            print("-------------------------------------------------")
+                            print(f"JSON file for application ID {application_id_optimizer} does not exist.")
+                            # Use the create_criteria_mapping() to get the criteria mappings
+                            # selected criteria must be a list of dictionaries like when reading it from file
+                            json_selected_criteria = {
+                                "selectedCriteria": [
+                                    {
+                                        "name": "attr-performance-capacity-num-of-cores",
+                                        "type": 2,
+                                        "title": "Number of CPU Cores"
+                                    },
+                                    {
+                                        "name": "attr-performance-capacity-memory",
+                                        "type": 2,
+                                        "title": "Memory Size"
+                                    }
+                                ]
+                            }
+                            # check if distance was asked by optimizer
+                            if locations:
+                                distance_item = {
+                                    "name": "9f5706e3-08bd-412d-8d59-04f464e867a8",
+                                    "type": 2,
+                                    "title": "Proximity to Data Source"
+                                }
+                                json_selected_criteria["selectedCriteria"].append(distance_item)
+                            selected_criteria = {criterion['title']: criterion for criterion in json_selected_criteria.get('selectedCriteria', [])}
+                            app_data = {"app_specific": 0}
+                            extracted_data_SAL, node_ids, node_names, providers = extract_SAL_node_candidate_data(
+                                sal_reply_body, app_data, application_id_optimizer, selected_criteria, correlation_id_optimizer)
 
-                        if evaluation_results.get('LPstatus') == 'feasible':
-                            feasibility = True
-                            ## Extract and Save the Results
-                            ScoresAndRanks = evaluation_results.get('results', [])
-                            # Sort scores and ranks to order first the best nodes
-                            ScoresAndRanks = sorted(ScoresAndRanks, key=lambda x: x['Score'], reverse=True)
-                            # Check the length and truncate if necessary
-                            if len(ScoresAndRanks) > 250:
-                                print("Evaluated Nodes: ", len(ScoresAndRanks))
-                                ScoresAndRanks = ScoresAndRanks[:250]
-                                # print("Remaining Nodes: ", len(ScoresAndRanks))
-                            # print("Scores and Ranks:", ScoresAndRanks)
+                            # Create data_table:
+                            # provider_criteria do not exist when the application file does not exist. None is treated like false
+                            data_table = create_data_table(extracted_data_SAL, selected_criteria, None, locations)
+                            # print(data_table)
+                            relative_wr_data = []
+                            immediate_wr_data = []
+                            # create default app_data dictionary for policy and app_specific when file not exists for the application
+                            app_data = {'policy': '0', 'app_specific': False}
 
-                            # Append the Score and Rank of each node to SAL's Response
-                            Message_Results = append_evaluation_results(sal_reply_body, ScoresAndRanks)
-                            Message_Results = sorted(Message_Results, key=lambda x: x['rank'], reverse=False)
-                            #  print("Message_Results:", Message_Results)
-                        else:
-                            # problem is infeasible
+                        # Check the number of nodes before Evaluation
+                        print("There are " + str(len(node_ids)) + " nodes for Evaluation")
+                        if len(node_ids) == 0:
                             feasibility = False
-                            results = evaluation_results.get('results')
-                            Message_Results = results  # Message_Results variable may contain info about the infeasible case also
+                            Message_Results = {
+                                "message": "No resources returned from SAL"
+                            }
+                        else:
+                            # Convert the original data of RAM and # of Cores, e.g. 1/X, if they are selected
+                            # print("Original data_table:", data_table)
+                            # TODO: INCORPORATE THIS INTO create_data_table function
+                            if (app_data['policy'] == '0'):
+                                data_table = convert_data_table(data_table)  # Convert RAM and # of Cores, e.g. 1/X
+                                # print("Converted data_table:", data_table)
+                            else:
+                                print("Policy is MAX for this application")
 
-                else:  # SAL returned only one node, thus no evaluation needed
-                    feasibility = True
-                    print("There is only one node!")
-                    # Append the Score and Rank of each node to SAL's Response
-                    Message_Results = append_evaluation_results(sal_reply_body, [])
+                            ## Run evaluation
+                            evaluation_results = perform_evaluation(data_table, relative_wr_data, immediate_wr_data, node_names,
+                                                                    node_ids)
+                            # print("Evaluation Results:", evaluation_results)
 
-            else:  # Then SAL's reply body is empty send an empty body to Optimizer
-                print("No Body in reply from SAL!")
+                            if evaluation_results.get('LPstatus') == 'feasible':
+                                feasibility = True
+                                ## Extract and Save the Results
+                                ScoresAndRanks = evaluation_results.get('results', [])
+                                # Sort scores and ranks to order first the best nodes
+                                ScoresAndRanks = sorted(ScoresAndRanks, key=lambda x: x['Score'], reverse=True)
+                                # Check the length and truncate if necessary
+                                if len(ScoresAndRanks) > 250:
+                                    print("Evaluated Nodes: ", len(ScoresAndRanks))
+                                    ScoresAndRanks = ScoresAndRanks[:250]
+                                    # print("Remaining Nodes: ", len(ScoresAndRanks))
+                                # print("Scores and Ranks:", ScoresAndRanks)
+
+                                # Append the Score and Rank of each node to SAL's Response
+                                Message_Results = append_evaluation_results(sal_reply_body, ScoresAndRanks)
+                                Message_Results = sorted(Message_Results, key=lambda x: x['rank'], reverse=False)
+                                #  print("Message_Results:", Message_Results)
+                            else:
+                                # problem is infeasible
+                                feasibility = False
+                                results = evaluation_results.get('results')
+                                Message_Results = results  # Message_Results variable may contain info about the infeasible case also
+
+                    else:  # SAL returned only one node, thus no evaluation needed
+                        feasibility = True
+                        print("There is only one node!")
+                        # Append the Score and Rank of each node to SAL's Response
+                        Message_Results = append_evaluation_results(sal_reply_body, [])
+
+                else:  # Then SAL's reply body is empty send an empty body to Optimizer
+                    print("No Body in reply from SAL!")
+                    Message_Results = {
+                        "message": "No resources returned from SAL"
+                    }
+
+            else: # Status <> 200 or sal_reply is  None or sal_reply == ''
                 Message_Results = {
-                    "message": "No resources returned from SAL"
+                    "message": status
                 }
 
             ## Prepare message to be sent to OPTIMIZER
-            CFSBResponse = {
-                "metaData": {"user": "admin"},
-                "body": Message_Results
-            }
-
-            if feasibility: # Write CFSBResponse to file
-                # print("CFSBResponse:", CFSBResponse)
-                # Writing the formatted JSON to a json file
-                formatted_json = json.dumps(CFSBResponse, indent=4)
-                with open('CFSB_Response.json', 'w') as file:
-                    file.write(formatted_json)
-                    print("-------------------------------------------------")
-                    print("Data with Scores and Ranks for Nodes are saved to CFSB_Response.json")
-
-            ## Send message to OPTIMIZER
-            # Measure the size of the message in bytes and MB
-            try:
-                message_str = json.dumps(CFSBResponse)
+            try: # Measure the size of the message in bytes and MB
+                message_str = json.dumps(Message_Results)
                 message_bytes = message_str.encode('utf-8')
                 message_size_bytes = len(message_bytes)
                 message_size_mb = message_size_bytes / (1024 * 1024)  # Convert bytes to MB
-                print(f"Sending message to Optimizer of size {message_size_bytes} bytes ({message_size_mb:.2f} MB)")
+                print(f"Message Size: {message_size_bytes} bytes ({message_size_mb:.2f} MB)")
             except Exception as e:
                 print("Error measuring message size:", e)
 
             # Check against the 104857600 bytes limit (~100 MB) of ActiveMQ
             if message_size_bytes > 104857600:
                 print(f"Message size exceeds limit of 104857600 bytes (100 MB). Message not sent.")
-                # TODO Handle this case (Send a suitable message to OPTIMIZER?)
-            else:
-                # Check connection for 'SendToOPTMulti'
-                # if not is_activemq_connected(context, 'SendToOPT'):
-                #     error_msg = {"ActiveMQ connection is down. Unable to send message to Optimizer."}
-                #     print("ActiveMQ connection is down for 'SendToOPTMulti'. Not sending the message.")
-                #     return error_msg
-                context.get_publisher('SendToOPT').send(CFSBResponse, application_id_optimizer,
-                                                        properties={'correlation_id': correlation_id_optimizer}, raw=True)
-                print("-------------------------------------------------")
-                print("Message to Optimizer has been sent from Key: OPT-Triggering with Correlation Id: ", correlation_id_optimizer)
+                Message_Results = {
+                    "message": "The message size exceeds limit of 104857600 bytes (100 MB) imposed by ActiveMQ"
+                }
+
+            CFSBResponse = {
+                    "metaData": {"user": "admin"},
+                    "body": Message_Results
+            }
+            ## Send message to OPTIMIZER
+            context.get_publisher('SendToOPT').send(CFSBResponse, application_id_optimizer,
+                                                    properties={'correlation_id': correlation_id_optimizer}, raw=True)
+            print(f"Message to Optimizer: {Message_Results}")
+            print("-------------------------------------------------")
+            print("Message to Optimizer has been sent from Key: OPT-Triggering with Correlation Id: ", correlation_id_optimizer)
 
         except json.JSONDecodeError as e:
             print(f"Failed to parse message body from Optimizer as JSON: {e}")
+
+        # For debugging purposes, it can be removed for production
+        if feasibility: # Write CFSBResponse to file
+            # print("CFSBResponse:", CFSBResponse)
+            # Writing the formatted JSON to a json file
+            formatted_json = json.dumps(CFSBResponse, indent=4)
+            with open('CFSB_Response.json', 'w') as file:
+                file.write(formatted_json)
+                print("-------------------------------------------------")
+                print("Data with Scores and Ranks for Nodes are saved to CFSB_Response.json")
         print_end_message()
 
     def handle_multi(self, application_id_optimizer, correlation_id_optimizer, body_sent_from_optimizer, context):
         request_id = correlation_id_optimizer
         print(f"Entered handle_multi - Request ID: {request_id}, App ID: {application_id_optimizer}")
+        feasibility = False
+
         try:
             unique_nodes_dict = {}  # Store unique nodes
             list_number = 0  # Count the # of Lists and requests to SAL
@@ -330,56 +337,106 @@ class SyncedHandler(Handler):
                 print(f"[Request {request_id}] Received response from SAL")
 
                 ## Process SAL's Reply
-                sal_body = sal_reply.get('body') if isinstance(sal_reply, dict) else None
-                if sal_body:
-                    print(f"[Request {request_id}] SAL Replied for List {list_number}")
-                    nodes_by_requirement = json.loads(sal_body)
-                    print(f"[Request {request_id}] Nodes in List {list_number}: {len(nodes_by_requirement)}")
+                # Test possible problematic response from SAL or Server
+                # sal_reply = {
+                #     'when': '2025-05-29T14:53:50.398298Z',
+                #     'body': '{"key":"gateway-server-exception-error","message":" Request processing failed; nested exception is java.lang.NullPointerException</p><p><b>Description</b> The server encountered an unexpected condition that prevented it from fulfilling the request."}',
+                #     'metaData': {
+                #         'user': 'admin',
+                #         'status': 500,  # Note: just use int directly
+                #         'protocol': 'HTTP'
+                #     }
+                # }
+                status = sal_reply.get('metaData', {}).get('status', None)
 
-                    # Remove aws invalid instance types
-                    # This is a temporary workaround to be removed when proper node candidate filtering is in place.
-                    filtered_nodes_by_requirement = []
-                    for node in nodes_by_requirement:
-                        try:
-                            if ("cloud" in node and node["cloud"]["id"] != "edge" and "api" in node[
-                                "cloud"] and "providerName" in node["cloud"]["api"] and "aws-ec2" ==
-                                    node["cloud"]["api"]["providerName"] and node["hardware"][
-                                        "name"] not in VALID_AWS_INSTANCE_TYPES):
-                                print(f"Skipping invalid instance type {node['hardware']['name']}")
-                                continue
-                            else:
+                if sal_reply is not None and sal_reply != '' and status == 200:
+                    sal_body = sal_reply.get('body') if isinstance(sal_reply, dict) else None
+
+                    ## ── Begin error‐checκ ──
+                    try:
+                        parsed = json.loads(sal_body) # Do this as sal_body is a raw string
+                    except (TypeError, json.JSONDecodeError):
+                        parsed = sal_body
+
+                    if isinstance(parsed, dict) \
+                            and 'key' in parsed \
+                            and any(kw in parsed['key'].lower() for kw in ('error', 'exception')):
+                        print("Error found in SAL’s reply:", parsed.get('message'))
+                        sal_body = []
+                        Message_Results = {
+                            "message": f"An error returned from SAL for list {list_number}"
+                        }
+                    ## ── End error‐check ──
+
+                    if not sal_body or sal_body.strip() == '[]': # Check whether SAL's reply body is empty
+                        print(f"[Request {request_id}] returned an empty body: {sal_reply}")
+                    else:
+                        print(f"[Request {request_id}] SAL Replied for List {list_number}")
+                        nodes_by_requirement = json.loads(sal_body)
+                        print(f"[Request {request_id}] Nodes in List {list_number}: {len(nodes_by_requirement)}")
+
+                        # Remove aws invalid instance types
+                        # This is a temporary workaround to be removed when proper node candidate filtering is in place.
+                        filtered_nodes_by_requirement = []
+                        for node in nodes_by_requirement:
+                            try:
+                                if ("cloud" in node and node["cloud"]["id"] != "edge" and "api" in node[
+                                    "cloud"] and "providerName" in node["cloud"]["api"] and "aws-ec2" ==
+                                        node["cloud"]["api"]["providerName"] and node["hardware"][
+                                            "name"] not in VALID_AWS_INSTANCE_TYPES):
+                                    print(f"Skipping invalid instance type {node['hardware']['name']}")
+                                    continue
+                                else:
+                                    filtered_nodes_by_requirement.append(node)
+                            except Exception as e:
+                                print(f"Exception filtering {node}: {e}")
+                        nodes_by_requirement = filtered_nodes_by_requirement
+
+                        """
+                        Hardcoded filter for UiO openstack nodes. Discard any node from Oslo and keep only nodes from Bergen that are running Ubuntu 22.04
+                        This is a temporary workaround to be removed when proper node candidate filtering is in place.
+                        """
+                        filtered_nodes_by_requirement = []
+                        for node in nodes_by_requirement:
+                            try:
+                                if (node.get("cloud", {}).get("id") != "edge" and 
+                                    node.get("location", {}).get("geoLocation",{}).get("city") == "Oslo"):
+                                    print(f"Skipping invalid instance type {node}")
+                                    continue
+                                if (node.get("cloud", {}).get("id") != "edge" and 
+                                    node.get("location", {}).get("geoLocation",{}).get("city") == "Bergen" and
+                                    "Ubuntu 22.04" not in node.get("image", {}).get("name", "")):
+                                    print(f"Skipping invalid instance type {node}")
+                                    continue                                
+                                
                                 filtered_nodes_by_requirement.append(node)
-                        except Exception as e:
-                            print(f"Exception filtering {node}: {e}")
-                    nodes_by_requirement = filtered_nodes_by_requirement
+                            except Exception as e:
+                                print(f"Exception filtering {node}: {e}")
+                        nodes_by_requirement = filtered_nodes_by_requirement
 
-                    for node in nodes_by_requirement:
-                        unique_nodes_dict[node["id"]] = node
-                else:
-                    print(f"[Request {request_id}] returned an empty body: {sal_reply}")
-            print(f"[Request {request_id}] Finished Processing Lists. Unique Nodes: {len(unique_nodes_dict)}")
+
+                        for node in nodes_by_requirement:
+                            unique_nodes_dict[node["id"]] = node
+
+                else: # Some error occured SAL did not reply
+                    Message_Results = {
+                        "message": status
+                    }
+                    print(f"STATUS: {status}")
+
+            total_nodes = len(unique_nodes_dict)  # Get the total number of nodes
+            print(f"[Request {request_id}] Finished Processing Lists. Unique Nodes: {total_nodes}")
 
             ## Continue with Evaluation
-            ## Continue with Evaluation
-            try:
+            if total_nodes != 0:
                 # Here the code differentiates from the SINGLE request
                 nodes_data = list(unique_nodes_dict.values())
-                # Check if there is any error in SAL's reply body
-                if 'key' in nodes_data and any(
-                        keyword in nodes_data['key'].lower() for keyword in ['error', 'exception']):
-                    print("Error found in SAL's message body using Multi:", nodes_data['message'])
-                    sal_reply_body = []
-                else:  # No error found in SAL's reply body
-                    total_nodes = len(nodes_data)  # Get the total number of nodes
-                    # print("Total Nodes in SAL's reply:", total_nodes)
-                    sal_reply_body = json.dumps(nodes_data)
-            except json.JSONDecodeError as e:
-                print(f"Error parsing JSON reply from SAL: {e}")
-                sal_reply_body = ''  # Make it an Empty string in case of error
 
-            # Check whether SAL's reply body is empty
-            if sal_reply_body.strip() not in ('', '[]'):
+                print("Total Nodes in SAL's reply:", total_nodes)
+                # print(nodes_data)
+                sal_reply_body = json.dumps(nodes_data)
                 # print("SAL reply Body:", sal_reply_body)  # print(type(sal_reply))
+
                 # Check the number of nodes before Evaluation
                 if total_nodes > 1:
                     # Search for application_id, Read JSON and create data to pass to Evaluation
@@ -441,7 +498,7 @@ class SyncedHandler(Handler):
                     if len(node_ids) == 0:
                         feasibility = False
                         Message_Results = {
-                             "message": "No resources returned from SAL"
+                            "message": "No resources returned from SAL"
                         }
                     else:# print("Original Data", data_table)
 
@@ -493,69 +550,73 @@ class SyncedHandler(Handler):
                     print("There is only one node!")
                     Message_Results = append_evaluation_results(sal_reply_body, [])
 
-            else:  # Then SAL's reply body is empty, thus send an empty body to Optimizer
-                print("No Body in reply from SAL!")
-                Message_Results = {
-                    "message": "No resources returned from SAL"
-                }
-                feasibility = False
-            ## Prepare message to be sent to OPTIMIZER
-            CFSBResponse = {
-                "metaData": {"user": "admin"},
-                "body": Message_Results
-            }
-
-            if feasibility: # Write CFSBResponse to file
-                # print("CFSBResponse:", CFSBResponse)
-                # Writing the formatted JSON to a json file
-                formatted_json = json.dumps(CFSBResponse, indent=4)
-                with open('CFSB_Response.json', 'w') as file:
-                    file.write(formatted_json)
-                    print("-------------------------------------------------")
-                    print("Data with Scores and Ranks for Nodes are saved to CFSB_Response.json")
-
-            ## Send message to OPTIMIZER
-            logging.debug(f"[DEBUG] About to send response for Request ID: {correlation_id_optimizer} "
-                f"with properties: {{'correlation_id': {correlation_id_optimizer}}}")
+            else: # Then SAL's reply body is empty, thus send an empty body to Optimizer
+                if status == 200: # If Status = 200, then SAL responded with an empty list,
+                    # otherwise an error occured with Status code saved above
+                    print("No resources returned from SAL!")
+                    Message_Results = {
+                        "message": "No resources returned from SAL"
+                    }
 
             # Measure the size of the message in bytes and MB
             try:
-                message_str = json.dumps(CFSBResponse)
+                message_str = json.dumps(Message_Results)
                 message_bytes = message_str.encode('utf-8')
                 message_size_bytes = len(message_bytes)
                 message_size_mb = message_size_bytes / (1024 * 1024)  # Convert bytes to MB
-                print(f"Sending message to Optimizer of size {message_size_bytes} bytes ({message_size_mb:.2f} MB)")
+                print(f"Message Size: {message_size_bytes} bytes ({message_size_mb:.2f} MB)")
             except Exception as e:
                 print("Error measuring message size:", e)
 
             # Check against the 104857600 bytes limit (~100 MB) of ActiveMQ
             if message_size_bytes > 104857600:
                 print(f"Message size exceeds limit of 104857600 bytes (100 MB). Message not sent.")
-                # TODO Handle this case (Send a suitable message to OPTIMIZER?)
-            else:
-                # Check connection for 'SendToOPTMulti'
-                # if not is_activemq_connected(context, 'SendToOPTMulti'):
-                #     error_msg = {"ActiveMQ connection is down. Unable to send message to Optimizer."}
-                #     print("ActiveMQ connection is down for 'SendToOPTMulti'. Not sending the message.")
-                #     return error_msg
+                Message_Results = {
+                    "message": "The message size exceeds limit of 104857600 bytes (100 MB) imposed by ActiveMQ"
+                }
 
-                context.get_publisher('SendToOPTMulti').send(CFSBResponse, application_id_optimizer, properties={'correlation_id': correlation_id_optimizer}, raw=True)
-                print(f"Message to Optimizer has been sent from OPT-Triggering-Multi " f"Correlation Id sent: {correlation_id_optimizer}")
-                print("Message to Optimizer has been sent from OPT-Triggering-Multi with Correlation Id: ", correlation_id_optimizer)
-                # print(f"[Request {request_id}] Sent Response to Optimizer")
+
+            ## Prepare message to be sent to OPTIMIZER
+            CFSBResponse = {
+                "metaData": {"user": "admin"},
+                "body": Message_Results
+            }
+
+            ## Send message to OPTIMIZER
+            logging.debug(f"[DEBUG] About to send response for Request ID: {correlation_id_optimizer} "
+                          f"with properties: {{'correlation_id': {correlation_id_optimizer}}}")
+            print(f"Message to Optimizer: {Message_Results}")
+            print("-------------------------------------------------")
+            context.get_publisher('SendToOPTMulti').send(CFSBResponse, application_id_optimizer, properties={'correlation_id': correlation_id_optimizer}, raw=True)
+            print("Message to Optimizer has been sent from from Key: OPT-Triggering-Multi with Correlation Id: ", correlation_id_optimizer)
+
 
         except json.JSONDecodeError as e:
-              print(f"Failed to parse message body from Optimizer as JSON: {e}")
+                print(f"Failed to parse message body from Optimizer as JSON: {e}")
 
+        # For debugging purposes, it can be removed for production
+        if feasibility: # Write CFSBResponse to file
+           # print("CFSBResponse:", CFSBResponse)
+           # Writing the formatted JSON to a json file
+            formatted_json = json.dumps(CFSBResponse, indent=4)
+            with open('CFSB_Response.json', 'w') as file:
+                 file.write(formatted_json)
+                 print("-------------------------------------------------")
+                 print("Data with Scores and Ranks for Nodes are saved to CFSB_Response.json")
         print_end_message()
+
 
     def requestSAL(self, RequestToSal):
         try:
             sal_reply = Context.publishers['SAL-GET'].send_sync(RequestToSal)
             # Process SAL's Reply
-            sal_body = sal_reply.get('body')  # Get the 'body' as a JSON string
-            # print("sal_body requestSAL function:", sal_body)
-            return sal_body
+            status = sal_reply.get('metaData', {}).get('status', None)
+            if sal_reply is not None and sal_reply != '' and status == 200:
+                sal_body = sal_reply.get('body')  # Get the 'body' as a JSON string
+                # print("sal_body requestSAL function:", sal_body)
+                return sal_body
+            else:
+                return None
         except Exception as e:
             print(f"Error while requesting SAL: {e}")
             return None

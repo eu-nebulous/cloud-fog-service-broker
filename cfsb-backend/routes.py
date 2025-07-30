@@ -1,13 +1,13 @@
 from flask import Blueprint, request, jsonify, render_template, session
-from User_Functions import *
+from node_functions import *
 import data_types as attr_data_types
-from Evaluation import perform_evaluation
+from node_evaluation import perform_evaluation
 from data_types import get_attr_data_type
 import db.db_functions as db_functions
 import os
 import time
 import get_data as file
-import activemq
+import message_handler
 import traceback
 
 main_routes = Blueprint('main', __name__)
@@ -22,10 +22,16 @@ main_routes = Blueprint('main', __name__)
 #Used in CriteriaSelection.vue
 @main_routes.route('/get_hierarchical_category_list')
 def get_hierarchical_category_list():
+    # change this to True to use only the active criteria from the get_active_criteria_specific() function
+    only_active = False
     items_list = file.get_level_1_items()  # Assume this function returns the list correctly
     if items_list is not None:
-        # Return the list as a JSON response
-        return jsonify(items_list)
+        if only_active:
+            # return only the active criteria registered
+            return jsonify(file.get_active_criteria_specific(items_list))
+        else:
+            # Return the list as a JSON response
+            return jsonify(items_list)
     else:
         # Return an empty list or an error message if items_list is None
         return jsonify([]), 404  # or return jsonify({"error": "No items found"}), 404
@@ -80,7 +86,7 @@ def process_selected_criteria():
             "body": body_json_string_for_SAL
         }
         print("Request to Sal:", RequestToSal)
-        sal_reply = activemq.call_publisher(RequestToSal)
+        sal_reply = message_handler.call_publisher(RequestToSal)
 
         # Parse the JSON string to a Python object
         nodes_data = json.loads(sal_reply) if isinstance(sal_reply, str) else sal_reply
@@ -88,7 +94,7 @@ def process_selected_criteria():
         formatted_json = json.dumps(nodes_data, indent=4)
         with open('NodeCandidates.json', 'w') as file1:
             file1.write(formatted_json)
-        print("Request from front-end (Printed from Routes)")
+        print("Request from front-end (Printed from Routes.py)")
 
         # Check if there is any error in SAL's reply body
         if 'key' in nodes_data and any(keyword in nodes_data['key'].lower() for keyword in ['error', 'exception']):
@@ -304,9 +310,9 @@ def send():
     data = request.get_json()
     body = data['body']
     body = json.dumps(body)
-    print(type(body))
+    # print(type(body))
     application_id = data['application_id']
     correlation_id = data['correlation_id']
     key = data['key']
-    sender = activemq.call_otp_publisher(data)
+    sender = message_handler.call_otp_publisher(data)
     return data
