@@ -602,51 +602,96 @@ def extract_SAL_node_candidate_data_OLD(json_string):
 
 # Used to calculate the distance between Locations of Sources and Nodes
 def calculate_distance(reference_point, raw_datasource_locations, default_reference_point=[0.0, 0.0]):
-    # Earth's mean radius in kilometers
-    EARTH_RADIUS_KM = 6371.0088
+    """
+    Compute a score based on the average haversine distance from a reference point
+    to one or many locations. Accepts:
+      - raw_datasource_locations as a float/int (returned as-is),
+      - a single [lat, lon],
+      - a list of [lat, lon],
+      - a JSON string encoding either a single [lat, lon] or a list of them.
 
-    # Validate and assign reference point
-    if not (isinstance(reference_point, (list, tuple)) and len(reference_point) == 2 and
-            -90 <= reference_point[0] <= 90 and -180 <= reference_point[1] <= 180):
+    Returns: float score = (1 / avg_distance_km) * 10000
+    """
+
+    # 0) If the input is already numeric, return it (precomputed distance)
+    if isinstance(raw_datasource_locations, (int, float)):
+        return float(raw_datasource_locations)
+
+    # 1) Validate reference point, or fall back to default
+    if not (
+            isinstance(reference_point, (list, tuple)) and
+            len(reference_point) == 2 and
+            isinstance(reference_point[0], (int, float)) and
+            isinstance(reference_point[1], (int, float)) and
+            -90 <= reference_point[0] <= 90 and
+            -180 <= reference_point[1] <= 180
+    ):
         print(f"Invalid reference point: {reference_point}. Using default: {default_reference_point}")
         reference_point = default_reference_point
 
-    # Parse the JSON string into a Python object
-    try:
-        datasource_locations = json.loads(raw_datasource_locations)
-    except json.JSONDecodeError as e:
-        raise ValueError(f"Error parsing datasource locations: {e}")
+    # 2) If a string, try to JSON-decode
+    data = raw_datasource_locations
+    if isinstance(data, str):
+        try:
+            data = json.loads(data)
+        except json.JSONDecodeError as e:
+            raise ValueError(f"Error parsing datasource locations: {e}")
 
-    # Filter and validate data source locations
-    valid_locations = [
-        [lat, lon] for lat, lon in datasource_locations
-        if isinstance(lat, (int, float)) and isinstance(lon, (int, float)) and
-           -90 <= lat <= 90 and -180 <= lon <= 180
-    ]
+    # 3) Normalize to a list of [lat, lon]
+    #    Accept a single pair [lat, lon] or a list of pairs [[lat, lon], ...]
+    coords = []
 
-    if not valid_locations:
-        raise ValueError("No valid data source locations provided.")
+    def is_pair(x):
+        return (
+                isinstance(x, (list, tuple)) and
+                len(x) == 2 and
+                isinstance(x[0], (int, float)) and
+                isinstance(x[1], (int, float)) and
+                -90 <= x[0] <= 90 and
+                -180 <= x[1] <= 180
+        )
 
-    # Haversine formula for distance calculation
+    if is_pair(data):
+        # Single coordinate pair -> wrap to list
+        coords = [[float(data[0]), float(data[1])]]
+    elif isinstance(data, (list, tuple)):
+        # Could be a list of pairs
+        for item in data:
+            if is_pair(item):
+                coords.append([float(item[0]), float(item[1])])
+            else:
+                # Silently skip non-conforming items; you can log if needed
+                # print(f"Skipping invalid item: {item}")
+                pass
+    else:
+        raise TypeError(f"Unsupported type for locations input: {type(data)}")
+
+    if not coords:
+        raise ValueError("No valid data source locations found.")
+
+    # 4) Haversine
+    EARTH_RADIUS_KM = 6371.0088
     def haversine(lat1, lon1, lat2, lon2):
-        lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])  # Convert to radians
+        lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])
         dlat = lat2 - lat1
         dlon = lon2 - lon1
-        a = math.sin(dlat / 2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2)**2
+        a = math.sin(dlat/2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon/2)**2
         c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-        return EARTH_RADIUS_KM * c  # Distance in kilometers
+        return EARTH_RADIUS_KM * c
 
-    # Compute distances
-    distances = [
-        haversine(reference_point[0], reference_point[1], lat, lon)
-        for lat, lon in valid_locations
-    ]
+    # 5) Compute distances and score
+    ref_lat, ref_lon = float(reference_point[0]), float(reference_point[1])
+    distances = [haversine(ref_lat, ref_lon, lat, lon) for lat, lon in coords]
 
-    # Compute the average distance
-    avg_distance = sum(distances) / len(distances) # in Kilometers
-    distance = 1/avg_distance
-    distance = distance * 10000
-    return distance
+    avg_distance = sum(distances) / len(distances)
+
+    # Avoid division by zero if all distances are 0
+    if avg_distance == 0:
+        # Define the score you want when distances are zero; here we return a large number
+        return float('inf')
+
+    return (1.0 / avg_distance) * 10000.0
+
 
 def create_data_table(extracted_data, selected_criteria, provider_criteria, locations):
     field_mapping = create_criteria_mapping()  # Get the default criteria using the function
