@@ -113,7 +113,11 @@ class SyncedHandler(Handler):
             }
             print(f"[Request {request_id}] Sending to SAL: {RequestToSal}")
             sal_reply = context.publishers['SAL-GET'].send_sync(RequestToSal)
-            print(f"[Request {request_id}] Waiting for response from SAL...")
+            if sal_reply is None:
+                context.get_publisher('SendToOPTMulti').send({"success": False,"message": "SAL-GET request failed"}, application_id_optimizer, properties={'correlation_id': correlation_id_optimizer}, raw=True)
+                print(f"[Request {request_id}] SAL-GET request failed")
+                return
+
             print(f"[Request {request_id}] Received response from SAL")
 
             # Test possible problematic response from SAL or Server
@@ -332,8 +336,11 @@ class SyncedHandler(Handler):
                 RequestToSal = {"metaData": {"user": "admin"}, "body": requirement}
                 print(f"[Request {request_id}] Sending to SAL: {RequestToSal}")
                 sal_reply = context.publishers['SAL-GET'].send_sync(RequestToSal)
+                if sal_reply is None:
+                    context.get_publisher('SendToOPTMulti').send({"success": False,"message": "SAL-GET request failed"}, application_id_optimizer, properties={'correlation_id': correlation_id_optimizer}, raw=True)
+                    print(f"[Request {request_id}] SAL-GET request failed")        
+                    return
                 # **Prevent Blocking on send_sync()**
-                print(f"[Request {request_id}] Waiting for response from SAL...")
                 print(f"[Request {request_id}] Received response from SAL")
 
                 ## Process SAL's Reply
@@ -649,7 +656,7 @@ def start_exn_connector_in_background():
                         username=os.getenv('NEBULOUS_BROKER_USERNAME'), password=os.getenv('NEBULOUS_BROKER_PASSWORD'),
                         handler=Bootstrap(),
                         publishers=[
-                            SyncedPublisher('SAL-GET', addressSAL_GET, True, True),
+                            SyncedPublisher('SAL-GET', addressSAL_GET, True, True,timeout=120),
                             core.publisher.Publisher('SendToOPT', addressSendToOPT, True, True),
                             core.publisher.Publisher('SendToOPTMulti', addressSendToOPTMulti, True, True),
                             SyncedPublisher('OPT-Triggering-Multi', addressOPTtriggeringMulti, True, True), # Publisher for OTP multi
