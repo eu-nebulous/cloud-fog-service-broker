@@ -215,7 +215,7 @@ def process_evaluation_data():
         # Transform grid data to table and get node names directly from the function
         data_table, relative_wr_data, immediate_wr_data, node_names, node_ids = transform_grid_data_to_table(data)
 
-        print("data_table Frontend:", data_table)
+        # print("data_table Frontend:", data_table)
         # print("relative_wr_data:", relative_wr_data)
         # print("immediate_wr_data:", immediate_wr_data)
         # print("# node_names:", len(node_names))
@@ -308,11 +308,5 @@ def save_app():
 @main_routes.route('/test_sender', methods=['POST'])
 def send():
     data = request.get_json()
-    body = data['body']
-    body = json.dumps(body)
-    # print(type(body))
-    application_id = data['application_id']
-    correlation_id = data['correlation_id']
-    key = data['key']
     sender = message_handler.call_otp_publisher(data)
     return data

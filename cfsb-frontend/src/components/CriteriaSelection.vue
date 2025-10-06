@@ -5,7 +5,7 @@
         <div class="col col-12 col-md-8">
           <div v-if="!this.policy || !this.nodesMode" class="alert alert-warning">
             <p>Policy or Nodes Mode have not been set.</p>
-            <p>Default policy is set to <span class="fw-bold">Minimal</span> and default Nodes Mode is set to <span class="fw-bold">Bring All Nodes</span></p>
+            <p>Default policy is set to <span class="fw-bold">Minimal</span> and default Nodes Mode is set to <span class="fw-bold">Bring App Specific Nodes</span></p>
             <button @click="goBackToHome" class="bg-color-primary">Change Settings</button>
           </div>
         </div>
@@ -63,7 +63,7 @@ export default {
     this.nodesMode = this.$route.params.nodesModeChoice || localStorage.getItem("nodesModeChoice");
     if (!this.policy || !this.nodesMode) {
       this.policy = 0;
-      this.nodesMode = 0;
+      this.nodesMode = 1;
       console.log('set default policy to ', this.policy, 'and default nodes to', this.nodesMode);
       localStorage.setItem('policyChoice', this.policy);
       localStorage.setItem('nodesModeChoice', this.nodesMode);
