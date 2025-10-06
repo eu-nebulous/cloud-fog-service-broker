@@ -47,6 +47,9 @@ def extract_SAL_node_candidate_data_Front(json_data_all, app_specific, app_id):
             # if matches_application_id(node, app_id) or node.get("nodeCandidateType", "") == "IAAS"
         ]
         print("USE ONLY app_specific NODES")
+        if len(json_data) < 1:
+            print("NO nodes with app id " + str(app_id))
+
     # Print or use the filtered data
     # print(json_data)
 
@@ -469,12 +472,17 @@ def extract_SAL_node_candidate_data(json_data_all, app_data, app_id, selected_cr
         json_data_all = [json_data_all]  # Wrap it in a list
 
     # application_id = "123456789"
+    if json_data_all:
+        nodes_count_before_filtering = len(json_data_all)
+    else:
+        nodes_count_before_filtering = 0
+    print("Nodes before filtering: " + str(nodes_count_before_filtering))
 
     # Filter the json_data_all based on app_specific
     app_specific = app_data['app_specific']
     # app_specific = 1
     # print(app_specific)
-    if app_specific == "0" or not app_specific: # All Applications
+    if app_specific == "0" or not app_specific or app_id == "dummy-application-id-123": # All Applications
         print(f"[Request {correlation_id_optimizer} - Filtering for all applications")
         # Keep only nodes for all applications  # json_data = [node for node in json_data_all if is_for_all_applications(node)]
         # Keep only nodes for all applications and IAAS (CLOUDS) nodes
@@ -494,7 +502,18 @@ def extract_SAL_node_candidate_data(json_data_all, app_data, app_id, selected_cr
 
     # Print or use the filtered data
     # print("Data for eligible nodes in NEW:", json_data)
-    print(f"[Request {correlation_id_optimizer} - Nodes after filtering: {len(json_data)}")
+
+    # check nodes based on filtering
+    filtered_nodes_message = ""
+    if nodes_count_before_filtering == 0:
+        print(f"[Request {correlation_id_optimizer} - No nodes before filtering")
+        filtered_nodes_message = "No resources returned from SAL"
+    elif len(json_data) == 0:
+        print(f"[Request {correlation_id_optimizer} - No nodes AFTER filtering - Not matched for {app_id}")
+        filtered_nodes_message = "No resources returned from SAL matching Application ID: " + str(app_id)
+    else:
+        print(f"[Request {correlation_id_optimizer} - Nodes after filtering: {len(json_data)}")
+        filtered_nodes_message = "No resources returned from SAL"
 
     extracted_data = []
     node_ids = []
@@ -567,7 +586,7 @@ def extract_SAL_node_candidate_data(json_data_all, app_data, app_id, selected_cr
     # node_ids = [node['id'] for node in extracted_data]
     # node_names = [node.get('name', '') for node in json_data if isinstance(node, dict)]
     # print("Extracted from NEW:", extracted_data)
-    return extracted_data, node_ids, node_names, providers
+    return extracted_data, node_ids, node_names, providers, filtered_nodes_message
 
 # Used BEFORE to extract_SAL_node_candidate_data when Optimizer asks
 def extract_SAL_node_candidate_data_OLD(json_string):
@@ -601,6 +620,60 @@ def extract_SAL_node_candidate_data_OLD(json_string):
     return extracted_data, node_ids, node_names
 
 # Used to calculate the distance between Locations of Sources and Nodes
+# Used before Issue #61 was found
+# def calculate_distance(reference_point, raw_datasource_locations, default_reference_point=[0.0, 0.0]):
+#     # If the raw_datasource_locations is already a float, return it as-is
+#     if isinstance(raw_datasource_locations, (int, float)):
+#         print("in raw")
+#         return raw_datasource_locations
+#
+#     # Earth's mean radius in kilometers
+#     EARTH_RADIUS_KM = 6371.0088
+#
+#     # Validate and assign reference point
+#     if not (isinstance(reference_point, (list, tuple)) and len(reference_point) == 2 and
+#             -90 <= reference_point[0] <= 90 and -180 <= reference_point[1] <= 180):
+#         print(f"Invalid reference point: {reference_point}. Using default: {default_reference_point}")
+#         reference_point = default_reference_point
+#
+#     # Parse the JSON string into a Python object
+#     try:
+#         datasource_locations = json.loads(raw_datasource_locations)
+#     except json.JSONDecodeError as e:
+#         raise ValueError(f"Error parsing datasource locations: {e}")
+#
+#     # Filter and validate data source locations
+#
+#     valid_locations = [
+#         [lat, lon] for lat, lon in datasource_locations
+#         if isinstance(lat, (int, float)) and isinstance(lon, (int, float)) and
+#            -90 <= lat <= 90 and -180 <= lon <= 180
+#     ]
+#
+#     if not valid_locations:
+#         raise ValueError("No valid data source locations provided.")
+#
+#     # Haversine formula for distance calculation
+#     def haversine(lat1, lon1, lat2, lon2):
+#         lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])  # Convert to radians
+#         dlat = lat2 - lat1
+#         dlon = lon2 - lon1
+#         a = math.sin(dlat / 2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2)**2
+#         c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+#         return EARTH_RADIUS_KM * c  # Distance in kilometers
+#
+#     # Compute distances
+#     distances = [
+#         haversine(reference_point[0], reference_point[1], lat, lon)
+#         for lat, lon in valid_locations
+#     ]
+#
+#     # Compute the average distance
+#     avg_distance = sum(distances) / len(distances) # in Kilometers
+#     distance = 1/avg_distance
+#     distance = distance * 10000
+#     return distance
+
 def calculate_distance(reference_point, raw_datasource_locations, default_reference_point=[0.0, 0.0]):
     """
     Compute a score based on the average haversine distance from a reference point
@@ -720,14 +793,13 @@ def create_data_table(extracted_data, selected_criteria, provider_criteria, loca
                     value = node[node_dict_mapping[field_name]]
                 elif field_name == "distance": # calculate values for location
                     if locations: # if locations asked by optimizer
-                        # print("Check for locations")
                         if (node[node_dict_mapping["distance_lat"]] not in [None, ""]) and (
                                 node[node_dict_mapping["distance_long"]] not in [None, ""]):
+
                             latitude = node[node_dict_mapping["distance_lat"]]
                             longitude = node[node_dict_mapping["distance_long"]]
                             reference_point = [latitude, longitude]
-                            value = calculate_distance(reference_point, locations,
-                                                                 default_reference_point=[0.0, 0.0])
+                            value = calculate_distance(reference_point, locations, default_reference_point=[0.0, 0.0])
                         else: # when node does not provide location data
                             value = 0.3 # Any antipodal distance on earth is approximately 20,037 kilometers, thus we considered 30k, that is 1/30 due to the conversion
                 else:

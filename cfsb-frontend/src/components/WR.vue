@@ -83,6 +83,7 @@
 <script>
 export const backendURL = import.meta.env.VITE_BACKEND_URL;
 const apiURL = backendURL;
+import {useNodeStore} from "@/stores/nodeStore.js";
 export default {
   data() {
     return {
@@ -100,6 +101,16 @@ export default {
       isLoading: null
     };
   },
+  computed: {
+    nodeNames() {
+      const nodeStore = useNodeStore();
+      return nodeStore.nodeNames;
+    },
+    gridData() {
+      const nodeStore = useNodeStore();
+      return nodeStore.gridData;
+    }
+  },
   mounted() {
     // Prioritize data from route parameters
     if (this.$route.params.data) {
@@ -107,9 +118,10 @@ export default {
       this.receivedGridData = JSON.parse(this.$route.params.data);
     } else {
       // Fallback to localStorage if route params are not available
-      const gridDataFromStorage = localStorage.getItem('gridData');
-      if (gridDataFromStorage) {
-        this.receivedGridData = JSON.parse(gridDataFromStorage);
+      // const gridDataFromStorage = localStorage.getItem('gridData');
+      const gridDataFromState = this.gridData;
+      if (gridDataFromState) {
+        this.receivedGridData = JSON.parse(gridDataFromState);
       }
     }
 
@@ -317,7 +329,9 @@ export default {
 
       // Retrieve node names from local storage
       let nodeNamesArray = [];
-      const NodeNamesString = localStorage.getItem('NodeNames');
+      // const NodeNamesString = localStorage.getItem('NodeNames');
+      // Get node names from state -- commented above line
+      const NodeNamesString = this.nodeNames;
       if (NodeNamesString) {
         nodeNamesArray = JSON.parse(NodeNamesString);
       }

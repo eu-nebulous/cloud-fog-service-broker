@@ -243,7 +243,7 @@ export default {
     setDefaultUser() {
       localStorage.setItem('fog_broker_user_uuid', 'CFSB User');
       // localStorage.setItem('fog_broker_app_id', '2f7cc63df4b1da7532756f44345758da');
-      localStorage.setItem('fog_broker_app_id', '123456789');
+      localStorage.setItem('fog_broker_app_id', 'dummy-application-id-123');
     },
     getUserLocalData() {
       let user_data = {};
