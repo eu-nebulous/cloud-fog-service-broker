@@ -656,7 +656,7 @@ def start_exn_connector_in_background():
                         username=os.getenv('NEBULOUS_BROKER_USERNAME'), password=os.getenv('NEBULOUS_BROKER_PASSWORD'),
                         handler=Bootstrap(),
                         publishers=[
-                            SyncedPublisher('SAL-GET', addressSAL_GET, True, True),
+                            SyncedPublisher('SAL-GET', addressSAL_GET, True, True,timeout=120),
                             core.publisher.Publisher('SendToOPT', addressSendToOPT, True, True),
                             core.publisher.Publisher('SendToOPTMulti', addressSendToOPTMulti, True, True),
                             SyncedPublisher('OPT-Triggering-Multi', addressOPTtriggeringMulti, True, True), # Publisher for OTP multi
