@@ -871,6 +871,9 @@ def process_sal_reply(context, RequestToSal, list_number, unique_nodes_dict):
     """
     # Send request to SAL
     sal_reply = context.publishers['SAL-GET'].send_sync(RequestToSal)
+    if sal_reply is None:
+        logging.error(f"[ERROR] SAL-GET request failed for List {list_number}")
+        return None
     logging.info(f"[SAL] Response received for List {list_number}: {sal_reply}")
 
     # Extract 'body' safely
