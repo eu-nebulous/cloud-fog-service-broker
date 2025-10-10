@@ -485,18 +485,16 @@ def extract_SAL_node_candidate_data(json_data_all, app_data, app_id, selected_cr
     if app_specific == "0" or not app_specific or app_id == "dummy-application-id-123": # All Applications
         print(f"[Request {correlation_id_optimizer} - Filtering for all applications")
         # Keep only nodes for all applications  # json_data = [node for node in json_data_all if is_for_all_applications(node)]
-        # Keep only nodes for all applications and IAAS (CLOUDS) nodes
+        # Keep only EDGE nodes for all applications and the specific appID and all IAAS (CLOUDS) nodes
         json_data = [
             node for node in json_data_all
             if is_for_all_applications(node) or matches_application_id(node, app_id) or node.get("nodeCandidateType", "") == "IAAS"
         ]
     else:
-        # Keep only nodes for specific applications that match application_id
+        # Keep only EDGE nodes for specific applications that match application_id and all IAAS nodes
         print(f"[Request {correlation_id_optimizer} - Filtering for specific application: {app_id}")
         json_data = [
-            # node for node in json_data_all if matches_application_id(node, app_id)
-            # if matches_application_id(node, app_id) or node.get("nodeCandidateType", "") == "IAAS"
-            node for node in json_data_all if isinstance(node, dict) and matches_application_id(node, app_id)
+             node for node in json_data_all if matches_application_id(node, app_id) or node.get("nodeCandidateType", "") == "IAAS"
         ]
         # print("USE ONLY app_specific NODES")
 
