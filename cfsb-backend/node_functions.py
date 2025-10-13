@@ -43,8 +43,7 @@ def extract_SAL_node_candidate_data_Front(json_data_all, app_specific, app_id):
     else:
         # Keep only nodes for specific applications that match application_id, and IAAS nodes
         json_data = [
-            node for node in json_data_all if matches_application_id(node, app_id)
-            # if matches_application_id(node, app_id) or node.get("nodeCandidateType", "") == "IAAS"
+            node for node in json_data_all if matches_application_id(node, app_id) or node.get("nodeCandidateType", "") == "IAAS"
         ]
         print("USE ONLY app_specific NODES")
         if len(json_data) < 1:
