@@ -8,7 +8,7 @@ def create_app():
     app = Flask(__name__)
     #CORS(app)
     CORS(app, supports_credentials=True)  # Enable CORS and allow credentials
-    #CORS(app, resource={r"/*":{"origins":"*"}})
+    CORS(app, resource={r"/*":{"origins":"*"}})
     #CORS(app, resources={r"/api/*": {"origins": "*"}})
     app.register_blueprint(main_routes)
     return app
