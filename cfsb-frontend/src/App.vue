@@ -71,6 +71,7 @@
 
     <footer class="footer text-center p-2">
       <span class="text-white">&copy NebulOus - Cloud Fog Service Broker</span>
+      <span class="color-primary"> - V 6.3</span>
     </footer>
   </div>
 </template>
