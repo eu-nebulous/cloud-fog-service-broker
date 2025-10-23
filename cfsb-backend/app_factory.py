@@ -6,10 +6,12 @@ import logging
 def create_app():
     logging.info("Creating the application")
     app = Flask(__name__)
-    #CORS(app)
-    CORS(app, supports_credentials=True)  # Enable CORS and allow credentials
-    CORS(app, resource={r"/*":{"origins":"*"}})
-    #CORS(app, resources={r"/api/*": {"origins": "*"}})
+    cors_allowed_origins = [
+        "https://cfsb.cd.nebulouscloud.eu",
+        "https://cfsb.dev.nebulouscloud.eu",
+        "https://cfsb.prod.nebulouscloud.eu",
+    ]
+    CORS(app, resources={r"/*": {"origins": cors_allowed_origins}}, supports_credentials=True)  # Enable CORS and allow credentials
     app.register_blueprint(main_routes)
     return app
 
