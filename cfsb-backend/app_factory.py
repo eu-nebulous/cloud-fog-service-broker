@@ -11,7 +11,7 @@ def create_app():
         "https://cfsb.dev.nebulouscloud.eu",
         "https://cfsb.prod.nebulouscloud.eu",
     ]
-    CORS(app, resources={r"/*": {"origins": cors_allowed_origins}}, supports_credentials=True)  # Enable CORS and allow credentials
+    CORS(app, resources={r"/*": {"origins": cors_allowed_origins}})  # Enable CORS
     app.register_blueprint(main_routes)
     return app
 
