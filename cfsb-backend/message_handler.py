@@ -105,8 +105,7 @@ class SyncedHandler(Handler):
         try:
             ## Prepare message to be send to SAL - remove locations if needed
             body_json_string, locations = remove_request_attribute('CFSB-datasource-geolocations', json.loads(body_json_string))
-            if locations:
-                body_json_string = json.dumps(body_json_string)  # Convert the body data to a JSON string
+            body_json_string = json.dumps(body_json_string)  # Convert the body data to a JSON string
 
             RequestToSal = {  # Dictionary
                 "metaData": {"user": "admin"},  # key [String "metaData"] value [dictionary]
@@ -137,6 +136,9 @@ class SyncedHandler(Handler):
 
             status = sal_reply.get('metaData', {}).get('status', None)
 
+            if status != 200:
+                print("SAL reply message status: " + str(status))
+                print(sal_reply)
             if sal_reply and status == 200:
                 sal_body = sal_reply.get('body')
                 try:
@@ -616,8 +618,15 @@ class SyncedHandler(Handler):
         key = RequestData.get('key')
         application_id = RequestData.get('application_id')
         # If body is a list with one element, extract that element
-        if isinstance(body, list) and len(body) == 1:
-            body = body[0]  # Get the first dictionary from the list
+        # if isinstance(body, list) and len(body) == 1:
+        #     body = body[0]  # Get the first dictionary from the list
+        if isinstance(body, list):
+            body = {"body": body}
+        elif isinstance(body, dict):
+            body = body
+        else:
+            body = {}
+
         reply = Context.publishers[key].send_sync(body, application_id)
         return reply
 
