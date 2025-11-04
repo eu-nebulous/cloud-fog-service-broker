@@ -5,7 +5,8 @@ export default {
     return {
       policyChoice: 0,
       nodesModeChoice: 1,
-      validNodesModeChoice: false
+      validNodesModeChoice: false,
+      application_id: "dummy-application-id-123",
     }
   },
   methods: {
@@ -38,6 +39,7 @@ export default {
     get_project_choices() {
       localStorage.setItem('policyChoice', this.policyChoice);
       localStorage.setItem('nodesModeChoice', this.nodesModeChoice);
+      this.application_id = localStorage.getItem('fog_broker_app_id');
       this.validNodesModeChoice = this.verifyNMC_with_AppID();
       console.log(this.validNodesModeChoice);
       if (this.validNodesModeChoice) {
@@ -62,8 +64,8 @@ export default {
       }
     },
     submitAppIDForm() {
-      if (this.app_id){
-        localStorage.setItem('fog_broker_app_id', this.app_id);
+      if (this.application_id){
+        localStorage.setItem('fog_broker_app_id', this.application_id);
       }
       let elem = this.$refs.modalCloseBtn
       // elem.click()
@@ -160,18 +162,19 @@ export default {
 
             <form @submit.prevent="submitAppIDForm">
               <div class="mb-3">
-                <label for="app_id" class="form-label">Change Application ID</label>
-                <input type="text" class="form-control" id="app_id" v-model="app_id" placeholder="Application ID" required>
+                <label for="application_id" class="form-label">Change Application ID</label>
+                <input type="text" class="form-control" id="application_id" v-model="application_id" placeholder="Application ID" required>
               </div>
 
-              <button type="submit" class="btn btn-success">Submit</button>
+              <button type="submit" class="btn btn-success" data-bs-dismiss="modal">Submit</button>
             </form>
 
-            <div v-if="!validNodesModeChoice" class="alert alert-danger">Error: The combination of App Specific Nodes with no App ID given (dummy-application-id-123) might not return any nodes</div>
+            <div v-if="!validNodesModeChoice" class="alert alert-danger">Error: The combination of App Specific Nodes with no App ID or <span class="fw-bold" v-text="this.application_id"></span> given, will fetch nodes available for <span class="fw-bold">ALL Applications</span></div>
+            <div class="alert alert-info">Please type a valid app-id and click Submit or leave it blank (for ALL Applications) and click Accept & Close</div>
 
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" ref="modalCloseBtn">Accept & Close</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Accept & Close</button>
           </div>
         </div>
       </div>

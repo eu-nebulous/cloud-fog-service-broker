@@ -32,7 +32,7 @@ def extract_SAL_node_candidate_data_Front(json_data_all, app_specific, app_id):
     # app_id = "123456789"
 
     # Filter the json_data_all based on app_specific
-    if app_specific == "0" or not app_specific: # When all nodes chosen, we give only the nodes for all applications.
+    if app_specific == "0" or not app_specific or app_id == "dummy-application-id-123": # When all nodes chosen, we give only the nodes for all applications.
         print("ENTERED app_specific == 0")
         # Keep only nodes for all applications  # json_data = [node for node in json_data_all if is_for_all_applications(node)]
         # Keep only nodes for all applications and IAAS (CLOUDS) nodes
@@ -348,6 +348,17 @@ def matches_application_id(node, application_id):
     parts = name.split("|")
     return len(parts) > 1 and parts[1] == application_id
 
+# Function to extract the enabled resources for an Application ID - Used for IAAS nodes.
+# returns a list of the uuids (uuid is the cloud id on the node data)
+def get_enabled_resources(response):
+    resources = response.get("resources", [])
+    enabled_resources = []
+    for resource in resources:
+        resource_status = resource.get("enabled")
+        if resource_status:
+            enabled_resources.append(resource["uuid"])
+    return enabled_resources
+
 # Used to convert RAM and # of Cores, i.e., 1/X
 def convert_data_table(created_data_table):
     # Check if 'Number of CPU Cores' exists in the dictionary and convert its values
@@ -493,7 +504,7 @@ def extract_SAL_node_candidate_data(json_data_all, app_data, app_id, selected_cr
         # Keep only EDGE nodes for specific applications that match application_id and all IAAS nodes
         print(f"[Request {correlation_id_optimizer} - Filtering for specific application: {app_id}")
         json_data = [
-             node for node in json_data_all if matches_application_id(node, app_id) or node.get("nodeCandidateType", "") == "IAAS"
+            node for node in json_data_all if matches_application_id(node, app_id) or node.get("nodeCandidateType", "") == "IAAS"
         ]
         # print("USE ONLY app_specific NODES")
 

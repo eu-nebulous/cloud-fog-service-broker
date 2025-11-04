@@ -630,12 +630,36 @@ class SyncedHandler(Handler):
         reply = Context.publishers[key].send_sync(body, application_id)
         return reply
 
+    def request_sal_resources(self, RequestToSal):
+        print("reached request_sal_resources")
+        try:
+            sal_reply = Context.publishers['APP-GET'].send_sync(RequestToSal)
+            # Process SAL's Reply
+            if sal_reply is not None and sal_reply != '':
+                return sal_reply
+            else:
+                return None
+        except Exception as e:
+            print(f"Error while requesting SAL: {e}")
+            return None
+
+    def nodecandidates_resources(self, RequestData):
+        body = RequestData.get('body')
+        key = RequestData.get('key')
+        application_id = RequestData.get('application_id')
+        reply = Context.publishers[key].send_sync(body)
+        print(reply)
+        return reply
+
 
 class Bootstrap(ConnectorHandler):
     context = None
 
     def ready(self, context: Context):
         self.context = context
+        # print("send app-get")
+        # app_reply = context.publishers['APP-GET'].send_sync({"appId": "b5a47a85-37f3-4b7a-befe-92f2a7b34d07"})
+        # print(app_reply)
         # Start the heartbeat to check connectivity with ActiveMQ
         # start_heartbeat(self.context)
 def start_exn_connector_in_background():
@@ -649,6 +673,7 @@ def start_exn_connector_in_background():
         addressOPTtriggeringMulti = 'eu.nebulouscloud.cfsb.get_node_candidates_multi'
         addressSendToOPT = 'eu.nebulouscloud.cfsb.get_node_candidates.reply'
         addressSendToOPTMulti = 'eu.nebulouscloud.cfsb.get_node_candidates_multi.reply'
+        addressNodeCandidatesResources = 'eu.nebulouscloud.ui.app.get'
         print(f"Init EXN connector with parameters: url={os.getenv('NEBULOUS_BROKER_URL')}, port={os.getenv('NEBULOUS_BROKER_PORT')}, username={os.getenv('NEBULOUS_BROKER_USERNAME')}")
         connector = EXN('ui', url=os.getenv('NEBULOUS_BROKER_URL'), port=os.getenv('NEBULOUS_BROKER_PORT'),
                         username=os.getenv('NEBULOUS_BROKER_USERNAME'), password=os.getenv('NEBULOUS_BROKER_PASSWORD'),
@@ -658,14 +683,15 @@ def start_exn_connector_in_background():
                             core.publisher.Publisher('SendToOPT', addressSendToOPT, True, True),
                             core.publisher.Publisher('SendToOPTMulti', addressSendToOPTMulti, True, True),
                             SyncedPublisher('OPT-Triggering-Multi', addressOPTtriggeringMulti, True, True), # Publisher for OTP multi
-                            SyncedPublisher('OPT-Triggering', addressOPTtriggering, True, True) # Publisher for OTP
+                            SyncedPublisher('OPT-Triggering', addressOPTtriggering, True, True), # Publisher for OTP
+                            SyncedPublisher('APP-GET', addressNodeCandidatesResources, True, True, timeout=120),
                         ],
                         consumers=[
                             # Consumer('SAL-GET-REPLY', addressSAL_GET, handler=SyncedHandler(), topic=True, fqdn=True),
                             Consumer('OPT-Triggering', addressOPTtriggering, handler=SyncedHandler(), topic=True,
                                      fqdn=True),
                             Consumer('OPT-Triggering-Multi', addressOPTtriggeringMulti, handler=SyncedHandler(),
-                                     topic=True, fqdn=True)
+                                     topic=True, fqdn=True),
                         ])
         connector.start()
 
@@ -684,6 +710,15 @@ def call_publisher(body):
 def call_otp_publisher(data):
     handler = SyncedHandler()
     request = handler.requestEmulate(data)
+    return request
+
+def call_resources_publisher(data):
+    handler = SyncedHandler()
+    # For frontend request
+    request = handler.request_sal_resources(data)
+
+    # For postman call use this
+    # request = handler.nodecandidates_resources(data)
     return request
 
 # def safe_send_sync(publisher, message, *args, **kwargs):
