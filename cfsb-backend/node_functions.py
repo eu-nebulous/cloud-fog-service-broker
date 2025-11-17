@@ -950,7 +950,7 @@ def process_sal_reply(context, RequestToSal, list_number, unique_nodes_dict):
         dict: A processed response dictionary containing nodes or an error message.
     """
     # Send request to SAL
-    sal_reply = context.publishers['SAL-GET'].send_sync(RequestToSal)
+    sal_reply = context.publishers['SAL-GET'].send_sync(RequestToSal,"CFSB")
     if sal_reply is None:
         logging.error(f"[ERROR] SAL-GET request failed for List {list_number}")
         return None

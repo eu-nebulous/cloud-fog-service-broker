@@ -112,7 +112,7 @@ class SyncedHandler(Handler):
                 "body": body_json_string  # key [String "body"] value [JSON String]
             }
             print(f"[Request {request_id}] Sending to SAL: {RequestToSal}")
-            sal_reply = context.publishers['SAL-GET'].send_sync(RequestToSal)
+            sal_reply = context.publishers['SAL-GET'].send_sync(RequestToSal,application_id_optimizer)
             if sal_reply is None:
                 context.get_publisher('SendToOPTMulti').send({"success": False, "message": "SAL-GET request failed"},
                                                              application_id_optimizer,
@@ -341,7 +341,7 @@ class SyncedHandler(Handler):
                 ## Prepare message to be sent to SAL
                 RequestToSal = {"metaData": {"user": "admin"}, "body": requirement}
                 print(f"[Request {request_id}] Sending to SAL: {RequestToSal}")
-                sal_reply = context.publishers['SAL-GET'].send_sync(RequestToSal)
+                sal_reply = context.publishers['SAL-GET'].send_sync(RequestToSal,application_id_optimizer)
                 if sal_reply is None:
                     context.get_publisher('SendToOPTMulti').send(
                         {"success": False, "message": "SAL-GET request failed"}, application_id_optimizer,
@@ -600,7 +600,7 @@ class SyncedHandler(Handler):
 
     def requestSAL(self, RequestToSal):
         try:
-            sal_reply = Context.publishers['SAL-GET'].send_sync(RequestToSal)
+            sal_reply = Context.publishers['SAL-GET'].send_sync(RequestToSal,"CFSB")
             # Process SAL's Reply
             status = sal_reply.get('metaData', {}).get('status', None)
             if sal_reply is not None and sal_reply != '' and status == 200:
@@ -633,7 +633,7 @@ class SyncedHandler(Handler):
     def request_sal_resources(self, RequestToSal):
         print("reached request_sal_resources")
         try:
-            sal_reply = Context.publishers['APP-GET'].send_sync(RequestToSal)
+            sal_reply = Context.publishers['APP-GET'].send_sync(RequestToSal,"CFSB")
             # Process SAL's Reply
             if sal_reply is not None and sal_reply != '':
                 return sal_reply
@@ -647,7 +647,7 @@ class SyncedHandler(Handler):
         body = RequestData.get('body')
         key = RequestData.get('key')
         application_id = RequestData.get('application_id')
-        reply = Context.publishers[key].send_sync(body)
+        reply = Context.publishers[key].send_sync(body,application_id)
         print(reply)
         return reply
 
@@ -657,7 +657,8 @@ class Bootstrap(ConnectorHandler):
 
     def ready(self, context: Context):
         self.context = context
-        # print("send app-get")
+        print("ready")
+            
         # app_reply = context.publishers['APP-GET'].send_sync({"appId": "b5a47a85-37f3-4b7a-befe-92f2a7b34d07"})
         # print(app_reply)
         # Start the heartbeat to check connectivity with ActiveMQ
