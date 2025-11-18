@@ -4,7 +4,9 @@ export default {
   data() {
     return {
       policyChoice: 0,
-      nodesModeChoice: 0,
+      nodesModeChoice: 1,
+      validNodesModeChoice: false,
+      application_id: "dummy-application-id-123",
     }
   },
   methods: {
@@ -37,13 +39,36 @@ export default {
     get_project_choices() {
       localStorage.setItem('policyChoice', this.policyChoice);
       localStorage.setItem('nodesModeChoice', this.nodesModeChoice);
-      this.$router.push({
-        name: "CriteriaSelection",
-        params: {
-          policyChoice: this.policyChoice,
-          nodesModeChoice: this.nodesModeChoice,
-        },
-      });
+      this.application_id = localStorage.getItem('fog_broker_app_id');
+      this.validNodesModeChoice = this.verifyNMC_with_AppID();
+      console.log(this.validNodesModeChoice);
+      if (this.validNodesModeChoice) {
+        console.log("valid")
+        this.$router.push({
+          name: "CriteriaSelection",
+          params: {
+            policyChoice: this.policyChoice,
+            nodesModeChoice: this.nodesModeChoice,
+          },
+        });
+      } else {
+        let myModal = new bootstrap.Modal(document.getElementById('invalidNMCModal'));
+        myModal.show();
+      }
+    },
+    verifyNMC_with_AppID(){
+      if (this.nodesModeChoice === 1 && localStorage.getItem('fog_broker_app_id') === "dummy-application-id-123" || this.nodesModeChoice === 1 && !localStorage.getItem('fog_broker_app_id')) {
+        return false;
+      } else {
+        return true;
+      }
+    },
+    submitAppIDForm() {
+      if (this.application_id){
+        localStorage.setItem('fog_broker_app_id', this.application_id);
+      }
+      let elem = this.$refs.modalCloseBtn
+      // elem.click()
     }
   },
   mounted() {
@@ -98,11 +123,11 @@ export default {
             </p>
             <form>
               <div class="form-check">
-              <input v-model="nodesModeChoice" @change="onChoiceChange" class="form-check-input" type="radio" name="nodes_mode_choice" id="nodes_choice_all" value="0" checked>
+              <input v-model="nodesModeChoice" @change="onChoiceChange" class="form-check-input" type="radio" name="nodes_mode_choice" id="nodes_choice_all" value="0">
               <label class="form-check-label" for="nodes_choice_all">All Available Nodes</label>
               </div>
               <div class="form-check">
-                <input v-model="nodesModeChoice" @change="onChoiceChange" class="form-check-input" type="radio" name="nodes_mode_choice" id="nodes_choice_own" value="1">
+                <input v-model="nodesModeChoice" @change="onChoiceChange" class="form-check-input" type="radio" name="nodes_mode_choice" id="nodes_choice_own" value="1" checked>
                 <label class="form-check-label" for="nodes_choice_own">Application Specific Nodes</label>
               </div>
             </form>
@@ -124,6 +149,38 @@ export default {
         <img src="/images/Broker.png" class="img-fluid border-radius-md" alt="...">
       </div>
     </div>
+
+    <!-- Invalid nodes mode choice modal -->
+    <div class="modal fade" id="invalidNMCModal" aria-hidden="false">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title">Invalid Nodes Mode Choice</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+
+            <form @submit.prevent="submitAppIDForm">
+              <div class="mb-3">
+                <label for="application_id" class="form-label">Change Application ID</label>
+                <input type="text" class="form-control" id="application_id" v-model="application_id" placeholder="Application ID" required>
+              </div>
+
+              <button type="submit" class="btn btn-success" data-bs-dismiss="modal">Submit</button>
+            </form>
+
+            <div v-if="!validNodesModeChoice" class="alert alert-danger">Error: The combination of App Specific Nodes with no App ID or <span class="fw-bold" v-text="this.application_id"></span> given, will fetch nodes available for <span class="fw-bold">ALL Applications</span></div>
+            <div class="alert alert-info">Please type a valid app-id and click Submit or leave it blank (for ALL Applications) and click Accept & Close</div>
+
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Accept & Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- end modal -->
+
   </div>
 
 </template>

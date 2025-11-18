@@ -5,12 +5,25 @@ import Evaluation from '@/components/Evaluation.vue'; // Import the Evaluation c
 import WR from '@/components/WR.vue';
 import Results from '@/components/Results.vue'; // Import the Results component
 import HomePage from "@/components/HomePage.vue";
+import Policy from "@/components/Policy.vue";
+import NodesMode from "@/components/NodesMode.vue";
+import DefinedCriteria from "@/components/DefinedCriteria.vue";
 
 const routes = [
     {
         path: '/',
         name: 'HomePage',
         component: HomePage
+    },
+    {
+        path: '/nodes-mode-selection',
+        name: 'NodesMode',
+        component: NodesMode
+    },
+    {
+        path: '/policy-selection',
+        name: 'Policy',
+        component: Policy
     },
     {
         path: '/criteria-selection',
@@ -34,6 +47,11 @@ const routes = [
         path: '/results',
         name: 'Results',
         component: Results // Route for the Results component
+    },
+    {
+        path: '/defined-criteria',
+        name: 'DefinedCriteria',
+        component: DefinedCriteria // Route for the Results component
     }
 ];
 

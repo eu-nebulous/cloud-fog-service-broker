@@ -62,6 +62,8 @@
 export const backendURL = import.meta.env.VITE_BACKEND_URL;
 const apiURL = backendURL;
 import DefinedCriteria from "@/components/DefinedCriteria.vue";
+import { useNodeStore } from "@/stores/nodeStore.js";
+
 export default {
   components: {DefinedCriteria},
   data() {
@@ -225,13 +227,19 @@ export default {
           }))
         }));
 
+        const nodeStore = useNodeStore();
+
         const DataforWR = JSON.stringify(formattedGridData);
-        localStorage.setItem('gridData', DataforWR); // Save gridData to localStorage
+        // localStorage.setItem('gridData', DataforWR); // Save gridData to localStorage
         // console.log("Save DataforWR DataGrid.VUE to localstorage:", JSON.stringify(JSON.parse(DataforWR), null, 2));
+        // new code to use store --  commented the setItem line: setItem('gridData', DataforWR).
+        nodeStore.setGridData(DataforWR);
 
         // Save the NodeNames to localStorage
         const NodeNames = JSON.stringify(this.NodeNames);
-        localStorage.setItem('NodeNames', NodeNames);
+        // localStorage.setItem('NodeNames', NodeNames);
+        // New code. Try to store them in state -- commented above line
+        nodeStore.setNodeNames(NodeNames);
 
         // Navigate to WR component with prepared data and NodeNames
         this.$router.push({

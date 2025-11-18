@@ -22,7 +22,7 @@ import os
 import time
 from proton import Message
 
-VALID_AWS_INSTANCE_TYPES ="c6a.24xlarge, g5.2xlarge, r7iz.12xlarge, g6.24xlarge, m4.4xlarge, m5ad.12xlarge, u7i-6tb.112xlarge, m6idn.large, i3en.3xlarge, r6in.24xlarge, c3.large, c4.4xlarge, t2.2xlarge, m6id.xlarge, c6a.16xlarge, r6a.2xlarge, r3.large, r7iz.8xlarge, r5.24xlarge, i7ie.18xlarge, d3en.2xlarge, m5n.16xlarge, m6id.2xlarge, r7a.2xlarge, x1e.2xlarge, m6a.2xlarge, r6a.metal, m5zn.2xlarge, m7i-flex.12xlarge, r5dn.8xlarge, c5ad.24xlarge, c6in.24xlarge, r5a.2xlarge, r7iz.16xlarge, r6id.16xlarge, g6e.48xlarge, f1.2xlarge, c6in.xlarge, r5n.12xlarge, r6a.xlarge, c7i.2xlarge, r7a.xlarge, c5n.2xlarge, m7i.metal-24xl, g6e.8xlarge, x2iedn.2xlarge, r6idn.16xlarge, m7i.16xlarge, i3en.12xlarge, i7ie.24xlarge, inf2.48xlarge, i4i.16xlarge, g5.4xlarge, c6id.8xlarge, c6i.32xlarge, x1e.8xlarge, t1.micro, x2iezn.4xlarge, m2.4xlarge, r5a.xlarge, r6i.xlarge, m5a.16xlarge, c7a.xlarge, trn1.32xlarge, m5a.2xlarge, c3.8xlarge, m5dn.12xlarge, r6in.metal, m5d.xlarge, i3en.24xlarge, r6id.12xlarge, x2iedn.xlarge, c5ad.12xlarge, i7ie.xlarge, m6id.32xlarge, c6i.2xlarge, r7iz.xlarge, m7i.8xlarge, m5zn.6xlarge, m5zn.large, m6idn.12xlarge, r7a.4xlarge, r6idn.xlarge, m6idn.4xlarge, r3.8xlarge, r6in.12xlarge, inf2.8xlarge, z1d.2xlarge, trn1n.32xlarge, m5dn.2xlarge, d3en.8xlarge, t3a.2xlarge, c4.8xlarge, m5ad.large, c6i.4xlarge, trn1.2xlarge, m7a.xlarge, c7a.large, c7i-flex.16xlarge, c7a.medium, r6idn.8xlarge, c5.4xlarge, i4i.24xlarge, m6a.large, i2.2xlarge, m5d.8xlarge, r5b.12xlarge, m6id.12xlarge, c5d.large, c7i-flex.8xlarge, r7a.32xlarge, x1e.32xlarge, r6id.xlarge, c6id.24xlarge, m7i.2xlarge, m5.24xlarge, c6a.48xlarge, m6i.24xlarge, c6i.8xlarge, c7i.8xlarge, m5.12xlarge, c5n.large, c6i.large, m7i.24xlarge, x1.16xlarge, d2.8xlarge, r6idn.2xlarge, c6a.32xlarge, m7i-flex.2xlarge, r4.16xlarge, r6id.2xlarge, m5dn.large, m6i.large, r7iz.32xlarge, c5ad.4xlarge, m5a.4xlarge, m5.8xlarge, r5ad.24xlarge, m5ad.4xlarge, c5d.12xlarge, c7i-flex.2xlarge, r7i.metal-48xl, c7a.metal-48xl, u7i-12tb.224xlarge, c6in.12xlarge, p2.8xlarge, m5d.16xlarge, m6in.12xlarge, r5a.16xlarge, m5d.large, m5d.metal, c5n.4xlarge, r5b.metal, c6id.large, x2idn.24xlarge, m6in.32xlarge, g6.8xlarge, i7ie.3xlarge, r5n.4xlarge, g4dn.12xlarge, r6id.4xlarge, g6.48xlarge, m5.xlarge, c7a.2xlarge, m2.2xlarge, c6in.16xlarge, c5ad.16xlarge, c7a.4xlarge, g4ad.8xlarge, g4ad.2xlarge, c5a.4xlarge, t3.2xlarge, u-3tb1.56xlarge, g5.24xlarge, g4dn.metal, m6in.16xlarge, r6i.24xlarge, m5.metal, i4i.4xlarge, m5dn.xlarge, r5ad.8xlarge, r5ad.12xlarge, inf1.xlarge, m7a.32xlarge, r7a.large, m7a.16xlarge, t3.medium, r7a.medium, m6a.metal, m6in.24xlarge, t3.xlarge, z1d.xlarge, c5.xlarge, r5a.large, i7ie.12xlarge, r6idn.24xlarge, c6i.24xlarge, g4ad.4xlarge, r7iz.metal-16xl, r6a.12xlarge, d3.8xlarge, d2.2xlarge, m5ad.2xlarge, c5a.12xlarge, x2iezn.8xlarge, r7i.16xlarge, t3a.small, r5a.12xlarge, r6a.32xlarge, r6in.large, c5d.2xlarge, m5ad.8xlarge, g6e.16xlarge, m6i.8xlarge, i4i.metal, m5dn.8xlarge, r6i.4xlarge, c4.large, m6idn.xlarge, r7i.2xlarge, p3.2xlarge, d3en.4xlarge, r5b.large, r5ad.large, c6a.8xlarge, c5n.9xlarge, d3.2xlarge, m7i.48xlarge, x2iedn.metal, r5.large, r5n.16xlarge, vt1.6xlarge, c7a.12xlarge, h1.2xlarge, u-12tb1.112xlarge, c7i.16xlarge, vt1.3xlarge, c5ad.xlarge, r5.4xlarge, r5b.24xlarge, m6i.metal, c7a.8xlarge, h1.8xlarge, m6i.16xlarge, c6in.8xlarge, c6i.16xlarge, c7i-flex.4xlarge, r5dn.xlarge, m5zn.3xlarge, t3.large, r7i.8xlarge, g6e.12xlarge, m5n.12xlarge, m4.xlarge, t2.micro, r7i.12xlarge, m5n.8xlarge, r5d.4xlarge, c7i-flex.xlarge, c5.12xlarge, inf1.6xlarge, c5a.2xlarge, c5d.24xlarge, t3a.medium, r6a.8xlarge, c6a.12xlarge, i7ie.48xlarge, r5.metal, i4i.2xlarge, c6in.2xlarge, c5a.24xlarge, c6id.16xlarge, u7in-24tb.224xlarge, r3.2xlarge, r6id.32xlarge, d3.xlarge, c7i.metal-24xl, r3.4xlarge, t2.large, m4.large, c7i.xlarge, c5a.xlarge, inf2.24xlarge, c7i.large, r5a.4xlarge, u-6tb1.56xlarge, inf1.2xlarge, m6i.32xlarge, c4.2xlarge, m6in.4xlarge, c7i.24xlarge, m5zn.12xlarge, r7a.24xlarge, m6a.4xlarge, m5d.24xlarge, m5n.metal, c5.metal, c3.xlarge, m5n.large, r7i.metal-24xl, r6a.48xlarge, u-24tb1.112xlarge, d3en.6xlarge, r5d.large, c5ad.2xlarge, i2.xlarge, u-6tb1.112xlarge, r5.16xlarge, c7i-flex.12xlarge, m6in.metal, m5.4xlarge, r5n.24xlarge, m3.xlarge, m5n.4xlarge, c6id.32xlarge, x2idn.metal, c5.24xlarge, g5.12xlarge, r6a.4xlarge, r5d.xlarge, c7i-flex.large, r5b.4xlarge, m6i.4xlarge, h1.4xlarge, r5d.16xlarge, t3.nano, m5dn.metal, r5dn.metal, c5d.18xlarge, c5.9xlarge, m6idn.32xlarge, m4.16xlarge, m1.xlarge, u7in-16tb.224xlarge, c6in.large, m5a.8xlarge, r7iz.2xlarge, r5n.2xlarge, r4.2xlarge, m7a.medium, p5.48xlarge, c5n.18xlarge, r5d.24xlarge, c5d.4xlarge, x2iezn.12xlarge, p4d.24xlarge, m5zn.metal, r5dn.large, r5b.2xlarge, r6in.32xlarge, r6id.24xlarge, c6a.metal, r5d.2xlarge, h1.16xlarge, r5b.xlarge, c6id.metal, r7i.large, r5dn.12xlarge, t3.micro, m6id.metal, g6.xlarge, i2.8xlarge, x2idn.16xlarge, r5d.8xlarge, c4.xlarge, inf2.xlarge, m7a.4xlarge, m6in.large, c7a.24xlarge, r5b.16xlarge, g6.2xlarge, c7a.48xlarge, m6id.16xlarge, m6idn.2xlarge, g5.16xlarge, m7a.48xlarge, c5a.16xlarge, m5.16xlarge, t3a.large, m7a.8xlarge, z1d.metal, r6i.12xlarge, m6a.16xlarge, r3.xlarge, g4dn.xlarge, x1e.16xlarge, r5.8xlarge, r6idn.large, r6in.4xlarge, z1d.12xlarge, r5.xlarge, m4.2xlarge, c6in.32xlarge, r7a.metal-48xl, i3.xlarge, r6in.8xlarge, r6idn.4xlarge, i3.large, m7i-flex.16xlarge, r6i.16xlarge, r7i.xlarge, c6a.xlarge, m7a.12xlarge, m3.2xlarge, t2.medium, c6a.4xlarge, c5.large, u7i-8tb.112xlarge, m6idn.24xlarge, c5n.metal, m7a.24xlarge, c7i.metal-48xl, c7a.16xlarge, m7i-flex.4xlarge, m6idn.metal, r5ad.2xlarge, m5ad.24xlarge, x2iedn.4xlarge, i2.4xlarge, m6in.xlarge, r4.xlarge, c7a.32xlarge, r5dn.16xlarge, r5ad.16xlarge, m5ad.xlarge, c3.4xlarge, i4i.large, r6a.24xlarge, r6id.large, m7a.2xlarge, m5n.2xlarge, g4dn.16xlarge, r4.8xlarge, vt1.24xlarge, x1e.xlarge, r6idn.metal, m5.large, r5d.metal, m5dn.4xlarge, c5ad.8xlarge, t2.xlarge, x2iezn.6xlarge, c7i.12xlarge, m5a.large, c3.2xlarge, m7i.xlarge, m5zn.xlarge, g6e.4xlarge, c5d.xlarge, m5d.12xlarge, c7i.4xlarge, i3.16xlarge, x2iedn.16xlarge, m5n.24xlarge, d2.4xlarge, r4.large, r5ad.xlarge, p3.16xlarge, c5.2xlarge, r6i.metal, z1d.large, m5.2xlarge, r5.2xlarge, m4.10xlarge, i4i.12xlarge, m5dn.16xlarge, r5n.8xlarge, x2idn.32xlarge, g5.xlarge, c5d.metal, i3en.2xlarge, r7i.24xlarge, i3.8xlarge, r6idn.32xlarge, r5.12xlarge, m5n.xlarge, c6id.12xlarge, m6idn.8xlarge, g4ad.16xlarge, r7iz.metal-32xl, r7a.8xlarge, r5n.xlarge, r6id.8xlarge, x2iezn.metal, g6.12xlarge, c5a.8xlarge, m7i.large, f2.48xlarge, r5ad.4xlarge, z1d.6xlarge, m6i.xlarge, m5dn.24xlarge, m6id.4xlarge, x2iedn.24xlarge, r6id.metal, x2iezn.2xlarge, r6in.16xlarge, dl1.24xlarge, g6.16xlarge, m7i-flex.8xlarge, r6a.16xlarge, c6in.4xlarge, m5d.2xlarge, c5ad.large, i4i.32xlarge, x1.32xlarge, r6i.8xlarge, m6id.24xlarge, c6id.4xlarge, g6.4xlarge, m5a.xlarge, m6idn.16xlarge, r7a.12xlarge, m6id.8xlarge, m5a.24xlarge, p2.xlarge, m3.medium, m7i.12xlarge, c6a.2xlarge, r6i.32xlarge, r7a.16xlarge, i3.4xlarge, gr6.4xlarge, m7i-flex.large, t3.small, inf1.24xlarge, m6id.large, c6id.xlarge, gr6.8xlarge, r5b.8xlarge, m2.xlarge, m7i.4xlarge, u-18tb1.112xlarge, c6i.metal, i3en.large, r6a.large, g5.48xlarge, m6in.8xlarge, x2iedn.32xlarge, m6a.24xlarge, r7i.48xlarge, f2.12xlarge, m6a.xlarge, m5ad.16xlarge, t2.nano, m3.large, c6id.2xlarge, r5a.24xlarge, m6a.32xlarge, d3.4xlarge, i3.2xlarge, c6i.12xlarge, m6in.2xlarge, m6a.8xlarge, r6idn.12xlarge, x1e.4xlarge, r5a.8xlarge, g6e.xlarge, g6e.2xlarge, p3.8xlarge, t2.small, r5d.12xlarge, r5dn.2xlarge, c6i.xlarge, i4i.xlarge, t3a.nano, i3.metal, p2.16xlarge, u7in-32tb.224xlarge, g5.8xlarge, m7a.metal-48xl, x2iedn.8xlarge, i3en.xlarge, r5dn.4xlarge, r6in.xlarge, m6a.12xlarge, r7i.4xlarge, g6e.24xlarge, c5n.xlarge, r6i.large, g4dn.2xlarge, d3en.12xlarge, d3en.xlarge, c5.18xlarge, g4dn.4xlarge, r7iz.large, m7i.metal-48xl, r7a.48xlarge, i3en.6xlarge, m7a.large, i3en.metal, r5n.large, r7iz.4xlarge, p3dn.24xlarge, i7ie.large, m7i-flex.xlarge, u-9tb1.112xlarge, m1.small, i4i.8xlarge, m6i.2xlarge, g4dn.8xlarge, i7ie.2xlarge, r5dn.24xlarge, c6in.metal, f1.16xlarge, r6in.2xlarge, t3a.xlarge, t3a.micro, c5a.large, m5a.12xlarge, f1.4xlarge, r4.4xlarge, d2.xlarge, m6a.48xlarge, c5d.9xlarge, m1.medium, g4ad.xlarge, m6i.12xlarge, c7i.48xlarge, r5n.metal, m1.large, m5d.4xlarge, c6a.large, r6i.2xlarge, z1d.3xlarge, i7ie.6xlarge"
+VALID_AWS_INSTANCE_TYPES ="g2.2xlarge, c6a.24xlarge, g5.2xlarge, r7iz.12xlarge, g6.24xlarge, m4.4xlarge, m5ad.12xlarge, u7i-6tb.112xlarge, m6idn.large, i3en.3xlarge, r6in.24xlarge, c3.large, c4.4xlarge, t2.2xlarge, m6id.xlarge, c6a.16xlarge, r6a.2xlarge, r3.large, r7iz.8xlarge, r5.24xlarge, i7ie.18xlarge, d3en.2xlarge, m5n.16xlarge, m6id.2xlarge, r7a.2xlarge, x1e.2xlarge, m6a.2xlarge, r6a.metal, m5zn.2xlarge, m7i-flex.12xlarge, r5dn.8xlarge, c5ad.24xlarge, c6in.24xlarge, r5a.2xlarge, r7iz.16xlarge, r6id.16xlarge, g6e.48xlarge, f1.2xlarge, c6in.xlarge, r5n.12xlarge, r6a.xlarge, c7i.2xlarge, r7a.xlarge, c5n.2xlarge, m7i.metal-24xl, g6e.8xlarge, x2iedn.2xlarge, r6idn.16xlarge, m7i.16xlarge, i3en.12xlarge, i7ie.24xlarge, inf2.48xlarge, i4i.16xlarge, g5.4xlarge, c6id.8xlarge, c6i.32xlarge, x1e.8xlarge, t1.micro, x2iezn.4xlarge, m2.4xlarge, r5a.xlarge, r6i.xlarge, m5a.16xlarge, c7a.xlarge, trn1.32xlarge, m5a.2xlarge, c3.8xlarge, m5dn.12xlarge, r6in.metal, m5d.xlarge, i3en.24xlarge, r6id.12xlarge, x2iedn.xlarge, c5ad.12xlarge, i7ie.xlarge, m6id.32xlarge, c6i.2xlarge, r7iz.xlarge, m7i.8xlarge, m5zn.6xlarge, m5zn.large, m6idn.12xlarge, r7a.4xlarge, r6idn.xlarge, m6idn.4xlarge, r3.8xlarge, r6in.12xlarge, inf2.8xlarge, z1d.2xlarge, trn1n.32xlarge, m5dn.2xlarge, d3en.8xlarge, t3a.2xlarge, c4.8xlarge, m5ad.large, c6i.4xlarge, trn1.2xlarge, m7a.xlarge, c7a.large, c7i-flex.16xlarge, c7a.medium, r6idn.8xlarge, c5.4xlarge, i4i.24xlarge, m6a.large, i2.2xlarge, m5d.8xlarge, r5b.12xlarge, m6id.12xlarge, c5d.large, c7i-flex.8xlarge, r7a.32xlarge, x1e.32xlarge, r6id.xlarge, c6id.24xlarge, m7i.2xlarge, m5.24xlarge, c6a.48xlarge, m6i.24xlarge, c6i.8xlarge, c7i.8xlarge, m5.12xlarge, c5n.large, c6i.large, m7i.24xlarge, x1.16xlarge, d2.8xlarge, r6idn.2xlarge, c6a.32xlarge, m7i-flex.2xlarge, r4.16xlarge, r6id.2xlarge, m5dn.large, m6i.large, r7iz.32xlarge, c5ad.4xlarge, m5a.4xlarge, m5.8xlarge, r5ad.24xlarge, m5ad.4xlarge, c5d.12xlarge, c7i-flex.2xlarge, r7i.metal-48xl, c7a.metal-48xl, u7i-12tb.224xlarge, c6in.12xlarge, p2.8xlarge, m5d.16xlarge, m6in.12xlarge, r5a.16xlarge, m5d.large, m5d.metal, c5n.4xlarge, r5b.metal, c6id.large, x2idn.24xlarge, m6in.32xlarge, g6.8xlarge, i7ie.3xlarge, r5n.4xlarge, g4dn.12xlarge, r6id.4xlarge, g6.48xlarge, m5.xlarge, c7a.2xlarge, m2.2xlarge, c6in.16xlarge, c5ad.16xlarge, c7a.4xlarge, g4ad.8xlarge, g4ad.2xlarge, c5a.4xlarge, t3.2xlarge, u-3tb1.56xlarge, g5.24xlarge, g4dn.metal, m6in.16xlarge, r6i.24xlarge, m5.metal, i4i.4xlarge, m5dn.xlarge, r5ad.8xlarge, r5ad.12xlarge, inf1.xlarge, m7a.32xlarge, r7a.large, m7a.16xlarge, t3.medium, r7a.medium, m6a.metal, m6in.24xlarge, t3.xlarge, z1d.xlarge, c5.xlarge, r5a.large, i7ie.12xlarge, r6idn.24xlarge, c6i.24xlarge, g4ad.4xlarge, r7iz.metal-16xl, r6a.12xlarge, d3.8xlarge, d2.2xlarge, m5ad.2xlarge, c5a.12xlarge, x2iezn.8xlarge, r7i.16xlarge, t3a.small, r5a.12xlarge, r6a.32xlarge, r6in.large, c5d.2xlarge, m5ad.8xlarge, g6e.16xlarge, m6i.8xlarge, i4i.metal, m5dn.8xlarge, r6i.4xlarge, c4.large, m6idn.xlarge, r7i.2xlarge, p3.2xlarge, d3en.4xlarge, r5b.large, r5ad.large, c6a.8xlarge, c5n.9xlarge, d3.2xlarge, m7i.48xlarge, x2iedn.metal, r5.large, r5n.16xlarge, vt1.6xlarge, c7a.12xlarge, h1.2xlarge, u-12tb1.112xlarge, c7i.16xlarge, vt1.3xlarge, c5ad.xlarge, r5.4xlarge, r5b.24xlarge, m6i.metal, c7a.8xlarge, h1.8xlarge, m6i.16xlarge, c6in.8xlarge, c6i.16xlarge, c7i-flex.4xlarge, r5dn.xlarge, m5zn.3xlarge, t3.large, r7i.8xlarge, g6e.12xlarge, m5n.12xlarge, m4.xlarge, t2.micro, r7i.12xlarge, m5n.8xlarge, r5d.4xlarge, c7i-flex.xlarge, c5.12xlarge, inf1.6xlarge, c5a.2xlarge, c5d.24xlarge, t3a.medium, r6a.8xlarge, c6a.12xlarge, i7ie.48xlarge, r5.metal, i4i.2xlarge, c6in.2xlarge, c5a.24xlarge, c6id.16xlarge, u7in-24tb.224xlarge, r3.2xlarge, r6id.32xlarge, d3.xlarge, c7i.metal-24xl, r3.4xlarge, t2.large, m4.large, c7i.xlarge, c5a.xlarge, inf2.24xlarge, c7i.large, r5a.4xlarge, u-6tb1.56xlarge, inf1.2xlarge, m6i.32xlarge, c4.2xlarge, m6in.4xlarge, c7i.24xlarge, m5zn.12xlarge, r7a.24xlarge, m6a.4xlarge, m5d.24xlarge, m5n.metal, c5.metal, c3.xlarge, m5n.large, r7i.metal-24xl, r6a.48xlarge, u-24tb1.112xlarge, d3en.6xlarge, r5d.large, c5ad.2xlarge, i2.xlarge, u-6tb1.112xlarge, r5.16xlarge, c7i-flex.12xlarge, m6in.metal, m5.4xlarge, r5n.24xlarge, m3.xlarge, m5n.4xlarge, c6id.32xlarge, x2idn.metal, c5.24xlarge, g5.12xlarge, r6a.4xlarge, r5d.xlarge, c7i-flex.large, r5b.4xlarge, m6i.4xlarge, h1.4xlarge, r5d.16xlarge, t3.nano, m5dn.metal, r5dn.metal, c5d.18xlarge, c5.9xlarge, m6idn.32xlarge, m4.16xlarge, m1.xlarge, u7in-16tb.224xlarge, c6in.large, m5a.8xlarge, r7iz.2xlarge, r5n.2xlarge, r4.2xlarge, m7a.medium, p5.48xlarge, c5n.18xlarge, r5d.24xlarge, c5d.4xlarge, x2iezn.12xlarge, p4d.24xlarge, m5zn.metal, r5dn.large, r5b.2xlarge, r6in.32xlarge, r6id.24xlarge, c6a.metal, r5d.2xlarge, h1.16xlarge, r5b.xlarge, c6id.metal, r7i.large, r5dn.12xlarge, t3.micro, m6id.metal, g6.xlarge, i2.8xlarge, x2idn.16xlarge, r5d.8xlarge, c4.xlarge, inf2.xlarge, m7a.4xlarge, m6in.large, c7a.24xlarge, r5b.16xlarge, g6.2xlarge, c7a.48xlarge, m6id.16xlarge, m6idn.2xlarge, g5.16xlarge, m7a.48xlarge, c5a.16xlarge, m5.16xlarge, t3a.large, m7a.8xlarge, z1d.metal, r6i.12xlarge, m6a.16xlarge, r3.xlarge, g4dn.xlarge, x1e.16xlarge, r5.8xlarge, r6idn.large, r6in.4xlarge, z1d.12xlarge, r5.xlarge, m4.2xlarge, c6in.32xlarge, r7a.metal-48xl, i3.xlarge, r6in.8xlarge, r6idn.4xlarge, i3.large, m7i-flex.16xlarge, r6i.16xlarge, r7i.xlarge, c6a.xlarge, m7a.12xlarge, m3.2xlarge, t2.medium, c6a.4xlarge, c5.large, u7i-8tb.112xlarge, m6idn.24xlarge, c5n.metal, m7a.24xlarge, c7i.metal-48xl, c7a.16xlarge, m7i-flex.4xlarge, m6idn.metal, r5ad.2xlarge, m5ad.24xlarge, x2iedn.4xlarge, i2.4xlarge, m6in.xlarge, r4.xlarge, c7a.32xlarge, r5dn.16xlarge, r5ad.16xlarge, m5ad.xlarge, c3.4xlarge, i4i.large, r6a.24xlarge, r6id.large, m7a.2xlarge, m5n.2xlarge, g4dn.16xlarge, r4.8xlarge, vt1.24xlarge, x1e.xlarge, r6idn.metal, m5.large, r5d.metal, m5dn.4xlarge, c5ad.8xlarge, t2.xlarge, x2iezn.6xlarge, c7i.12xlarge, m5a.large, c3.2xlarge, m7i.xlarge, m5zn.xlarge, g6e.4xlarge, c5d.xlarge, m5d.12xlarge, c7i.4xlarge, i3.16xlarge, x2iedn.16xlarge, m5n.24xlarge, d2.4xlarge, r4.large, r5ad.xlarge, p3.16xlarge, c5.2xlarge, r6i.metal, z1d.large, m5.2xlarge, r5.2xlarge, m4.10xlarge, i4i.12xlarge, m5dn.16xlarge, r5n.8xlarge, x2idn.32xlarge, g5.xlarge, c5d.metal, i3en.2xlarge, r7i.24xlarge, i3.8xlarge, r6idn.32xlarge, r5.12xlarge, m5n.xlarge, c6id.12xlarge, m6idn.8xlarge, g4ad.16xlarge, r7iz.metal-32xl, r7a.8xlarge, r5n.xlarge, r6id.8xlarge, x2iezn.metal, g6.12xlarge, c5a.8xlarge, m7i.large, f2.48xlarge, r5ad.4xlarge, z1d.6xlarge, m6i.xlarge, m5dn.24xlarge, m6id.4xlarge, x2iedn.24xlarge, r6id.metal, x2iezn.2xlarge, r6in.16xlarge, dl1.24xlarge, g6.16xlarge, m7i-flex.8xlarge, r6a.16xlarge, c6in.4xlarge, m5d.2xlarge, c5ad.large, i4i.32xlarge, x1.32xlarge, r6i.8xlarge, m6id.24xlarge, c6id.4xlarge, g6.4xlarge, m5a.xlarge, m6idn.16xlarge, r7a.12xlarge, m6id.8xlarge, m5a.24xlarge, p2.xlarge, m3.medium, m7i.12xlarge, c6a.2xlarge, r6i.32xlarge, r7a.16xlarge, i3.4xlarge, gr6.4xlarge, m7i-flex.large, t3.small, inf1.24xlarge, m6id.large, c6id.xlarge, gr6.8xlarge, r5b.8xlarge, m2.xlarge, m7i.4xlarge, u-18tb1.112xlarge, c6i.metal, i3en.large, r6a.large, g5.48xlarge, m6in.8xlarge, x2iedn.32xlarge, m6a.24xlarge, r7i.48xlarge, f2.12xlarge, m6a.xlarge, m5ad.16xlarge, t2.nano, m3.large, c6id.2xlarge, r5a.24xlarge, m6a.32xlarge, d3.4xlarge, i3.2xlarge, c6i.12xlarge, m6in.2xlarge, m6a.8xlarge, r6idn.12xlarge, x1e.4xlarge, r5a.8xlarge, g6e.xlarge, g6e.2xlarge, p3.8xlarge, t2.small, r5d.12xlarge, r5dn.2xlarge, c6i.xlarge, i4i.xlarge, t3a.nano, i3.metal, p2.16xlarge, u7in-32tb.224xlarge, g5.8xlarge, m7a.metal-48xl, x2iedn.8xlarge, i3en.xlarge, r5dn.4xlarge, r6in.xlarge, m6a.12xlarge, r7i.4xlarge, g6e.24xlarge, c5n.xlarge, r6i.large, g4dn.2xlarge, d3en.12xlarge, d3en.xlarge, c5.18xlarge, g4dn.4xlarge, r7iz.large, m7i.metal-48xl, r7a.48xlarge, i3en.6xlarge, m7a.large, i3en.metal, r5n.large, r7iz.4xlarge, p3dn.24xlarge, i7ie.large, m7i-flex.xlarge, u-9tb1.112xlarge, m1.small, i4i.8xlarge, m6i.2xlarge, g4dn.8xlarge, i7ie.2xlarge, r5dn.24xlarge, c6in.metal, f1.16xlarge, r6in.2xlarge, t3a.xlarge, t3a.micro, c5a.large, m5a.12xlarge, f1.4xlarge, r4.4xlarge, d2.xlarge, m6a.48xlarge, c5d.9xlarge, m1.medium, g4ad.xlarge, m6i.12xlarge, c7i.48xlarge, r5n.metal, m1.large, m5d.4xlarge, c6a.large, r6i.2xlarge, z1d.3xlarge, i7ie.6xlarge"
 
 logging.getLogger('exn.connector').setLevel(logging.CRITICAL)
 # log_lock = threading.Lock() # Global lock for logging
@@ -86,6 +86,7 @@ class SyncedHandler(Handler):
                         # Ensure all arguments are correctly passed, including context
                         self.handle_multi(application_id_optimizer, request_id, body_sent_from_optimizer, context)
                     except Exception as e:
+                        # print(f"Before Exception {body_sent_from_optimizer}")
                         print(f"Exception in handle_multi [Request ID: {request_id}]: {e}")
                 else: # Single List
                     print(f"[Request {request_id}] The Request contains a Single List or an Empty List")
@@ -104,17 +105,19 @@ class SyncedHandler(Handler):
         try:
             ## Prepare message to be send to SAL - remove locations if needed
             body_json_string, locations = remove_request_attribute('CFSB-datasource-geolocations', json.loads(body_json_string))
-            if locations:
-                body_json_string = json.dumps(body_json_string)  # Convert the body data to a JSON string
+            body_json_string = json.dumps(body_json_string)  # Convert the body data to a JSON string
 
             RequestToSal = {  # Dictionary
                 "metaData": {"user": "admin"},  # key [String "metaData"] value [dictionary]
                 "body": body_json_string  # key [String "body"] value [JSON String]
             }
             print(f"[Request {request_id}] Sending to SAL: {RequestToSal}")
-            sal_reply = context.publishers['SAL-GET'].send_sync(RequestToSal)
+            sal_reply = context.publishers['SAL-GET'].send_sync(RequestToSal,application_id_optimizer)
             if sal_reply is None:
-                context.get_publisher('SendToOPTMulti').send({"success": False,"message": "SAL-GET request failed"}, application_id_optimizer, properties={'correlation_id': correlation_id_optimizer}, raw=True)
+                context.get_publisher('SendToOPTMulti').send({"success": False, "message": "SAL-GET request failed"},
+                                                             application_id_optimizer,
+                                                             properties={'correlation_id': correlation_id_optimizer},
+                                                             raw=True)
                 print(f"[Request {request_id}] SAL-GET request failed")
                 return
 
@@ -133,6 +136,9 @@ class SyncedHandler(Handler):
 
             status = sal_reply.get('metaData', {}).get('status', None)
 
+            if status != 200:
+                print("SAL reply message status: " + str(status))
+                print(sal_reply)
             if sal_reply and status == 200:
                 sal_body = sal_reply.get('body')
                 try:
@@ -165,7 +171,7 @@ class SyncedHandler(Handler):
 
                             # The read_application_data returns int the app_data the policy from the saved file, in order to check it to do the convert or not.
                             app_data, selected_criteria, provider_criteria, relative_wr_data, immediate_wr_data = read_application_data(application_id_optimizer)
-                            extracted_data_SAL, node_ids, node_names, providers = extract_SAL_node_candidate_data(sal_reply_body, app_data, application_id_optimizer, selected_criteria, correlation_id_optimizer)
+                            extracted_data_SAL, node_ids, node_names, providers, filtered_nodes_message = extract_SAL_node_candidate_data(sal_reply_body, app_data, application_id_optimizer, selected_criteria, correlation_id_optimizer)
                             data_table = create_data_table(extracted_data_SAL, selected_criteria, provider_criteria, locations)
                             # print("relative_wr_data:", relative_wr_data)
                             # print("immediate_wr_data:", immediate_wr_data)
@@ -197,8 +203,8 @@ class SyncedHandler(Handler):
                                 }
                                 json_selected_criteria["selectedCriteria"].append(distance_item)
                             selected_criteria = {criterion['title']: criterion for criterion in json_selected_criteria.get('selectedCriteria', [])}
-                            app_data = {"app_specific": 0}
-                            extracted_data_SAL, node_ids, node_names, providers = extract_SAL_node_candidate_data(
+                            app_data = {"app_specific": 1}
+                            extracted_data_SAL, node_ids, node_names, providers, filtered_nodes_message = extract_SAL_node_candidate_data(
                                 sal_reply_body, app_data, application_id_optimizer, selected_criteria, correlation_id_optimizer)
 
                             # Create data_table:
@@ -208,14 +214,14 @@ class SyncedHandler(Handler):
                             relative_wr_data = []
                             immediate_wr_data = []
                             # create default app_data dictionary for policy and app_specific when file not exists for the application
-                            app_data = {'policy': '0', 'app_specific': False}
+                            app_data = {'policy': '0', 'app_specific': True}
 
                         # Check the number of nodes before Evaluation
                         print("There are " + str(len(node_ids)) + " nodes for Evaluation")
                         if len(node_ids) == 0:
                             feasibility = False
                             Message_Results = {
-                                "message": "No resources returned from SAL"
+                                "message": filtered_nodes_message
                             }
                         else:
                             # Convert the original data of RAM and # of Cores, e.g. 1/X, if they are selected
@@ -335,10 +341,12 @@ class SyncedHandler(Handler):
                 ## Prepare message to be sent to SAL
                 RequestToSal = {"metaData": {"user": "admin"}, "body": requirement}
                 print(f"[Request {request_id}] Sending to SAL: {RequestToSal}")
-                sal_reply = context.publishers['SAL-GET'].send_sync(RequestToSal)
+                sal_reply = context.publishers['SAL-GET'].send_sync(RequestToSal,application_id_optimizer)
                 if sal_reply is None:
-                    context.get_publisher('SendToOPTMulti').send({"success": False,"message": "SAL-GET request failed"}, application_id_optimizer, properties={'correlation_id': correlation_id_optimizer}, raw=True)
-                    print(f"[Request {request_id}] SAL-GET request failed")        
+                    context.get_publisher('SendToOPTMulti').send(
+                        {"success": False, "message": "SAL-GET request failed"}, application_id_optimizer,
+                        properties={'correlation_id': correlation_id_optimizer}, raw=True)
+                    print(f"[Request {request_id}] SAL-GET request failed")
                     return
                 # **Prevent Blocking on send_sync()**
                 print(f"[Request {request_id}] Received response from SAL")
@@ -399,33 +407,10 @@ class SyncedHandler(Handler):
                                 print(f"Exception filtering {node}: {e}")
                         nodes_by_requirement = filtered_nodes_by_requirement
 
-                        """
-                        Hardcoded filter for UiO openstack nodes. Discard any node from Oslo and keep only nodes from Bergen that are running Ubuntu 22.04
-                        This is a temporary workaround to be removed when proper node candidate filtering is in place.
-                        """
-                        filtered_nodes_by_requirement = []
-                        for node in nodes_by_requirement:
-                            try:
-                                if (node.get("cloud", {}).get("id") != "edge" and 
-                                    node.get("location", {}).get("geoLocation",{}).get("city") == "Oslo"):
-                                    print(f"Skipping invalid instance type {node}")
-                                    continue
-                                if (node.get("cloud", {}).get("id") != "edge" and 
-                                    node.get("location", {}).get("geoLocation",{}).get("city") == "Bergen" and
-                                    "Ubuntu 22.04" not in node.get("image", {}).get("name", "")):
-                                    print(f"Skipping invalid instance type {node}")
-                                    continue                                
-                                
-                                filtered_nodes_by_requirement.append(node)
-                            except Exception as e:
-                                print(f"Exception filtering {node}: {e}")
-                        nodes_by_requirement = filtered_nodes_by_requirement
-
-
                         for node in nodes_by_requirement:
                             unique_nodes_dict[node["id"]] = node
 
-                else: # Some error occured SAL did not reply
+                else: # Some error occured and SAL did not reply
                     Message_Results = {
                         "message": status
                     }
@@ -454,7 +439,7 @@ class SyncedHandler(Handler):
                         # The read_application_data returns in app_data the policy from the saved file to check it and convert or not
                         app_data, selected_criteria, provider_criteria, relative_wr_data, immediate_wr_data = read_application_data(
                             application_id_optimizer)
-                        extracted_data_SAL, node_ids, node_names, providers = extract_SAL_node_candidate_data(
+                        extracted_data_SAL, node_ids, node_names, providers, filtered_nodes_message = extract_SAL_node_candidate_data(
                             sal_reply_body, app_data, application_id_optimizer, selected_criteria, correlation_id_optimizer)
                         data_table = create_data_table(extracted_data_SAL, selected_criteria, provider_criteria, locations)
                         # print("relative_wr_data:", relative_wr_data)
@@ -487,9 +472,10 @@ class SyncedHandler(Handler):
                             json_selected_criteria["selectedCriteria"].append(distance_item)
                         selected_criteria = {criterion['title']: criterion for criterion in
                                              json_selected_criteria.get('selectedCriteria', [])}
-                        app_data = {"app_specific": 0}
-                        extracted_data_SAL, node_ids, node_names, providers = extract_SAL_node_candidate_data(
+                        app_data = {"app_specific": 1}
+                        extracted_data_SAL, node_ids, node_names, providers, filtered_nodes_message = extract_SAL_node_candidate_data(
                             sal_reply_body, app_data, application_id_optimizer, selected_criteria, correlation_id_optimizer)
+
                         # Create data_table:
                         # provider_criteria do not exist when the application file does not exist. None is treated like false
                         data_table = create_data_table(extracted_data_SAL, selected_criteria, None, locations)
@@ -497,7 +483,7 @@ class SyncedHandler(Handler):
                         relative_wr_data = []
                         immediate_wr_data = []
                         # create default app_data dictionary for policy and app_specific when file not exists for the application
-                        app_data = {'policy': '0', 'app_specific': False} # Use the default policy (minimal)
+                        app_data = {'policy': '0', 'app_specific': True} # Use the default policy (minimal)
                         # print("app_data:", app_data['policy'])
 
                     # Check the number of nodes before Evaluation
@@ -505,10 +491,9 @@ class SyncedHandler(Handler):
                     if len(node_ids) == 0:
                         feasibility = False
                         Message_Results = {
-                            "message": "No resources returned from SAL"
+                            "message": filtered_nodes_message
                         }
-                    else:# print("Original Data", data_table)
-
+                    else: # print("Original Data", data_table)
                         # Convert the original data of RAM and # of Cores, e.g. 1/X, if they are selected
                         if (app_data['policy'] == '0'):
                             data_table = convert_data_table(data_table)  # Convert RAM and # of Cores, e.g. 1/X
@@ -615,7 +600,7 @@ class SyncedHandler(Handler):
 
     def requestSAL(self, RequestToSal):
         try:
-            sal_reply = Context.publishers['SAL-GET'].send_sync(RequestToSal)
+            sal_reply = Context.publishers['SAL-GET'].send_sync(RequestToSal,"CFSB")
             # Process SAL's Reply
             status = sal_reply.get('metaData', {}).get('status', None)
             if sal_reply is not None and sal_reply != '' and status == 200:
@@ -628,8 +613,42 @@ class SyncedHandler(Handler):
             print(f"Error while requesting SAL: {e}")
             return None
 
-    def requestEmulate(self, RequestBody):
-        reply = Context.publishers[RequestBody['key']].send_sync(RequestBody)
+    def requestEmulate(self, RequestData):
+        body = RequestData.get('body')
+        key = RequestData.get('key')
+        application_id = RequestData.get('application_id')
+        # If body is a list with one element, extract that element
+        # if isinstance(body, list) and len(body) == 1:
+        #     body = body[0]  # Get the first dictionary from the list
+        if isinstance(body, list):
+            body = {"body": body}
+        elif isinstance(body, dict):
+            body = body
+        else:
+            body = {}
+
+        reply = Context.publishers[key].send_sync(body, application_id)
+        return reply
+
+    def request_sal_resources(self, RequestToSal):
+        print("reached request_sal_resources")
+        try:
+            sal_reply = Context.publishers['APP-GET'].send_sync(RequestToSal,"CFSB")
+            # Process SAL's Reply
+            if sal_reply is not None and sal_reply != '':
+                return sal_reply
+            else:
+                return None
+        except Exception as e:
+            print(f"Error while requesting SAL: {e}")
+            return None
+
+    def nodecandidates_resources(self, RequestData):
+        body = RequestData.get('body')
+        key = RequestData.get('key')
+        application_id = RequestData.get('application_id')
+        reply = Context.publishers[key].send_sync(body,application_id)
+        print(reply)
         return reply
 
 
@@ -638,6 +657,10 @@ class Bootstrap(ConnectorHandler):
 
     def ready(self, context: Context):
         self.context = context
+        print("ready")
+            
+        # app_reply = context.publishers['APP-GET'].send_sync({"appId": "b5a47a85-37f3-4b7a-befe-92f2a7b34d07"})
+        # print(app_reply)
         # Start the heartbeat to check connectivity with ActiveMQ
         # start_heartbeat(self.context)
 def start_exn_connector_in_background():
@@ -651,6 +674,7 @@ def start_exn_connector_in_background():
         addressOPTtriggeringMulti = 'eu.nebulouscloud.cfsb.get_node_candidates_multi'
         addressSendToOPT = 'eu.nebulouscloud.cfsb.get_node_candidates.reply'
         addressSendToOPTMulti = 'eu.nebulouscloud.cfsb.get_node_candidates_multi.reply'
+        addressNodeCandidatesResources = 'eu.nebulouscloud.ui.app.get'
         print(f"Init EXN connector with parameters: url={os.getenv('NEBULOUS_BROKER_URL')}, port={os.getenv('NEBULOUS_BROKER_PORT')}, username={os.getenv('NEBULOUS_BROKER_USERNAME')}")
         connector = EXN('ui', url=os.getenv('NEBULOUS_BROKER_URL'), port=os.getenv('NEBULOUS_BROKER_PORT'),
                         username=os.getenv('NEBULOUS_BROKER_USERNAME'), password=os.getenv('NEBULOUS_BROKER_PASSWORD'),
@@ -660,14 +684,15 @@ def start_exn_connector_in_background():
                             core.publisher.Publisher('SendToOPT', addressSendToOPT, True, True),
                             core.publisher.Publisher('SendToOPTMulti', addressSendToOPTMulti, True, True),
                             SyncedPublisher('OPT-Triggering-Multi', addressOPTtriggeringMulti, True, True), # Publisher for OTP multi
-                            SyncedPublisher('OPT-Triggering', addressOPTtriggering, True, True) # Publisher for OTP
+                            SyncedPublisher('OPT-Triggering', addressOPTtriggering, True, True), # Publisher for OTP
+                            SyncedPublisher('APP-GET', addressNodeCandidatesResources, True, True, timeout=120),
                         ],
                         consumers=[
                             # Consumer('SAL-GET-REPLY', addressSAL_GET, handler=SyncedHandler(), topic=True, fqdn=True),
                             Consumer('OPT-Triggering', addressOPTtriggering, handler=SyncedHandler(), topic=True,
                                      fqdn=True),
                             Consumer('OPT-Triggering-Multi', addressOPTtriggeringMulti, handler=SyncedHandler(),
-                                     topic=True, fqdn=True)
+                                     topic=True, fqdn=True),
                         ])
         connector.start()
 
@@ -683,9 +708,18 @@ def call_publisher(body):
     return request
 
 # Used in routes.py
-def call_otp_publisher(body):
+def call_otp_publisher(data):
     handler = SyncedHandler()
-    request = handler.requestEmulate(body)
+    request = handler.requestEmulate(data)
+    return request
+
+def call_resources_publisher(data):
+    handler = SyncedHandler()
+    # For frontend request
+    request = handler.request_sal_resources(data)
+
+    # For postman call use this
+    # request = handler.nodecandidates_resources(data)
     return request
 
 # def safe_send_sync(publisher, message, *args, **kwargs):
