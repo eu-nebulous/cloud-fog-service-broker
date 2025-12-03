@@ -65,9 +65,7 @@ def extract_SAL_node_candidate_data_Front(json_data_all, app_specific, app_id):
         default_criteria_values = {criteria: hardware_info.get(criteria, 0.0) if criteria in hardware_info else item.get(criteria, 0.0) for criteria in default_criteria_list}
         node_type = item.get("nodeCandidateType", "")
 
-        # Skip busy nodes
-        if (item.get("jobIdForEdge") not in [None, "any", "", "all-applications"]) or (item.get("jobIdForByon") not in [None, "any", "", "all-applications"]):
-            continue
+
 
         # This is needed because the provider is treated differently by SAL for EDGE and IAAS
         if node_type == "EDGE":
@@ -533,10 +531,7 @@ def extract_SAL_node_candidate_data(json_data_all, app_data, app_id, selected_cr
 
     for item in json_data:  # Loop only in data of nodes that can be used based on app_specific
         node_flat_dict = extract_node_from_node_data(item)
-        # Skip busy nodes
-        if (node_flat_dict["jobIdForEdge"] not in [None, "any", "", "all-applications"]) or (node_flat_dict["jobIdForByon"] not in [None, "any", "", "all-applications"]):
-            print(f"[Request {correlation_id_optimizer} - Skipping busy node: {node_flat_dict['id']}")
-            continue
+
         if node_flat_dict["nodeCandidateType"] == "EDGE":
             node_flat_dict["nodeProviderId"] = node_flat_dict["hardware_providerId"]
         elif node_flat_dict["nodeCandidateType"] == "IAAS":
@@ -605,9 +600,6 @@ def extract_SAL_node_candidate_data_OLD(json_string):
     for item in json_data:
         # Ensure each item is a dictionary before accessing it
         if isinstance(item, dict):
-            # Skip busy nodes
-            if (item.get("jobIdForEdge") not in [None, "any", "", "all-applications"]) or (item.get("jobIdForByon") not in [None, "any", "", "all-applications"]):
-                continue
             node_data = {
                 "nodeId": item.get("nodeId", ''),
                 "id": item.get('id', ''),
