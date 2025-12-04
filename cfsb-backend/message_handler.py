@@ -86,6 +86,7 @@ class SyncedHandler(Handler):
                         # Ensure all arguments are correctly passed, including context
                         self.handle_multi(application_id_optimizer, request_id, body_sent_from_optimizer, context)
                     except Exception as e:
+                        # print(f"Before Exception {body_sent_from_optimizer}")
                         print(f"Exception in handle_multi [Request ID: {request_id}]: {e}")
                 else: # Single List
                     print(f"[Request {request_id}] The Request contains a Single List or an Empty List")
@@ -104,17 +105,19 @@ class SyncedHandler(Handler):
         try:
             ## Prepare message to be send to SAL - remove locations if needed
             body_json_string, locations = remove_request_attribute('CFSB-datasource-geolocations', json.loads(body_json_string))
-            if locations:
-                body_json_string = json.dumps(body_json_string)  # Convert the body data to a JSON string
+            body_json_string = json.dumps(body_json_string)  # Convert the body data to a JSON string
 
             RequestToSal = {  # Dictionary
                 "metaData": {"user": "admin"},  # key [String "metaData"] value [dictionary]
                 "body": body_json_string  # key [String "body"] value [JSON String]
             }
             print(f"[Request {request_id}] Sending to SAL: {RequestToSal}")
-            sal_reply = context.publishers['SAL-GET'].send_sync(RequestToSal)
+            sal_reply = context.publishers['SAL-GET'].send_sync(RequestToSal,application_id_optimizer)
             if sal_reply is None:
-                context.get_publisher('SendToOPTMulti').send({"success": False,"message": "SAL-GET request failed"}, application_id_optimizer, properties={'correlation_id': correlation_id_optimizer}, raw=True)
+                context.get_publisher('SendToOPTMulti').send({"success": False, "message": "SAL-GET request failed"},
+                                                             application_id_optimizer,
+                                                             properties={'correlation_id': correlation_id_optimizer},
+                                                             raw=True)
                 print(f"[Request {request_id}] SAL-GET request failed")
                 return
 
@@ -133,6 +136,9 @@ class SyncedHandler(Handler):
 
             status = sal_reply.get('metaData', {}).get('status', None)
 
+            if status != 200:
+                print("SAL reply message status: " + str(status))
+                print(sal_reply)
             if sal_reply and status == 200:
                 sal_body = sal_reply.get('body')
                 try:
@@ -165,7 +171,7 @@ class SyncedHandler(Handler):
 
                             # The read_application_data returns int the app_data the policy from the saved file, in order to check it to do the convert or not.
                             app_data, selected_criteria, provider_criteria, relative_wr_data, immediate_wr_data = read_application_data(application_id_optimizer)
-                            extracted_data_SAL, node_ids, node_names, providers = extract_SAL_node_candidate_data(sal_reply_body, app_data, application_id_optimizer, selected_criteria, correlation_id_optimizer)
+                            extracted_data_SAL, node_ids, node_names, providers, filtered_nodes_message = extract_SAL_node_candidate_data(sal_reply_body, app_data, application_id_optimizer, selected_criteria, correlation_id_optimizer)
                             data_table = create_data_table(extracted_data_SAL, selected_criteria, provider_criteria, locations)
                             # print("relative_wr_data:", relative_wr_data)
                             # print("immediate_wr_data:", immediate_wr_data)
@@ -197,8 +203,8 @@ class SyncedHandler(Handler):
                                 }
                                 json_selected_criteria["selectedCriteria"].append(distance_item)
                             selected_criteria = {criterion['title']: criterion for criterion in json_selected_criteria.get('selectedCriteria', [])}
-                            app_data = {"app_specific": 0}
-                            extracted_data_SAL, node_ids, node_names, providers = extract_SAL_node_candidate_data(
+                            app_data = {"app_specific": 1}
+                            extracted_data_SAL, node_ids, node_names, providers, filtered_nodes_message = extract_SAL_node_candidate_data(
                                 sal_reply_body, app_data, application_id_optimizer, selected_criteria, correlation_id_optimizer)
 
                             # Create data_table:
@@ -208,14 +214,14 @@ class SyncedHandler(Handler):
                             relative_wr_data = []
                             immediate_wr_data = []
                             # create default app_data dictionary for policy and app_specific when file not exists for the application
-                            app_data = {'policy': '0', 'app_specific': False}
+                            app_data = {'policy': '0', 'app_specific': True}
 
                         # Check the number of nodes before Evaluation
                         print("There are " + str(len(node_ids)) + " nodes for Evaluation")
                         if len(node_ids) == 0:
                             feasibility = False
                             Message_Results = {
-                                "message": "No resources returned from SAL"
+                                "message": filtered_nodes_message
                             }
                         else:
                             # Convert the original data of RAM and # of Cores, e.g. 1/X, if they are selected
@@ -335,10 +341,12 @@ class SyncedHandler(Handler):
                 ## Prepare message to be sent to SAL
                 RequestToSal = {"metaData": {"user": "admin"}, "body": requirement}
                 print(f"[Request {request_id}] Sending to SAL: {RequestToSal}")
-                sal_reply = context.publishers['SAL-GET'].send_sync(RequestToSal)
+                sal_reply = context.publishers['SAL-GET'].send_sync(RequestToSal,application_id_optimizer)
                 if sal_reply is None:
-                    context.get_publisher('SendToOPTMulti').send({"success": False,"message": "SAL-GET request failed"}, application_id_optimizer, properties={'correlation_id': correlation_id_optimizer}, raw=True)
-                    print(f"[Request {request_id}] SAL-GET request failed")        
+                    context.get_publisher('SendToOPTMulti').send(
+                        {"success": False, "message": "SAL-GET request failed"}, application_id_optimizer,
+                        properties={'correlation_id': correlation_id_optimizer}, raw=True)
+                    print(f"[Request {request_id}] SAL-GET request failed")
                     return
                 # **Prevent Blocking on send_sync()**
                 print(f"[Request {request_id}] Received response from SAL")
@@ -399,33 +407,10 @@ class SyncedHandler(Handler):
                                 print(f"Exception filtering {node}: {e}")
                         nodes_by_requirement = filtered_nodes_by_requirement
 
-                        """
-                        Hardcoded filter for UiO openstack nodes. Discard any node from Oslo and keep only nodes from Bergen that are running Ubuntu 22.04
-                        This is a temporary workaround to be removed when proper node candidate filtering is in place.
-                        """
-                        filtered_nodes_by_requirement = []
-                        for node in nodes_by_requirement:
-                            try:
-                                if (node.get("cloud", {}).get("id") != "edge" and 
-                                    node.get("location", {}).get("geoLocation",{}).get("city") == "Oslo"):
-                                    print(f"Skipping invalid instance type {node}")
-                                    continue
-                                if (node.get("cloud", {}).get("id") != "edge" and 
-                                    node.get("location", {}).get("geoLocation",{}).get("city") == "Bergen" and
-                                    "Ubuntu 22.04" not in node.get("image", {}).get("name", "")):
-                                    print(f"Skipping invalid instance type {node}")
-                                    continue                                
-                                
-                                filtered_nodes_by_requirement.append(node)
-                            except Exception as e:
-                                print(f"Exception filtering {node}: {e}")
-                        nodes_by_requirement = filtered_nodes_by_requirement
-
-
                         for node in nodes_by_requirement:
                             unique_nodes_dict[node["id"]] = node
 
-                else: # Some error occured SAL did not reply
+                else: # Some error occured and SAL did not reply
                     Message_Results = {
                         "message": status
                     }
@@ -454,7 +439,7 @@ class SyncedHandler(Handler):
                         # The read_application_data returns in app_data the policy from the saved file to check it and convert or not
                         app_data, selected_criteria, provider_criteria, relative_wr_data, immediate_wr_data = read_application_data(
                             application_id_optimizer)
-                        extracted_data_SAL, node_ids, node_names, providers = extract_SAL_node_candidate_data(
+                        extracted_data_SAL, node_ids, node_names, providers, filtered_nodes_message = extract_SAL_node_candidate_data(
                             sal_reply_body, app_data, application_id_optimizer, selected_criteria, correlation_id_optimizer)
                         data_table = create_data_table(extracted_data_SAL, selected_criteria, provider_criteria, locations)
                         # print("relative_wr_data:", relative_wr_data)
@@ -487,9 +472,10 @@ class SyncedHandler(Handler):
                             json_selected_criteria["selectedCriteria"].append(distance_item)
                         selected_criteria = {criterion['title']: criterion for criterion in
                                              json_selected_criteria.get('selectedCriteria', [])}
-                        app_data = {"app_specific": 0}
-                        extracted_data_SAL, node_ids, node_names, providers = extract_SAL_node_candidate_data(
+                        app_data = {"app_specific": 1}
+                        extracted_data_SAL, node_ids, node_names, providers, filtered_nodes_message = extract_SAL_node_candidate_data(
                             sal_reply_body, app_data, application_id_optimizer, selected_criteria, correlation_id_optimizer)
+
                         # Create data_table:
                         # provider_criteria do not exist when the application file does not exist. None is treated like false
                         data_table = create_data_table(extracted_data_SAL, selected_criteria, None, locations)
@@ -497,7 +483,7 @@ class SyncedHandler(Handler):
                         relative_wr_data = []
                         immediate_wr_data = []
                         # create default app_data dictionary for policy and app_specific when file not exists for the application
-                        app_data = {'policy': '0', 'app_specific': False} # Use the default policy (minimal)
+                        app_data = {'policy': '0', 'app_specific': True} # Use the default policy (minimal)
                         # print("app_data:", app_data['policy'])
 
                     # Check the number of nodes before Evaluation
@@ -505,10 +491,9 @@ class SyncedHandler(Handler):
                     if len(node_ids) == 0:
                         feasibility = False
                         Message_Results = {
-                            "message": "No resources returned from SAL"
+                            "message": filtered_nodes_message
                         }
-                    else:# print("Original Data", data_table)
-
+                    else: # print("Original Data", data_table)
                         # Convert the original data of RAM and # of Cores, e.g. 1/X, if they are selected
                         if (app_data['policy'] == '0'):
                             data_table = convert_data_table(data_table)  # Convert RAM and # of Cores, e.g. 1/X
@@ -615,7 +600,7 @@ class SyncedHandler(Handler):
 
     def requestSAL(self, RequestToSal):
         try:
-            sal_reply = Context.publishers['SAL-GET'].send_sync(RequestToSal)
+            sal_reply = Context.publishers['SAL-GET'].send_sync(RequestToSal,"CFSB")
             # Process SAL's Reply
             status = sal_reply.get('metaData', {}).get('status', None)
             if sal_reply is not None and sal_reply != '' and status == 200:
@@ -628,8 +613,42 @@ class SyncedHandler(Handler):
             print(f"Error while requesting SAL: {e}")
             return None
 
-    def requestEmulate(self, RequestBody):
-        reply = Context.publishers[RequestBody['key']].send_sync(RequestBody)
+    def requestEmulate(self, RequestData):
+        body = RequestData.get('body')
+        key = RequestData.get('key')
+        application_id = RequestData.get('application_id')
+        # If body is a list with one element, extract that element
+        # if isinstance(body, list) and len(body) == 1:
+        #     body = body[0]  # Get the first dictionary from the list
+        if isinstance(body, list):
+            body = {"body": body}
+        elif isinstance(body, dict):
+            body = body
+        else:
+            body = {}
+
+        reply = Context.publishers[key].send_sync(body, application_id)
+        return reply
+
+    def request_sal_resources(self, RequestToSal):
+        print("reached request_sal_resources")
+        try:
+            sal_reply = Context.publishers['APP-GET'].send_sync(RequestToSal,"CFSB")
+            # Process SAL's Reply
+            if sal_reply is not None and sal_reply != '':
+                return sal_reply
+            else:
+                return None
+        except Exception as e:
+            print(f"Error while requesting SAL: {e}")
+            return None
+
+    def nodecandidates_resources(self, RequestData):
+        body = RequestData.get('body')
+        key = RequestData.get('key')
+        application_id = RequestData.get('application_id')
+        reply = Context.publishers[key].send_sync(body,application_id)
+        print(reply)
         return reply
 
 
@@ -638,6 +657,10 @@ class Bootstrap(ConnectorHandler):
 
     def ready(self, context: Context):
         self.context = context
+        print("ready")
+            
+        # app_reply = context.publishers['APP-GET'].send_sync({"appId": "b5a47a85-37f3-4b7a-befe-92f2a7b34d07"})
+        # print(app_reply)
         # Start the heartbeat to check connectivity with ActiveMQ
         # start_heartbeat(self.context)
 def start_exn_connector_in_background():
@@ -651,6 +674,7 @@ def start_exn_connector_in_background():
         addressOPTtriggeringMulti = 'eu.nebulouscloud.cfsb.get_node_candidates_multi'
         addressSendToOPT = 'eu.nebulouscloud.cfsb.get_node_candidates.reply'
         addressSendToOPTMulti = 'eu.nebulouscloud.cfsb.get_node_candidates_multi.reply'
+        addressNodeCandidatesResources = 'eu.nebulouscloud.ui.app.get'
         print(f"Init EXN connector with parameters: url={os.getenv('NEBULOUS_BROKER_URL')}, port={os.getenv('NEBULOUS_BROKER_PORT')}, username={os.getenv('NEBULOUS_BROKER_USERNAME')}")
         connector = EXN('ui', url=os.getenv('NEBULOUS_BROKER_URL'), port=os.getenv('NEBULOUS_BROKER_PORT'),
                         username=os.getenv('NEBULOUS_BROKER_USERNAME'), password=os.getenv('NEBULOUS_BROKER_PASSWORD'),
@@ -660,14 +684,15 @@ def start_exn_connector_in_background():
                             core.publisher.Publisher('SendToOPT', addressSendToOPT, True, True),
                             core.publisher.Publisher('SendToOPTMulti', addressSendToOPTMulti, True, True),
                             SyncedPublisher('OPT-Triggering-Multi', addressOPTtriggeringMulti, True, True), # Publisher for OTP multi
-                            SyncedPublisher('OPT-Triggering', addressOPTtriggering, True, True) # Publisher for OTP
+                            SyncedPublisher('OPT-Triggering', addressOPTtriggering, True, True), # Publisher for OTP
+                            SyncedPublisher('APP-GET', addressNodeCandidatesResources, True, True, timeout=120),
                         ],
                         consumers=[
                             # Consumer('SAL-GET-REPLY', addressSAL_GET, handler=SyncedHandler(), topic=True, fqdn=True),
                             Consumer('OPT-Triggering', addressOPTtriggering, handler=SyncedHandler(), topic=True,
                                      fqdn=True),
                             Consumer('OPT-Triggering-Multi', addressOPTtriggeringMulti, handler=SyncedHandler(),
-                                     topic=True, fqdn=True)
+                                     topic=True, fqdn=True),
                         ])
         connector.start()
 
@@ -683,9 +708,18 @@ def call_publisher(body):
     return request
 
 # Used in routes.py
-def call_otp_publisher(body):
+def call_otp_publisher(data):
     handler = SyncedHandler()
-    request = handler.requestEmulate(body)
+    request = handler.requestEmulate(data)
+    return request
+
+def call_resources_publisher(data):
+    handler = SyncedHandler()
+    # For frontend request
+    request = handler.request_sal_resources(data)
+
+    # For postman call use this
+    # request = handler.nodecandidates_resources(data)
     return request
 
 # def safe_send_sync(publisher, message, *args, **kwargs):

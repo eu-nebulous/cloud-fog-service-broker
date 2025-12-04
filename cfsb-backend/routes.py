@@ -9,6 +9,7 @@ import time
 import get_data as file
 import message_handler
 import traceback
+import sal_messages
 
 main_routes = Blueprint('main', __name__)
 
@@ -65,32 +66,65 @@ def process_selected_criteria():
         else:
             print("No user defined criteria")
 
-        # Prepare message to be sent to SAL
-        message_for_SAL = [
-            {
-                "type": "NodeTypeRequirement",
-                "nodeTypes": ["IAAS", "PAAS", "FAAS", "BYON", "EDGE", "SIMULATION"],
-                # "nodeTypes": ["EDGE"],
-                "jobIdForEDGE": ""
-                #"jobIdForEDGE": "FCRnewLight0"
+        # NEW
+
+        # Message to get iaas resources
+        resources_message = sal_messages.create_iaas_resources_message(application_id)
+        # Send request
+        resources_response = message_handler.call_resources_publisher(resources_message)
+        # Get enabled resources - resources_response is received as dict
+        enabled_resources_ids = get_enabled_resources(resources_response)
+        print(enabled_resources_ids)
+        # keep unique ids just in case
+        unique_enabled_resources_ids = list(dict.fromkeys(enabled_resources_ids))
+        iaas_nodes_list = []
+        for enabled_id in unique_enabled_resources_ids:
+            # call sal with each iaas message
+            iaas_message = sal_messages.create_iaas_sal_message(enabled_id)
+            iaas_json_body = json.dumps(iaas_message)
+            IAAS_RequestToSal = {
+                "metaData": {"user": "admin"},
+                "body": iaas_json_body
             }
-        ]
+            print("Request to Sal for IAAS nodes:", IAAS_RequestToSal)
+            sal_iaas_reply = message_handler.call_publisher(IAAS_RequestToSal)
+            print(sal_iaas_reply)
+            # combine nodes for each cloud id request in a list
+            iaas_nodes = json.loads(sal_iaas_reply) if isinstance(sal_iaas_reply, str) else sal_iaas_reply
+            # append does not work because it creates a list of lists
+            iaas_nodes_list = iaas_nodes_list + iaas_nodes
 
-        # message_for_SAL =[{"type":"AttributeRequirement","requirementClass":"image","requirementAttribute":"operatingSystem.family","requirementOperator":"IN","value":"UBUNTU"},{"type":"AttributeRequirement","requirementClass":"image","requirementAttribute":"name","requirementOperator":"INC","value":"22"},{"type":"AttributeRequirement","requirementClass":"location","requirementAttribute":"name","requirementOperator":"EQ","value":"bgo"},{"type":"AttributeRequirement","requirementClass":"hardware","requirementAttribute":"ram","requirementOperator":"GEQ","value":"8192"},
-        #  {"type":"AttributeRequirement","requirementClass":"hardware","requirementAttribute":"cores","requirementOperator":"GEQ","value":"4"}]
-
-        body_json_string_for_SAL = json.dumps(message_for_SAL)
-
-        RequestToSal = {
+        # iaas_nodes_list contains the IAAS nodes
+        # End IAAS
+        # Edge nodes
+        edge_message = sal_messages.create_edge_sal_message(app_specific, application_id)
+        edge_json_body = json.dumps(edge_message)
+        EDGE_RequestToSal = {
             "metaData": {"user": "admin"},
-            "body": body_json_string_for_SAL
+            "body": edge_json_body
         }
-        print("Request to Sal:", RequestToSal)
-        sal_reply = message_handler.call_publisher(RequestToSal)
+        sal_edge_reply = message_handler.call_publisher(EDGE_RequestToSal)
+        print(sal_edge_reply)
+        print("Combining IAAS and EDGE nodes")
+        edge_nodes = json.loads(sal_edge_reply) if isinstance(sal_edge_reply, str) else sal_edge_reply
+        nodes_list = iaas_nodes_list + edge_nodes
+        # END NEW
+
+        # Prepare message to be sent to SAL - messages prepared in sal_messages.py file
+        # message_for_SAL = sal_messages.create_edge_sal_message(app_specific, application_id)
+
+        # body_json_string_for_SAL = json.dumps(message_for_SAL)
+        #
+        # RequestToSal = {
+        #     "metaData": {"user": "admin"},
+        #     "body": body_json_string_for_SAL
+        # }
+        # print("Request to Sal:", RequestToSal)
+        # sal_reply = message_handler.call_publisher(RequestToSal)
 
         # Parse the JSON string to a Python object
-        nodes_data = json.loads(sal_reply) if isinstance(sal_reply, str) else sal_reply
-        # print("nodes_data", nodes_data)
+        nodes_data = json.loads(nodes_list) if isinstance(nodes_list, str) else nodes_list
+        print("nodes_data", nodes_data)
         formatted_json = json.dumps(nodes_data, indent=4)
         with open('NodeCandidates.json', 'w') as file1:
             file1.write(formatted_json)
@@ -215,7 +249,7 @@ def process_evaluation_data():
         # Transform grid data to table and get node names directly from the function
         data_table, relative_wr_data, immediate_wr_data, node_names, node_ids = transform_grid_data_to_table(data)
 
-        print("data_table Frontend:", data_table)
+        # print("data_table Frontend:", data_table)
         # print("relative_wr_data:", relative_wr_data)
         # print("immediate_wr_data:", immediate_wr_data)
         # print("# node_names:", len(node_names))
@@ -308,11 +342,6 @@ def save_app():
 @main_routes.route('/test_sender', methods=['POST'])
 def send():
     data = request.get_json()
-    body = data['body']
-    body = json.dumps(body)
-    # print(type(body))
-    application_id = data['application_id']
-    correlation_id = data['correlation_id']
-    key = data['key']
-    sender = message_handler.call_otp_publisher(data)
+    # sender = message_handler.call_otp_publisher(data)
+    sender = message_handler.call_resources_publisher(data)
     return data
