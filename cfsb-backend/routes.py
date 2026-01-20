@@ -56,7 +56,9 @@ def process_selected_criteria():
         evaluation_settings = data.get('settings') # in evaluation_settings we pass data like policy and nodes mode
         policy = evaluation_settings[0]
         app_specific = evaluation_settings[1] # nodes_mode
-        print("policy: ", policy + ", app_specific: ", app_specific) # nodes_mode
+        location_filter_data = evaluation_settings[2] # nodes location
+        location_filter = json.loads(location_filter_data)
+        print("policy: ", policy + ", app_specific: ", app_specific + ", location: ", str(location_filter)) # nodes_mode
 
         # check for user defined criteria
         defined_criteria = []
@@ -72,27 +74,31 @@ def process_selected_criteria():
         resources_message = sal_messages.create_iaas_resources_message(application_id)
         # Send request
         resources_response = message_handler.call_resources_publisher(resources_message)
-        # Get enabled resources - resources_response is received as dict
-        enabled_resources_ids = get_enabled_resources(resources_response)
-        print(enabled_resources_ids)
-        # keep unique ids just in case
-        unique_enabled_resources_ids = list(dict.fromkeys(enabled_resources_ids))
         iaas_nodes_list = []
-        for enabled_id in unique_enabled_resources_ids:
-            # call sal with each iaas message
-            iaas_message = sal_messages.create_iaas_sal_message(enabled_id)
-            iaas_json_body = json.dumps(iaas_message)
-            IAAS_RequestToSal = {
-                "metaData": {"user": "admin"},
-                "body": iaas_json_body
-            }
-            print("Request to Sal for IAAS nodes:", IAAS_RequestToSal)
-            sal_iaas_reply = message_handler.call_publisher(IAAS_RequestToSal)
-            print(sal_iaas_reply)
-            # combine nodes for each cloud id request in a list
-            iaas_nodes = json.loads(sal_iaas_reply) if isinstance(sal_iaas_reply, str) else sal_iaas_reply
-            # append does not work because it creates a list of lists
-            iaas_nodes_list = iaas_nodes_list + iaas_nodes
+        if resources_response:
+            # Get enabled resources - resources_response is received as dict
+            enabled_resources_ids = get_enabled_resources(resources_response)
+            print(enabled_resources_ids)
+            # keep unique ids just in case
+            unique_enabled_resources_ids = list(dict.fromkeys(enabled_resources_ids))
+            for enabled_id in unique_enabled_resources_ids:
+                # call sal with each iaas message
+                iaas_message = sal_messages.create_iaas_sal_message(enabled_id)
+                iaas_json_body = json.dumps(iaas_message)
+                IAAS_RequestToSal = {
+                    "metaData": {"user": "admin"},
+                    "body": iaas_json_body
+                }
+                print("Request to Sal for IAAS nodes:", IAAS_RequestToSal)
+                sal_iaas_reply = message_handler.call_publisher(IAAS_RequestToSal)
+                print(sal_iaas_reply)
+                # combine nodes for each cloud id request in a list
+                iaas_nodes = json.loads(sal_iaas_reply) if isinstance(sal_iaas_reply, str) else sal_iaas_reply
+                # append does not work because it creates a list of lists
+                iaas_nodes_list = iaas_nodes_list + iaas_nodes
+        else:
+            print("No resources found for app-id: " + str(application_id))
+            print("IAAS nodes not fetched")
 
         # iaas_nodes_list contains the IAAS nodes
         # End IAAS
@@ -107,20 +113,14 @@ def process_selected_criteria():
         print(sal_edge_reply)
         print("Combining IAAS and EDGE nodes")
         edge_nodes = json.loads(sal_edge_reply) if isinstance(sal_edge_reply, str) else sal_edge_reply
+        if not edge_nodes:
+            edge_nodes = []
+            print("EDGE nodes not returned for app-id: " + str(application_id))
+
         nodes_list = iaas_nodes_list + edge_nodes
+        if not nodes_list:
+            print("EDGE and IAAS nodes not returned for app-id: " + str(application_id))
         # END NEW
-
-        # Prepare message to be sent to SAL - messages prepared in sal_messages.py file
-        # message_for_SAL = sal_messages.create_edge_sal_message(app_specific, application_id)
-
-        # body_json_string_for_SAL = json.dumps(message_for_SAL)
-        #
-        # RequestToSal = {
-        #     "metaData": {"user": "admin"},
-        #     "body": body_json_string_for_SAL
-        # }
-        # print("Request to Sal:", RequestToSal)
-        # sal_reply = message_handler.call_publisher(RequestToSal)
 
         # Parse the JSON string to a Python object
         nodes_data = json.loads(nodes_list) if isinstance(nodes_list, str) else nodes_list
@@ -140,7 +140,7 @@ def process_selected_criteria():
         else:  # No error found in SAL's reply body
             ###-------- Extract data from SAL's response --------###
             print("Use of SAL's response")
-            extracted_data, node_ids, node_names, providers = extract_SAL_node_candidate_data_Front(nodes_data,app_specific,application_id)
+            extracted_data, node_ids, node_names, providers = extract_SAL_node_candidate_data_Front(nodes_data,app_specific,application_id, location_filter)
             # print("SAL's extracted_data: ", extracted_data)
             ###-------- Extract data from SAL's response --------###
 

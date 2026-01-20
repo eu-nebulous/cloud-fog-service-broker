@@ -108,7 +108,7 @@ export default {
         // Retrieve app_id and user_id from local storage directly within this method
         const app_id = localStorage.getItem('fog_broker_app_id');
         const user_id = localStorage.getItem('fog_broker_user_uuid');
-        const settings = [localStorage.getItem('policyChoice'), localStorage.getItem('nodesModeChoice')];
+        const settings = [localStorage.getItem('policyChoice'), localStorage.getItem('nodesModeChoice'), localStorage.getItem('nodesLocation')];
         const response = await fetch(apiURL+'/process_selected_criteria', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
