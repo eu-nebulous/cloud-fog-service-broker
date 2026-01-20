@@ -112,7 +112,7 @@ class SyncedHandler(Handler):
                 "body": body_json_string  # key [String "body"] value [JSON String]
             }
             print(f"[Request {request_id}] Sending to SAL: {RequestToSal}")
-            sal_reply = context.publishers['SAL-GET'].send_sync(RequestToSal,application_id_optimizer)
+            sal_reply = context.publishers['SAL-GET'].send_sync(RequestToSal, application_id_optimizer)
             if sal_reply is None:
                 context.get_publisher('SendToOPTMulti').send({"success": False, "message": "SAL-GET request failed"},
                                                              application_id_optimizer,
@@ -341,7 +341,7 @@ class SyncedHandler(Handler):
                 ## Prepare message to be sent to SAL
                 RequestToSal = {"metaData": {"user": "admin"}, "body": requirement}
                 print(f"[Request {request_id}] Sending to SAL: {RequestToSal}")
-                sal_reply = context.publishers['SAL-GET'].send_sync(RequestToSal,application_id_optimizer)
+                sal_reply = context.publishers['SAL-GET'].send_sync(RequestToSal, application_id_optimizer)
                 if sal_reply is None:
                     context.get_publisher('SendToOPTMulti').send(
                         {"success": False, "message": "SAL-GET request failed"}, application_id_optimizer,
@@ -647,7 +647,7 @@ class SyncedHandler(Handler):
         body = RequestData.get('body')
         key = RequestData.get('key')
         application_id = RequestData.get('application_id')
-        reply = Context.publishers[key].send_sync(body,application_id)
+        reply = Context.publishers[key].send_sync(body,"CFSB")
         print(reply)
         return reply
 
@@ -657,8 +657,7 @@ class Bootstrap(ConnectorHandler):
 
     def ready(self, context: Context):
         self.context = context
-        print("ready")
-            
+        # print("send app-get")
         # app_reply = context.publishers['APP-GET'].send_sync({"appId": "b5a47a85-37f3-4b7a-befe-92f2a7b34d07"})
         # print(app_reply)
         # Start the heartbeat to check connectivity with ActiveMQ

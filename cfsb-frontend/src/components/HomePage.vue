@@ -6,6 +6,7 @@ export default {
       policyChoice: 0,
       nodesModeChoice: 1,
       validNodesModeChoice: false,
+      nodesLocation: {country: null, city: null},
       application_id: "dummy-application-id-123",
     }
   },
@@ -39,6 +40,7 @@ export default {
     get_project_choices() {
       localStorage.setItem('policyChoice', this.policyChoice);
       localStorage.setItem('nodesModeChoice', this.nodesModeChoice);
+      localStorage.setItem('nodesLocation', JSON.stringify(this.nodesLocation));
       this.application_id = localStorage.getItem('fog_broker_app_id');
       this.validNodesModeChoice = this.verifyNMC_with_AppID();
       console.log(this.validNodesModeChoice);
@@ -88,7 +90,7 @@ export default {
     <div class="spacer-sm"></div>
 
     <div class="row text-center p-4 bg-row border-radius-sm">
-      <div class="col col-12 col-lg-4">
+      <div class="col col-12 col-lg-3">
         <div class="card">
           <div class="card-header">
             <h2>Select Policy</h2>
@@ -112,7 +114,7 @@ export default {
           </div>
         </div>
       </div>
-      <div class="col col-12 col-lg-4">
+      <div class="col col-12 col-lg-3">
         <div class="card">
           <div class="card-header">
             <h2>Use All or Specific Nodes</h2>
@@ -134,7 +136,25 @@ export default {
           </div>
         </div>
       </div>
-      <div class="col col-12 col-lg-4">
+      <div class="col col-12 col-lg-3">
+        <div class="card">
+          <div class="card-header">
+            <h2>Select Location</h2>
+          </div>
+          <div class="card-body text-start">
+            <p class="description">
+              Type the name of the location (country and/or city), for nodes filtering.
+            </p>
+            <form>
+              <input v-model="nodesLocation.country" type="text" class="form-control" id="nodes_location_country_choice" name="nodes_location_country_choice" placeholder="e.g. Norway">
+              <p></p>
+              <input v-model="nodesLocation.city" type="text" class="form-control" id="nodes_location_city_choice" name="nodes_location_city_choice" placeholder="e.g. Bergen">
+              <div class="form-text">Leave blank to fetch nodes without location filtering</div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="col col-12 col-lg-3">
         <h3 class="display-6">Try now</h3>
         <router-link to="/criteria-selection" class="btn button-primary btn-lg" @click.native="get_project_choices">Criteria Selection</router-link>
       </div>

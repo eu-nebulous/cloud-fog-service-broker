@@ -17,7 +17,7 @@ import logging
 #################  BLOCK FOR FRONTEND #################
 
 # Used to extract_SAL_node_candidate_data from User Side for DataGrid
-def extract_SAL_node_candidate_data_Front(json_data_all, app_specific, app_id):
+def extract_SAL_node_candidate_data_Front(json_data_all, app_specific, app_id, location_filter=None):
     # Specify the file name
     file_name = "EDGE_EXAMPLE1.json"
     # # Write JSON data to the file
@@ -49,6 +49,15 @@ def extract_SAL_node_candidate_data_Front(json_data_all, app_specific, app_id):
         if len(json_data) < 1:
             print("NO nodes with app id " + str(app_id))
 
+    # Should Location filter be applied ? - check if city or country is not null
+    if location_filter["city"] is not None or location_filter["country"] is not None:
+        print("Filtering nodes for " + str(location_filter))
+        json_data = [
+            node for node in json_data if filter_nodes_by_location(node, location_filter)
+        ]
+    else:
+        print("Continue without location filtering ")
+
     # Print or use the filtered data
     # print(json_data)
 
@@ -64,8 +73,6 @@ def extract_SAL_node_candidate_data_Front(json_data_all, app_specific, app_id):
         # Extract default criteria values
         default_criteria_values = {criteria: hardware_info.get(criteria, 0.0) if criteria in hardware_info else item.get(criteria, 0.0) for criteria in default_criteria_list}
         node_type = item.get("nodeCandidateType", "")
-
-
 
         # This is needed because the provider is treated differently by SAL for EDGE and IAAS
         if node_type == "EDGE":
@@ -148,6 +155,39 @@ def create_node_name(node_data):
 
     node_name = " - ".join(part for part in node_name_parts if part)  # Only include non-empty parts
     return node_name
+
+
+def filter_nodes_by_location(node_data, location_filter):
+    location_filter_country = location_filter["country"]
+    location_filter_city = location_filter["city"]
+    check_filter_city = False
+    check_filter_country = False
+
+    # Safely access nested properties for city and country
+    location = node_data.get("location")
+    if location and "geoLocation" in location and location["geoLocation"]:
+        geo_location = location["geoLocation"]
+        node_city = geo_location.get("city", "")
+        node_country = geo_location.get("country", "")
+        if node_city and location_filter_city is not None:
+            if node_city.lower() == location_filter_city.lower():
+                check_filter_city = True
+        else:
+            # it means that location_filter_city was not given by the user
+            check_filter_city = True
+        if node_country and location_filter_country is not None:
+            if node_country.lower() == location_filter_country.lower():
+                check_filter_country = True
+        else:
+            # it means that location_filter_country was not given by the user
+            check_filter_country = True
+        if check_filter_city and check_filter_country:
+            # returns true when
+            # city was not given or given and is equal to node city
+            # country was not given or given and is equal to node country
+            return True
+    else:
+        return False
 
 
 # Used to create the required structure for the Evaluation in process_evaluation_data endpoint
@@ -531,7 +571,6 @@ def extract_SAL_node_candidate_data(json_data_all, app_data, app_id, selected_cr
 
     for item in json_data:  # Loop only in data of nodes that can be used based on app_specific
         node_flat_dict = extract_node_from_node_data(item)
-
         if node_flat_dict["nodeCandidateType"] == "EDGE":
             node_flat_dict["nodeProviderId"] = node_flat_dict["hardware_providerId"]
         elif node_flat_dict["nodeCandidateType"] == "IAAS":
